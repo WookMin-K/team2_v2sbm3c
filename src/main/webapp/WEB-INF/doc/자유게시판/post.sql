@@ -32,3 +32,7 @@ INCREMENT BY 1       -- 증가값
 MAXVALUE 9999999999  -- 최대값: 9999999999 --> NUMBER(10) 대응
 CACHE 2              -- 2번은 메모리에서만 계산
 NOCYCLE;             -- 다시 1부터 생성되는 것을 방지
+
+-- post에 추가 - 게시글 숨김 여부 추가
+ALTER TABLE post
+  ADD hidden_yn CHAR(1) DEFAULT 'N' NOT NULL;  -- 'N': 정상, 'Y': 숨김

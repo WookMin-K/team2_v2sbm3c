@@ -100,7 +100,7 @@ const MyPage = () => {
         <nav className="mt-10 space-y-4">
           {/* <button onClick={() => navigate('/mypage')} className="block w-full text-left">👤 내 정보</button> */}
           <button onClick={() => navigate('/mypage/bookmark')} className="block w-full text-left">⭐ 즐겨찾기</button>
-          <button onClick={() => navigate('/mypage/posts')} className="block w-full text-left">📝 내 게시글</button>
+          <button onClick={() => navigate('/mypage/postlist')} className="block w-full text-left">📝 내 게시글</button>
           <button onClick={() => navigate('/mypage/mytravel')} className="block w-full text-left">✈️ 내 여행 일정</button>
         </nav>
       </aside>

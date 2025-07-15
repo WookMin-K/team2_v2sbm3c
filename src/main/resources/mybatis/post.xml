@@ -193,6 +193,36 @@
     ORDER BY post_no ASC
     FETCH FIRST 1 ROWS ONLY
   </select>
+  
+    <!-- 내가 쓴 글 목록 페이징 -->
+  <select id="listByUser" parameterType="map" resultType="dev.mvc.post.PostVO">
+    SELECT 
+      p.post_no,
+      p.title,
+      p.content,
+      p.created_day,
+      p.user_no,
+      p.view_cnt,
+      p.notice_yn,
+      u.name            AS name       <!-- users.name 추가 -->
+    FROM (
+      SELECT 
+        ROW_NUMBER() OVER (ORDER BY notice_yn DESC, post_no DESC) AS rnum,
+        p.*
+      FROM post p
+      WHERE p.user_no = #{userNo}
+    ) p
+    JOIN users u 
+      ON p.user_no = u.user_no
+    WHERE p.rnum BETWEEN #{start} AND #{end}
+  </select>
+
+  <!-- 내가 쓴 글 전체 건수 -->
+  <select id="countByUser" parameterType="int" resultType="int">
+    SELECT COUNT(*)
+      FROM post
+     WHERE user_no = #{userNo}
+  </select>
 
 
 

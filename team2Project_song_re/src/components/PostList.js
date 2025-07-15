@@ -67,7 +67,7 @@ const PostList = () => {
 
                 {/* 내 게시글 버튼 */}
                 <button
-                  onClick={() => navigate('/mypage/posts')}
+                  onClick={() => navigate('/mypage/postlist')}
                   className="btn-post flex flex-col items-center gap-1 text-sm"
                 >
                   <span className="icon w-6 h-6" />

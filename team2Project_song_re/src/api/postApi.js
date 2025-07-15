@@ -5,6 +5,9 @@
 // const BASE_URL = 'http://localhost:9093/post';
 
 /** 게시글 전체 목록 조회 (map 에러 방지 포함) */
+
+import axios from 'axios';
+
 export const getPostList = async () => {
   const res = await fetch('/post/list');
   return await res.json();
@@ -44,4 +47,9 @@ export const deletePost = async (postNo) => {
 export const getPostListPaged = async (page = 1, type = 'all', keyword = '') => {
   const res = await fetch(`/post/list?page=${page}&type=${type}&keyword=${keyword}`);
   return await res.json();
+};
+
+export function getMyPostListPaged(page) {
+  return axios.get(`/post/mylist?page=${page}`)
+              .then(res => res.data);
 };

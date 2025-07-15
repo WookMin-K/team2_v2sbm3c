@@ -107,4 +107,8 @@ public interface PostProcInter {
    */
   public PostVO readNext(int post_no);
   
+
+  // 내가 쓴 글 목록 (페이징)
+  Map<String,Object> listByUser(int page, int userNo);
+  
 }

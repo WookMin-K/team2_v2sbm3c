@@ -1,6 +1,7 @@
 package dev.mvc.post;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
@@ -113,5 +114,13 @@ public interface PostDAOInter {
    * @return
    */
   public PostVO readNext(int post_no);
+  
+  // 내가 쓴 글 목록 (페이징)
+  List<PostVO> listByUser(@Param("start") int start,
+                          @Param("end")   int end,
+                          @Param("userNo")int userNo);
+
+  // 내가 쓴 글 전체 건수
+  int countByUser(int userNo);
 
 }

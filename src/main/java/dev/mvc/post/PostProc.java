@@ -89,5 +89,26 @@ public class PostProc implements PostProcInter {
   public PostVO readNext(int post_no) {
     return postDAO.readNext(post_no);
   }
+  
+  @Override
+  public Map<String,Object> listByUser(int page, int userNo) {
+    int recordPerPage = 10;
+    // 첫 번째 행 번호: (page-1)*pageSize + 1
+    int start = (page - 1) * recordPerPage + 1;
+    // 마지막 행 번호: page*pageSize
+    int end   = page * recordPerPage;
+
+    // 1) 페이징된 리스트
+    List<PostVO> list = postDAO.listByUser(start, end, userNo);
+    // 2) 총 건수
+    int total = postDAO.countByUser(userNo);
+
+    Map<String,Object> map = new HashMap<>();
+    map.put("list", list);
+    map.put("now_page", page);
+    map.put("total", total);
+    map.put("record_per_page", recordPerPage);
+    return map;
+  }
 
 }

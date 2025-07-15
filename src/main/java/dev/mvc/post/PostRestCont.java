@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/post")
@@ -328,5 +329,18 @@ public class PostRestCont {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
         return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+    }
+    
+    // 내 글 목록 (페이징)
+    @GetMapping("/mylist")
+    public Map<String,Object> mylist(
+        @RequestParam(value="page", defaultValue="1") int page,
+        HttpSession session) {
+      
+      Integer userNo = (Integer) session.getAttribute("user_no");
+      if (userNo == null) {
+        throw new RuntimeException("로그인 필요");
+      }
+      return postProc.listByUser(page, userNo);
     }
 }

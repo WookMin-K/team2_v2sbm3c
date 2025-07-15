@@ -27,6 +27,7 @@ import NoticeDelete from './components/notice/NoticeDelete';
 import BookmarkListPage from './components/bookmark/bookmark_list';
 import ResultPage from './pages/ResultPage';
 import MyTravelPage from './pages/MyTravelPage';
+import MyPostListPage from './pages/MyPostListPage';
 
 // ✅ login 복구 처리용 내부 래퍼
 
@@ -42,7 +43,8 @@ function App() {
             <Route path="/users/signup" element={<SignUp />} />
             <Route path="/mypage" element={<ProtectedRoute><MyPage /></ProtectedRoute>} />
             <Route path="/mypage/mytravel" element={<ProtectedRoute><MyTravelPage /></ProtectedRoute>} />
-            <Route path="/mypage/bookmark" element={<BookmarkListPage />} />
+             <Route path="/mypage/postlist" element={<ProtectedRoute><MyPostListPage /></ProtectedRoute>} />
+            <Route path="/mypage/bookmark" element={<ProtectedRoute><BookmarkListPage /></ProtectedRoute>}/>
             <Route path="/schedule" element={<ProtectedRoute><ScheduleMain /></ProtectedRoute>} />
             <Route path="/travel-info" element={<TravelInfoForm />} />
             <Route path="/result" element={<ResultPage />} />

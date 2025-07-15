@@ -159,7 +159,7 @@ const handleReplySubmit = async (e, parentReplyNo) => {
         <h4>글 관리</h4>
         <ul>
           <li><button className="link-btn" onClick={() => navigate('/mypage/bookmark')}>즐겨찾기</button></li>
-          <li><button className="link-btn" onClick={() => navigate('/post/list')}>내 게시물</button></li>
+          <li><button className="link-btn" onClick={() => navigate('/mypage/postlist')}>내 게시물</button></li>
         </ul>
       </div>
 
