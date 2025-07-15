@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.spot.SpotDAOInter">
+
+    <!-- 장소 등록 -->
+    <insert id="create" parameterType="dev.mvc.spot.SpotVO">
+        INSERT INTO spot (spot_no, name, type, description, district_no)
+        VALUES (#{spot_no}, #{name}, #{type}, #{description}, #{district_no})
+    </insert>
+    
+    <!-- 전체 장소 목록 -->
+    <select id="list_all_spots" resultType="dev.mvc.spot.SpotVO">
+        SELECT spot_no, name, type, description, district_no
+        FROM spot
+        ORDER BY spot_no ASC
+    </select>
+
+    <!-- 특정 장소 조회 -->
+    <select id="read_spot" parameterType="int" resultType="dev.mvc.spot.SpotVO">
+        SELECT spot_no, name, type, description, district_no
+        FROM spot
+        WHERE spot_no = #{spot_no}
+    </select>
+
+    <!-- 자치구 기준 장소 목록 -->
+    <select id="read_District_no" parameterType="int" resultType="dev.mvc.spot.SpotVO">
+        SELECT spot_no, name, type, description, district_no
+        FROM spot
+        WHERE district_no = #{district_no}
+        ORDER BY name ASC
+    </select>
+
+    <!-- 장소 수정 -->
+    <update id="update" parameterType="dev.mvc.spot.SpotVO">
+        UPDATE spot
+        SET name = #{name},
+            type = #{type},
+            description = #{description},
+            district_no = #{district_no}
+        WHERE spot_no = #{spot_no}
+    </update>
+
+    <!-- 장소 삭제 -->
+    <delete id="delete" parameterType="int">
+        DELETE FROM spot
+        WHERE spot_no = #{spot_no}
+    </delete>
+
+</mapper>

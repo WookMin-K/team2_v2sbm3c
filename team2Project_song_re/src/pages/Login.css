@@ -1,0 +1,115 @@
+/* 전체 배경 오버레이 */
+.login-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); /* 반투명 회색 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* 모달 박스 */
+.login-modal {
+  background-color: #f1f3f5;
+  width: 400px;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+  font-family: 'Pretendard', sans-serif;
+}
+
+/* 닫기 버튼 */
+.login-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* 제목 */
+.login-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 28px;
+  color: #222;
+}
+
+/* 입력창 스타일 */
+.login-input {
+  display: block;
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+}
+
+.login-input:focus {
+  border-color: #4c73ff;
+  box-shadow: 0 0 0 2px rgba(76, 115, 255, 0.2);
+}
+
+/* 로그인 버튼 */
+.login-button {
+  width: 100%;
+  padding: 12px 0;
+  background-color: #ccc;
+  color: #fff;
+  font-weight: 500;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.login-button:hover {
+  background-color: #999;
+}
+
+/* 하단 버튼 줄 */
+.login-bottom-row {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #555;
+}
+
+.login-sub-btn {
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s ease;
+}
+
+.login-sub-btn:hover {
+  color: #4c73ff;
+}
+
+/* 가입하기 버튼 */
+.SignUp-button {
+  background-color: #cbd5e0; /* Tailwind의 bg-gray-400 */
+  color: white;              /* text-white */
+  padding: 0.5rem 1.5rem;    /* py-2 = 0.5rem, px-6 = 1.5rem */
+  border-radius: 0.25rem;    /* rounded */
+  transition: background-color 150ms ease-in-out; /* transition */
+}
+
+.SignUp-button:hover {
+  background-color: #4b5563; /* hover:bg-gray-600 */
+}

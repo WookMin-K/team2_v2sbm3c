@@ -1,0 +1,146 @@
+/* ───────── 컨테이너 ───────── */
+.form-container {
+  width: 95vw;
+  height: 80vh;
+  box-sizing: border-box;
+  padding: 80px 40px;
+  margin: 0 auto;
+
+  background: #f4f5f7;
+  border: 1px solid #cfd3da;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
+  overflow: hidden;
+}
+
+/* ───── 상단 3칸 ───── */
+.grid-1 {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  justify-content: center;
+  align-items: center;
+  column-gap: 96px;
+  margin-top: 80px;
+  width: 100%;
+}
+
+/* ───── 하단 2칸 ───── */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, auto);  
+  justify-content: center;                 
+  column-gap: 96px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* ─── 입력 그룹 공통 wrapper ─── */
+.field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ─── 입력 그룹 라벨 ─── */
+.field-label {
+  font-size: 22px;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+/* ───── 인풋 공통 ───── */
+.input-box,
+select,
+.cost-input {
+  width: 340px;
+  height: 56px;
+  padding: 0 16px;
+  font-size: 17px;
+  border: 1px solid #DFD3D3;
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: box-shadow .15s ease;
+}
+
+/* ───── 달력 박스 전용 ───── */
+.date-range-box {
+  width: 360px;
+  height: 60px;
+  padding: 0 16px;
+  font-size: 17px;
+  border: 1px solid #DFD3D3;
+  border-radius: 8px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: box-shadow .15s ease;
+}
+
+.input-box.center {
+  justify-content: center;
+}
+.input-box:hover,
+select:hover,
+.cost-input:hover {
+  box-shadow: 0 0 0 3px rgba(80, 134, 255, .16);
+}
+.input-box img,
+.arrow-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+/* ─── 네비게이션 버튼 위치 조정 ─── */
+.nav-btns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 40px;
+  margin-top: 30px;
+  gap: 24px;
+}
+
+/* 이전/다음 버튼 공통 */
+.nav-btns .prev,
+.nav-btns .next {
+  background-color: #c3d8ee;
+  color: #234a7c;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.nav-btns .prev:hover,
+.nav-btns .next:hover {
+  background-color: #accbee;
+}
+
+/* ─── 좌상단 로고 ─── */
+.logo-area {
+  position: absolute;
+  top: 23px;
+  left: 25px;
+  z-index: 100;
+}
+.logo-area img {
+  height: 28px;
+  object-fit: contain;
+}

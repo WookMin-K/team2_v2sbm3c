@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.review.ReviewDAOInter">
+
+  <!-- 리뷰 번호 시퀀스 조회 -->
+  <select id="getReviewNo" resultType="int">
+    SELECT review_SEQ.NEXTVAL FROM dual
+  </select>
+
+  <!-- 리뷰 등록 -->
+  <insert id="create" parameterType="dev.mvc.review.ReviewVO">
+    INSERT INTO review (
+      review_no, rating, content, created_day, user_no, spot_no
+    ) VALUES (
+      #{review_no}, #{rating}, #{content}, SYSDATE, #{user_no}, #{spot_no}
+    )
+  </insert>
+
+  <!-- 장소별 리뷰 목록 -->
+  <select id="list_by_spot_no" parameterType="int" resultType="dev.mvc.review.ReviewVO">
+    SELECT review_no, rating, content, created_day, user_no, spot_no
+    FROM review
+    WHERE spot_no = #{spot_no}
+    ORDER BY review_no DESC
+  </select>
+
+  <!-- 리뷰 상세 조회 -->
+  <select id="read" parameterType="int" resultType="dev.mvc.review.ReviewVO">
+    SELECT review_no, rating, content, created_day, user_no, spot_no
+    FROM review
+    WHERE review_no = #{review_no}
+  </select>
+
+  <!-- 리뷰 수정 -->
+  <update id="update" parameterType="dev.mvc.review.ReviewVO">
+    UPDATE review
+    SET rating = #{rating},
+        content = #{content}
+    WHERE review_no = #{review_no}
+  </update>
+
+  <!-- 리뷰 삭제 -->
+  <delete id="delete" parameterType="int">
+    DELETE FROM review
+    WHERE review_no = #{review_no}
+  </delete>
+
+  <!-- 장소 삭제 시 관련 리뷰 전부 삭제용 -->
+  <delete id="delete_by_spot_no" parameterType="int">
+    DELETE FROM review
+    WHERE spot_no = #{spot_no}
+  </delete>
+
+</mapper>

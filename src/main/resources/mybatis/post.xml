@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.post.PostDAOInter">
+
+  <!-- 등록 -->
+  <insert id="create" parameterType="dev.mvc.post.PostVO">
+    INSERT INTO post (
+    post_no, title, content, user_no, created_day, view_cnt, notice_yn,
+    image, image_org, image_type, image_size,
+    files, file_org, file_type, file_size
+    ) VALUES (
+    post_seq.NEXTVAL, #{title}, #{content}, #{user_no}, SYSDATE, 0, #{notice_yn},
+    #{image, jdbcType=VARCHAR}, #{image_org, jdbcType=VARCHAR}, #{image_type, jdbcType=VARCHAR}, #{image_size, jdbcType=INTEGER},
+    #{files, jdbcType=VARCHAR}, #{file_org, jdbcType=VARCHAR}, #{file_type, jdbcType=VARCHAR}, #{file_size, jdbcType=INTEGER}
+    )
+  </insert>
+
+  <select id="list" resultType="dev.mvc.post.PostVO">
+    SELECT p.post_no, p.title, p.content, p.created_day,
+    p.user_no, p.view_cnt, p.notice_yn,
+    u.name
+    FROM post p
+    JOIN users u ON p.user_no = u.user_no
+    ORDER BY p.notice_yn DESC, p.post_no DESC
+  </select>
+
+
+  <!-- 목록 페이징 -->
+  <select id="list_by_page" resultType="dev.mvc.post.PostVO" parameterType="Map">
+    SELECT * FROM (
+    SELECT
+    ROW_NUMBER() OVER (ORDER BY p.notice_yn DESC, p.post_no DESC) AS rnum,
+    p.post_no, p.title, p.content, p.created_day,
+    p.user_no, p.view_cnt, p.notice_yn,
+    u.name
+    FROM post p
+    JOIN users u ON p.user_no = u.user_no
+    )
+    WHERE rnum BETWEEN #{start} AND #{end}
+  </select>
+
+
+  <!-- 상세 조회 -->
+  <select id="read" parameterType="int" resultType="dev.mvc.post.PostVO">
+    SELECT
+    p.post_no,
+    p.title,
+    p.content,
+    p.created_day,
+    p.user_no,
+    p.view_cnt,
+    p.notice_yn,
+    p.image,
+    p.image_org,
+    p.image_type,
+    p.image_size,
+    p.files,
+    p.file_org,
+    p.file_type,
+    p.file_size,
+    u.name
+    FROM post p
+    JOIN users u ON p.user_no = u.user_no
+    WHERE p.post_no = #{post_no}
+  </select>
+
+
+
+  <select id="getOriginalFileName" resultType="String" parameterType="String">
+    SELECT file_org FROM post WHERE files = #{savedFileName}
+  </select>
+  
+  <!-- 수정 -->
+  <update id="update" parameterType="dev.mvc.post.PostVO">
+    UPDATE post SET
+    title = #{title},
+    content = #{content},
+    image = #{image, jdbcType=VARCHAR},
+    image_org = #{image_org, jdbcType=VARCHAR},
+    image_type = #{image_type, jdbcType=VARCHAR},
+    image_size = #{image_size, jdbcType=NUMERIC},
+    files = #{files, jdbcType=VARCHAR},
+    file_org = #{file_org, jdbcType=VARCHAR},
+    file_type = #{file_type, jdbcType=VARCHAR},
+    file_size = #{file_size, jdbcType=NUMERIC},
+    notice_yn = #{notice_yn}
+    WHERE post_no = #{post_no}
+  </update>
+
+  <!-- 이미지 수정 -->
+  <update id="update_image" parameterType="dev.mvc.post.PostVO">
+    UPDATE post
+    SET
+    image = #{image, jdbcType=VARCHAR},
+    image_org = #{image_org, jdbcType=VARCHAR},
+    image_type = #{image_type, jdbcType=VARCHAR},
+    image_size = #{image_size, jdbcType=NUMERIC}
+    WHERE post_no = #{post_no}
+  </update>
+
+  <!-- 파일 수정 -->
+  <update id="update_file" parameterType="dev.mvc.post.PostVO">
+    UPDATE post
+    SET
+    files = #{files, jdbcType=VARCHAR},
+    file_org = #{file_org, jdbcType=VARCHAR},
+    file_type = #{file_type, jdbcType=VARCHAR},
+    file_size = #{file_size, jdbcType=NUMERIC}
+    WHERE post_no = #{post_no}
+  </update>
+
+  <!-- 삭제 -->
+  <delete id="delete" parameterType="int">
+    DELETE FROM post
+    WHERE post_no = #{post_no}
+  </delete>
+
+  <!-- 조회수 증가 -->
+  <update id="increaseViewCnt" parameterType="int">
+    UPDATE post SET view_cnt = view_cnt + 1 WHERE post_no = #{post_no}
+  </update>
+
+  <!-- 전체 게시글 수 (페이징용) -->
+  <select id="list_count" resultType="int">
+    SELECT COUNT(*) FROM post
+  </select>
+
+  <!-- 검색 + 페이징 -->
+  <select id="search_by_page" resultType="dev.mvc.post.PostVO" parameterType="map">
+    SELECT p.*, u.name
+    FROM (
+    SELECT ROWNUM AS rnum, a.*
+    FROM (
+    SELECT * FROM post
+    <where>
+      <choose>
+        <when test="type == 'title'">
+          title LIKE #{keyword}
+        </when>
+        <when test="type == 'content'">
+          content LIKE #{keyword}
+        </when>
+        <otherwise>
+          title LIKE #{keyword} OR content LIKE #{keyword}
+        </otherwise>
+      </choose>
+    </where>
+    ORDER BY post_no DESC
+    ) a
+    WHERE ROWNUM &lt;= #{end}
+    ) p
+    JOIN users u ON p.user_no = u.user_no
+    WHERE rnum &gt;= #{start}
+  </select>
+
+  <!-- 검색 결과 총 게시글 수 -->
+  <select id="search_count" resultType="int" parameterType="map">
+    SELECT COUNT(*) FROM post
+    WHERE
+    <choose>
+      <when test="type == 'title'">
+        title LIKE #{keyword}
+      </when>
+      <when test="type == 'content'">
+        content LIKE #{keyword}
+      </when>
+      <otherwise>
+        title LIKE #{keyword} OR content LIKE #{keyword}
+      </otherwise>
+    </choose>
+  </select>
+
+
+</mapper>

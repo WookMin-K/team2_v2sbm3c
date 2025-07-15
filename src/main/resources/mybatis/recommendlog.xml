@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.recommendlog.RecommendLogDAOInter">
+
+  <!-- ✅ 추천 로그 등록 -->
+  <insert id="insert" parameterType="dev.mvc.recommendlog.RecommendLogVO">
+    INSERT INTO recommend_log (
+      log_id,
+      user_no,
+      session_id,
+      keywords,
+      trip_no,
+      result_summary,
+      timestamp
+    ) VALUES (
+      recommend_log_seq.NEXTVAL,
+      #{user_no, jdbcType=NUMERIC},
+      #{session_id, jdbcType=VARCHAR},
+      #{keywords, jdbcType=CLOB},
+      #{trip_no, jdbcType=NUMERIC},
+      #{result_summary, jdbcType=VARCHAR},
+      SYSDATE
+    )
+  </insert>
+  <!-- ✅ 전체 추천 로그 목록 -->
+  <select id="list" resultType="dev.mvc.recommendlog.RecommendLogVO">
+    SELECT * FROM recommend_log
+    ORDER BY log_id DESC
+  </select>
+
+  <!-- ✅ 특정 회원의 추천 로그 목록 -->
+  <select id="list_by_user" parameterType="int" resultType="dev.mvc.recommendlog.RecommendLogVO">
+    SELECT * FROM recommend_log
+    WHERE user_no = #{user_no}
+    ORDER BY log_id DESC
+  </select>
+
+  <!-- ✅ 추천 로그 1건 조회 -->
+  <select id="read" parameterType="int" resultType="dev.mvc.recommendlog.RecommendLogVO">
+    SELECT * FROM recommend_log
+    WHERE log_id = #{log_id}
+  </select>
+
+  <!-- ✅ 추천 로그 삭제 -->
+  <delete id="delete" parameterType="int">
+    DELETE FROM recommend_log
+    WHERE log_id = #{log_id}
+  </delete>
+
+  <!-- ✅ 전체 추천 로그 개수 -->
+  <select id="count" resultType="int">
+    SELECT COUNT(*) FROM recommend_log
+  </select>
+
+</mapper>

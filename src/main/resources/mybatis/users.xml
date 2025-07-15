@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.users.UsersDAOInter">
+
+  <!--  ID 중복 확인 -->
+  <select id="checkID" parameterType="string" resultType="int">
+    SELECT COUNT(user_id)
+    FROM users
+    WHERE user_id = #{user_id}
+  </select>
+
+  <!-- 이메일 중복 확인 -->
+  <select id="checkEmail" parameterType="string" resultType="int">
+    SELECT COUNT(email)
+    FROM users
+    WHERE email = #{email}
+  </select>
+
+
+  <!-- 회원 등록 -->
+  <insert id="create" parameterType="dev.mvc.users.UsersVO">
+    INSERT INTO users (
+    user_no, user_id, password, email, name, phone,profile_url
+    created_at, grade
+    )
+    VALUES (
+    users_seq.nextval, #{user_id}, #{password}, #{email}, #{name}, #{phone},
+    SYSDATE, #{grade}, #{profile_url}
+    )
+  </insert>
+
+  <!-- 회원 전체 목록 조회 -->
+  <select id="list" resultType="dev.mvc.users.UsersVO">
+    SELECT user_no, user_id, password, email, name, phone, created_at, grade
+    FROM users
+    ORDER BY grade ASC, user_id ASC
+  </select>
+
+  <!-- 회원번호로 회원 정보 조회 -->
+  <select id="read" parameterType="int" resultType="dev.mvc.users.UsersVO">
+    SELECT user_no, user_id, password, email, name, phone, created_at, grade
+    FROM users
+    WHERE user_no = #{user_no}
+  </select>
+
+  <!-- 아이디로 회원 정보 조회 -->
+  <select id="readById" parameterType="string" resultType="dev.mvc.users.UsersVO">
+    SELECT user_no, user_id, password, email, name, phone, created_at, grade
+    FROM users
+    WHERE user_id = #{user_id}
+  </select>
+
+  <!-- 사용자 정보 수정
+  <update id="update" parameterType="dev.mvc.users.UsersVO">
+    UPDATE users
+    SET password = #{password},
+        email = #{email},
+        name = #{name},
+        phone = #{phone},
+        grade = #{grade}
+    WHERE user_id = #{user_id}
+  </update>
+   -->
+  <!-- 사용자 정보 개별 수정 -->
+  <update id="update_User" parameterType="dev.mvc.users.UsersVO">
+    UPDATE users
+    <set>
+      <if test="password != null">password = #{password},</if>
+      <if test="email != null">email = #{email},</if>
+      <if test="name != null">name = #{name},</if>
+      <if test="phone != null">phone = #{phone},</if>
+      <if test="grade != null">grade = #{grade},</if>
+    </set>
+    WHERE user_id = #{user_id}
+  </update>
+
+  <!--  사용자 삭제 -->
+  <delete id="delete" parameterType="int">
+    DELETE FROM users
+    WHERE user_no = #{user_no}
+  </delete>
+
+  <!-- 비밀번호 해시값 가져오기 -->
+  <select id="getHashedPassword" parameterType="int" resultType="String">
+    SELECT password
+    FROM users
+    WHERE user_no = #{user_no}
+  </select>
+
+  <!--  비밀번호 변경 -->
+  <update id="passwd_update" parameterType="hashmap">
+    UPDATE users
+    SET password = #{password}
+    WHERE user_no = #{user_no}
+  </update>
+
+  <!-- JOIN된 즐겨찾기 목록 조회 -->
+  <select id="list_join_by_user" resultType="dev.mvc.bookmark.BookmarkJoinVO" parameterType="int">
+    SELECT b.bookmark_no, b.user_no, u.name AS user_name,
+    b.spot_no, s.title AS spot_title
+    FROM bookmark b
+    JOIN users u ON b.user_no = u.user_no
+    JOIN spot s ON b.spot_no = s.spot_no
+    WHERE b.user_no = #{user_no}
+    ORDER BY b.bookmark_no DESC
+  </select>
+
+
+
+</mapper>
+
+<!--<?xml version="1.0" encoding="UTF-8" ?>-->
+<!--<!DOCTYPE mapper-->
+<!--  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"-->
+<!--  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">-->
+
+<!--<mapper namespace="dev.mvc.users.UsersDAOInter">-->
+
+<!--  &lt;!&ndash;  ID 중복 확인 &ndash;&gt;-->
+<!--  <select id="checkID" parameterType="string" resultType="int">-->
+<!--    SELECT COUNT(user_id)-->
+<!--    FROM users-->
+<!--    WHERE user_id = #{user_id}-->
+<!--  </select>-->
+
+<!--  &lt;!&ndash; 회원 등록 &ndash;&gt;-->
+<!--  <insert id="create" parameterType="dev.mvc.users.UsersVO">-->
+<!--    INSERT INTO users (-->
+<!--      user_no, user_id, password, email, name, phone,-->
+<!--      created_at, grade-->
+<!--    )-->
+<!--    VALUES (-->
+<!--      users_seq.nextval, #{user_id}, #{password}, #{email}, #{name}, #{phone},-->
+<!--      SYSDATE, 1-->
+<!--    )-->
+<!--  </insert>-->
+
+<!--  &lt;!&ndash; 회원 전체 목록 조회 &ndash;&gt;-->
+<!--  <select id="list" resultType="dev.mvc.users.UsersVO">-->
+<!--    SELECT user_no, user_id, password, email, name, phone, created_at, grade-->
+<!--    FROM users-->
+<!--    ORDER BY grade ASC, user_id ASC-->
+<!--  </select>-->
+<!--  -->
+<!--  &lt;!&ndash; 회원번호로 회원 정보 조회 &ndash;&gt;-->
+<!--  <select id="read" parameterType="int" resultType="dev.mvc.users.UsersVO">-->
+<!--    SELECT user_no, user_id, password, email, name, phone, created_at, grade-->
+<!--    FROM users-->
+<!--    WHERE user_no = #{user_no}-->
+<!--  </select>-->
+
+<!--  &lt;!&ndash; 아이디로 회원 정보 조회 &ndash;&gt;-->
+<!--  <select id="readById" parameterType="string" resultType="dev.mvc.users.UsersVO">-->
+<!--    SELECT user_no, user_id, password, email, name, phone, created_at, grade-->
+<!--    FROM users-->
+<!--    WHERE user_id = #{user_id}-->
+<!--  </select>-->
+
+<!--  &lt;!&ndash; 사용자 정보 수정-->
+<!--  <update id="update" parameterType="dev.mvc.users.UsersVO">-->
+<!--    UPDATE users-->
+<!--    SET password = #{password},-->
+<!--        email = #{email},-->
+<!--        name = #{name},-->
+<!--        phone = #{phone},-->
+<!--        grade = #{grade}-->
+<!--    WHERE user_id = #{user_id}-->
+<!--  </update>-->
+<!--   &ndash;&gt;-->
+<!--  &lt;!&ndash; 사용자 정보 개별 수정 &ndash;&gt;-->
+<!--  <update id="update_User" parameterType="dev.mvc.users.UsersVO">-->
+<!--    UPDATE users-->
+<!--    <set>-->
+<!--      <if test="password != null">password = #{password},</if>-->
+<!--      <if test="email != null">email = #{email},</if>-->
+<!--      <if test="name != null">name = #{name},</if>-->
+<!--      <if test="phone != null">phone = #{phone},</if>-->
+<!--      <if test="grade != null">grade = #{grade},</if>-->
+<!--    </set>-->
+<!--    WHERE user_id = #{user_id}-->
+<!--  </update>-->
+
+<!--  &lt;!&ndash;  사용자 삭제 &ndash;&gt;-->
+<!--  <delete id="delete" parameterType="int">-->
+<!--    DELETE FROM users-->
+<!--    WHERE user_no = #{user_no}-->
+<!--  </delete>-->
+<!--  -->
+<!--    &lt;!&ndash;  로그인 처리: user_id와 password가 일치하는지 확인 &ndash;&gt;-->
+<!--  <select id="login" resultType="int" parameterType="hashmap">-->
+<!--    SELECT COUNT(user_no) AS cnt-->
+<!--    FROM users-->
+<!--    WHERE user_id = #{user_id}-->
+<!--      AND password = #{password}-->
+<!--  </select>-->
+
+<!--  &lt;!&ndash; 현재 비밀번호 검사: user_no와 기존 password 일치 여부 &ndash;&gt;-->
+<!--  <select id="passwd_check" resultType="int" parameterType="hashmap">-->
+<!--    SELECT COUNT(user_no) AS cnt-->
+<!--    FROM users-->
+<!--    WHERE user_no = #{user_no}-->
+<!--      AND password = #{password}-->
+<!--  </select>-->
+
+<!--  &lt;!&ndash;  비밀번호 변경 &ndash;&gt;-->
+<!--  <update id="passwd_update" parameterType="hashmap">-->
+<!--    UPDATE users-->
+<!--    SET password = #{password}-->
+<!--    WHERE user_no = #{user_no}-->
+<!--  </update>-->
+<!--  -->
+<!--  &lt;!&ndash; JOIN된 즐겨찾기 목록 조회 &ndash;&gt;-->
+<!--  <select id="list_join_by_user" resultType="dev.mvc.bookmark.BookmarkJoinVO" parameterType="int">-->
+<!--  SELECT b.bookmark_no, b.user_no, u.name AS user_name,-->
+<!--         b.spot_no, s.title AS spot_title-->
+<!--  FROM bookmark b-->
+<!--    JOIN users u ON b.user_no = u.user_no-->
+<!--    JOIN spot s ON b.spot_no = s.spot_no-->
+<!--  WHERE b.user_no = #{user_no}-->
+<!--  ORDER BY b.bookmark_no DESC-->
+<!--</select>-->
+<!--  -->
+
+
+<!--</mapper>-->
+

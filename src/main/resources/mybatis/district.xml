@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.district.DistrictDAOInter">
+
+    <!-- 구군 추가 -->
+    <insert id="create" parameterType="dev.mvc.district.DistrictVO">
+        INSERT INTO district (district_no, dname, region_no, dimage)
+        VALUES (#{district_no}, #{dname}, #{region_no}, #{dimage})
+    </insert>
+
+    <!-- 특정 구군 조회 -->
+    <select id="read_district" parameterType="int" resultType="dev.mvc.district.DistrictVO">
+        SELECT district_no, dname, region_no, dimage
+        FROM district
+        WHERE district_no = #{district_no}
+    </select>
+
+    <!-- 구군 수정 -->
+    <update id="update" parameterType="dev.mvc.district.DistrictVO">
+        UPDATE district
+        SET dname = #{dname}, region_no = #{region_no}, dimage = #{dimage}
+        WHERE district_no = #{district_no}
+    </update>
+
+    <!-- 구군 삭제 -->
+    <delete id="delete" parameterType="int">
+        DELETE FROM district
+        WHERE district_no = #{district_no}
+    </delete>
+    
+    <!-- region_no로 구군 목록 조회 -->
+  <select id="list" parameterType="int" resultType="dev.mvc.district.DistrictVO">
+    SELECT district_no, dname, region_no, dimage
+    FROM district
+    WHERE region_no = #{region_no}
+    ORDER BY district_no ASC
+  </select>
+
+  <!-- Trip 테이블과 조인하여, 각 구군에서 가장 높은 viewcnt 기준으로 정렬 -->
+    <select id="list_by_views" parameterType="int" resultType="dev.mvc.district.DistrictVO">
+      SELECT d.district_no, d.dname, d.region_no, d.dimage
+      FROM district d
+      LEFT JOIN (
+        SELECT district_no, MAX(viewcnt) AS max_view
+        FROM trip
+        GROUP BY district_no
+      ) t ON d.district_no = t.district_no
+      WHERE d.region_no = #{region_no}
+      ORDER BY NVL(t.max_view, 0) DESC
+    </select>
+    
+    <select id="list_all" resultType="dev.mvc.district.DistrictVO">
+      SELECT * FROM district ORDER BY district_no
+    </select>
+
+
+</mapper>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.trip.TripDAOInter">
+
+  <!-- 전체 목록 -->
+  <select id="list_all" resultType="dev.mvc.trip.TripVO">
+    SELECT trip_no, tname, image, intro, tnew, viewcnt, url_1, url_2, sname, district_no, keywords
+    FROM trip
+    ORDER BY trip_no ASC
+  </select>
+
+  <!-- 조회 -->
+  <!-- 여행지 단일 조회 + district JOIN -->
+  <select id="read" resultType="dev.mvc.trip.TripVO" parameterType="int">
+    SELECT
+      t.trip_no,
+      t.tname,
+      t.image,
+      t.intro,
+      t.tnew,
+      t.viewcnt,
+      t.url_1,
+      t.url_2,
+      t.sname,
+      t.district_no,
+      d.region_no AS region_no,     
+      d.dname    
+    FROM trip t
+    LEFT JOIN district d ON t.district_no = d.district_no
+    WHERE t.trip_no = #{trip_no}
+  </select>
+
+
+  <!-- 등록 -->
+  <insert id="create" parameterType="dev.mvc.trip.TripVO">
+    INSERT INTO trip (
+      trip_no, tname, image, intro, tnew, viewcnt, url_1, url_2, sname, district_no, keywords
+    ) VALUES (
+      #{trip_no}, #{tname}, #{image}, #{intro}, #{tnew}, #{viewcnt}, #{url_1}, #{url_2}, #{sname}, #{district_no}, #{keywords}
+    )
+  </insert>
+
+  <!-- 수정 -->
+  <update id="update" parameterType="dev.mvc.trip.TripVO">
+    UPDATE trip
+    SET tname = #{tname},
+        image = #{image},
+        intro = #{intro},
+        tnew = #{tnew},
+        viewcnt = #{viewcnt},
+        url_1 = #{url_1},
+        url_2 = #{url_2},
+        sname = #{sname},
+        district_no = #{district_no},
+        keywords = #{keywords}
+    WHERE trip_no = #{trip_no}
+  </update>
+
+  <!-- 삭제 -->
+  <delete id="delete" parameterType="Integer">
+    DELETE FROM trip
+    WHERE trip_no = #{trip_no}
+  </delete>
+
+  <!-- 조회 수 증가 -->
+  <update id="update_views" parameterType="int">
+    UPDATE trip
+    SET viewcnt = viewcnt + 1
+    WHERE trip_no = #{trip_no}
+  </update>
+
+  <!-- after -->
+  <select id="list_by_views" resultType="dev.mvc.trip.TripVO">
+    SELECT trip_no, tname, image, intro, tnew, viewcnt, url_1, url_2, sname, district_no, keywords
+    FROM trip
+    WHERE district_no = #{district_no}
+    ORDER BY viewcnt DESC
+  </select>
+
+  <select id="read_by_district" parameterType="int" resultType="dev.mvc.trip.TripVO">
+    SELECT * FROM trip
+    WHERE district_no = #{district_no}
+    ORDER BY viewcnt DESC
+  </select>
+
+  <select id="read_list_by_district" parameterType="int" resultType="dev.mvc.trip.TripVO">
+    SELECT trip_no, tname, image, intro, tnew, viewcnt, url_1, url_2, sname, district_no, keywords
+    FROM trip
+    WHERE district_no = #{district_no}
+    ORDER BY viewcnt DESC
+  </select>
+
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.notice.NoticeDAOInter">
+
+  <!-- ✅ 1. 등록 (파일 필드 포함) -->
+  <insert id="create" parameterType="dev.mvc.notice.NoticeVO">
+    INSERT INTO notice_board (
+      notice_no, title, content, user_no, type, question_id,
+      saved_name1, origin_name1, filetype1, filesize1,
+      saved_name2, origin_name2, filetype2, filesize2
+    ) VALUES (
+      notice_board_seq.NEXTVAL,
+      #{title}, #{content}, #{user_no}, #{type}, #{question_id, jdbcType=INTEGER},
+      #{saved_name1, jdbcType=VARCHAR}, #{origin_name1, jdbcType=VARCHAR},
+      #{filetype1, jdbcType=VARCHAR}, #{filesize1, jdbcType=BIGINT},
+      #{saved_name2, jdbcType=VARCHAR}, #{origin_name2, jdbcType=VARCHAR},
+      #{filetype2, jdbcType=VARCHAR}, #{filesize2, jdbcType=BIGINT}
+    )
+  </insert>
+
+  <!-- ✅ 2. 페이징 리스트 조회 -->
+  <!-- ✅ 2. 페이징 리스트 조회 (작성자 이름 포함) -->
+  <select id="list_by_page" parameterType="hashmap" resultType="dev.mvc.notice.NoticeVO">
+    <![CDATA[
+      SELECT * FROM (
+        SELECT ROWNUM rnum, A.*
+        FROM (
+          SELECT 
+            n.notice_no,
+            n.title,
+            n.content,
+            n.user_no,
+            n.type,
+            n.viewcnt,
+            n.wdate,
+            n.question_id,
+            n.saved_name1, n.origin_name1, n.filetype1, n.filesize1,
+            n.saved_name2, n.origin_name2, n.filetype2, n.filesize2,
+            u.name AS user_name
+          FROM notice_board n
+          JOIN users u ON n.user_no = u.user_no
+          WHERE n.type = #{type}
+          ORDER BY n.notice_no DESC
+        ) A
+        WHERE ROWNUM <= #{end}
+      )
+      WHERE rnum >= #{start}
+    ]]>
+  </select>
+
+  <!-- ✅ 3. 타입별 전체 개수 -->
+  <select id="count_by_type" parameterType="string" resultType="int">
+    SELECT COUNT(*) FROM notice_board WHERE type = #{type}
+  </select>
+
+  <!-- ✅ 4. 조회수 증가 -->
+  <update id="increaseViewCnt" parameterType="int">
+    UPDATE notice_board
+    SET viewcnt = viewcnt + 1
+    WHERE notice_no = #{notice_no}
+  </update>
+
+  <!-- ✅ 5. 단건 조회 (파일 포함 전체 칼럼) -->
+  <select id="read" parameterType="int" resultType="dev.mvc.notice.NoticeVO">
+    SELECT * FROM notice_board
+    WHERE notice_no = #{notice_no}
+  </select>
+
+
+  <!-- ✅ 6. 수정 (파일 필드 포함 + jdbcType 명시) -->
+  <update id="update" parameterType="dev.mvc.notice.NoticeVO">
+    UPDATE notice_board
+    SET title = #{title},
+        content = #{content},
+        type = #{type},
+        question_id = #{question_id, jdbcType=INTEGER},
+        saved_name1 = #{saved_name1, jdbcType=VARCHAR},
+        origin_name1 = #{origin_name1, jdbcType=VARCHAR},
+        filetype1 = #{filetype1, jdbcType=VARCHAR},
+        filesize1 = #{filesize1, jdbcType=BIGINT},
+        saved_name2 = #{saved_name2, jdbcType=VARCHAR},
+        origin_name2 = #{origin_name2, jdbcType=VARCHAR},
+        filetype2 = #{filetype2, jdbcType=VARCHAR},
+        filesize2 = #{filesize2, jdbcType=BIGINT}
+    WHERE notice_no = #{notice_no}
+  </update>
+
+
+
+  <!-- ✅ 7. 삭제 -->
+  <delete id="delete" parameterType="int">
+    DELETE FROM notice_board
+    WHERE notice_no = #{notice_no}
+  </delete>
+
+</mapper>

@@ -1,0 +1,25 @@
+/* ChartComponents - 선형/파이 차트 외부 영역 스타일 */
+
+.chart-container {
+  width: 100%;
+  height: 320px;
+  margin-bottom: 18px;
+  background: #fcfcfc;
+  border-radius: 14px;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.07);
+  padding: 10px 16px 24px 16px;
+  position: relative;
+}
+
+/* 차트 출처 표시 */
+.chart-source {
+  text-align: right;
+  margin-right: 20px;
+  font-size: 10px;
+  color: #666;
+}
+
+/* 파이차트 내부 legend, label 조정 (옵션) */
+.recharts-legend-wrapper {
+  bottom: 0 !important;
+}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.plan_spot.Plan_spotDAOInter">
+
+  <!-- ResultMap -->
+  <resultMap id="Plan_spotDAOInter" type="dev.mvc.plan_spot.Plan_spotVO">
+    <id     property="plan_spot_no" column="plan_spot_no" />
+    <result property="order_in_day" column="order_in_day" />
+    <result property="plan_day_no"  column="plan_day_no" />
+    <result property="spot_no"      column="spot_no" />
+  </resultMap>
+
+  <!-- Create -->
+  <insert id="create" parameterType="dev.mvc.plan_spot.Plan_spotVO">
+    INSERT INTO plan_spot (plan_spot_no, order_in_day, plan_day_no, spot_no) 
+      VALUES (plan_spot_seq.NEXTVAL, #{order_in_day}, #{plan_day_no}, #{spot_no})
+  </insert>
+
+  <!-- Read -->
+  <select id="read" parameterType="int" resultMap="Plan_spotDAOInter">
+    SELECT plan_spot_no, order_in_day, plan_day_no, spot_no
+    FROM plan_spot
+    WHERE plan_spot_no = #{plan_spot_no}
+  </select>
+
+  <!-- Update -->
+  <update id="update" parameterType="dev.mvc.plan_spot.Plan_spotVO">
+    UPDATE plan_spot
+    SET
+      order_in_day = #{order_in_day},
+      plan_day_no = #{plan_day_no},
+      spot_no = #{spot_no}
+    WHERE plan_spot_no = #{plan_spot_no}
+  </update>
+
+  <!-- Delete -->
+  <delete id="delete" parameterType="int">
+    DELETE FROM plan_spot WHERE plan_spot_no = #{plan_spot_no}
+  </delete>
+
+</mapper>

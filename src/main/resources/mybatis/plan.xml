@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.plan.PlanDAOInter">
+
+  <!-- Result mapping -->
+  <resultMap id="PlanDAOInter" type="dev.mvc.plan.PlanVO">
+    <id     property="plan_no"      column="plan_no" />
+    <result property="title"        column="title" />
+    <result property="start_date"   column="start_date" />
+    <result property="end_date"     column="end_date" />
+    <result property="departure"    column="departure" />
+    <result property="transport"    column="transport" />
+    <result property="people_count" column="people_count" />
+    <result property="budget_range" column="budget_range" />
+    <result property="user_no"      column="user_no" />
+  </resultMap>
+
+  <!-- Create -->
+  <insert id="create" parameterType="dev.mvc.plan.PlanVO">
+    INSERT INTO plan (
+      plan_no, title, start_date, end_date, departure,
+      transport, people_count, budget_range, user_no
+    ) VALUES (
+      plan_seq.NEXTVAL,
+      #{title}, #{start_date}, #{end_date}, #{departure},
+      #{transport}, #{people_count}, #{budget_range}, #{user_no}
+    )
+  </insert>
+  <!-- Read -->
+  <select id="read" parameterType="int" resultMap="PlanDAOInter">
+    SELECT plan_no, title, start_date, end_date, departure,
+      transport, people_count, budget_range, user_no
+    FROM plan 
+    WHERE plan_no = #{plan_no}
+  </select>
+
+  <!-- Update -->
+  <update id="update" parameterType="dev.mvc.plan.PlanVO">
+    UPDATE plan
+    SET title = #{title}, start_date = #{start_date}, end_date = #{end_date}, departure = #{departure},
+      transport = #{transport}, people_count = #{people_count}, budget_range = #{budget_range}
+    WHERE plan_no = #{plan_no}
+  </update>
+
+  <!-- Delete -->
+  <delete id="delete" parameterType="int">
+    DELETE FROM plan WHERE plan_no = #{plan_no}
+  </delete>
+
+</mapper>

@@ -1,0 +1,351 @@
+/* ====== 전체 컨테이너 ====== */
+.vs-container {
+  max-width: 720px;
+  margin: auto;
+  padding: 2.2rem;
+  border-radius: 14px;
+  background: linear-gradient(145deg, #ffffff, #f7f8ff);
+  box-shadow: inset 0 0 30px rgba(92, 107, 192, 0.06);
+  animation: fadeIn 0.6s ease;
+}
+
+/* ====== 질문 타이틀 ====== */
+.vs-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+  color: #333;
+  text-align: center;
+}
+
+.vs-question {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin-bottom: 3rem;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ====== 옵션 영역 ====== */
+.vs-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.2rem;
+  justify-content: center;
+}
+
+/* ====== 선택지 버튼 (카드형) ====== */
+.vs-option-btn {
+  flex: 1 1 45%;
+  padding: 1.3rem;
+  background: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+}
+
+.vs-option-btn:hover {
+  background-color: #f0f3ff;
+  transform: translateY(-2px);
+}
+
+.vs-option-btn.selected {
+  background: #5c6bc0;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 8px 18px rgba(92, 107, 192, 0.3);
+}
+
+/* ====== 제출 버튼 ====== */
+.vs-submit-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #5c6bc0, #3f51b5);
+  color: white;
+  border: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  margin-top: 2.5rem;
+  cursor: pointer;
+}
+
+.vs-submit-btn:hover {
+  background: linear-gradient(135deg, #3f51b5, #2c387e);
+}
+
+/* ====== 추천 결과 출력 상태 ====== */
+.vs-result-ready {
+  text-align: center;
+  padding: 2rem;
+  animation: fadeIn 0.6s ease;
+}
+
+/* ====== 모달 배경 오버레이 ====== */
+.vs-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* ====== 모달 본체 ====== */
+.vs-modal-content {
+  background: white;
+  border-radius: 14px;
+  padding: 36px;
+  width: 90%;
+  max-width: 800px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: slideUp 0.4s ease-out;
+  overflow: hidden;
+}
+
+/* ====== 모달 닫기 버튼 ====== */
+.vs-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: #f44;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* ====== 애니메이션 ====== */
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+/* ====== 이모지 / 텍스트 스타일 ====== */
+.vs-option-emoji {
+  font-size: 2.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.vs-option-text {
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+/* ====== 모바일 반응형 ====== */
+@media (max-width: 600px) {
+  .vs-modal-content {
+    padding: 24px;
+    width: 95%;
+  }
+
+  .vs-option-btn {
+    flex: 1 1 100%;
+    font-size: 1rem;
+  }
+
+  .vs-question {
+    font-size: 1.6rem;
+  }
+
+  .vs-submit-btn {
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+  .vs-modal-close {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+}
+
+.recommend-container {
+  max-width: 860px;
+  margin: 3rem auto;
+  padding: 2.4rem 3rem;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  animation: fadeIn 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 추천 타이틀 */
+.recommend-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #2c2c2c;
+  text-align: center;
+  margin-bottom: 1rem;
+  letter-spacing: -0.3px;
+}
+
+/* 추천 근거 배지 */
+.recommend-reason {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #666;
+  margin-bottom: 1.8rem;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* AI 분석 요약 카드 */
+.recommend-summary {
+  background: #f8f9fd;
+  border-radius: 12px;
+  padding: 1.7rem 2.2rem;
+  width: 100%;
+  margin-bottom: 2rem;
+  line-height: 1.75;
+  font-size: 1.05rem;
+  color: #333;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+
+.recommend-summary p {
+  margin-bottom: 1rem;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  text-align: justify;
+}
+
+/* 강조 요소: 첫 문장은 굵게 */
+.recommend-summary p:first-child {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #37474f;
+}
+
+/* 이미지 중앙 정렬 */
+/* ===== 이미지 ===== */
+.recommend-image-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.recommend-image {
+  width: 100%;
+  max-width: 640px;
+  border-radius: 14px;
+  object-fit: cover;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 버튼 영역 */
+/* ===== 버튼 영역 ===== */
+.recommend-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* ===== 버튼 공통 ===== */
+.recommend-btn {
+  padding: 12px 24px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary, .btn-green {
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-primary {
+  background: #5c6bc0;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #3f51b5;
+}
+
+.btn-green {
+  background: #66bb6a;
+  color: white;
+}
+
+.btn-green:hover {
+  background: #43a047;
+}
+
+/* 전체 정보 보기 버튼 */
+.recommend-btn.info {
+  background: linear-gradient(135deg, #5c6bc0, #3f51b5);
+  color: white;
+}
+
+.recommend-btn.info:hover {
+  background: linear-gradient(135deg, #3f51b5, #2c387e);
+}
+
+/* 일정 만들기 버튼 */
+.recommend-btn.plan {
+  background: white;
+  color: #5c6bc0;
+  border: 2px solid #5c6bc0;
+}
+
+.recommend-btn.plan:hover {
+  background: #f5f8ff;
+}
+
+/* ===== 부가 설명 ===== */
+.recommend-footer {
+  text-align: center;
+  margin-top: 0.8rem;
+  font-size: 0.95rem;
+  color: #666;
+}

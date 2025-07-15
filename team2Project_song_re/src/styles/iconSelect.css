@@ -1,0 +1,54 @@
+/* 컨테이너 */
+.icon-select { position: relative; }
+
+/* 화살표 버튼 */
+.arrow-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}
+.arrow-btn:active img { transform: scale(.9); }
+
+/* 기본 화살표 없애기 */
+select.appearance-none {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* placeholder 중앙 정렬 */
+select.text-center:invalid {
+  text-align: center;
+}
+
+/* '--' 플레이스홀더를 버튼 안 정중앙에 고정 */
+.placeholder-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.input-box { 
+  position: relative; 
+  text-align: center;
+}
+
+.arrow-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  padding: 4px;
+  cursor: pointer;
+}
+.arrow-btn:active img { transform: scale(.9); }

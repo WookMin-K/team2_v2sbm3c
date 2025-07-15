@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.region.RegionDAOInter">
+    
+    <!-- 지역 추가 -->
+    <insert id="create" parameterType="dev.mvc.region.RegionVO">
+        INSERT INTO region (region_no, rname,rimage)
+        VALUES (#{region_no}, #{rname}, #{rimage})
+    </insert>
+    
+    <!-- 전체 지역 조회 -->
+    <select id="list" resultType="dev.mvc.region.RegionVO">
+        SELECT region_no, rname, rimage
+        FROM region
+        ORDER BY region_no ASC
+    </select>
+
+    <!-- 특정 지역 조회 -->
+    <select id="read" parameterType="int" resultType="dev.mvc.region.RegionVO">
+        SELECT region_no, rname, rimage
+        FROM region
+        WHERE region_no = #{region_no}
+    </select>
+
+    <!-- 지역 수정 -->
+    <update id="update" parameterType="dev.mvc.region.RegionVO">
+        UPDATE region
+        SET rname = #{rname},
+              rimage = #{rimage}
+        WHERE region_no = #{region_no}
+    </update>
+
+    <!-- 지역 삭제 -->
+    <delete id="delete" parameterType="int">
+        DELETE FROM region
+        WHERE region_no = #{region_no}
+    </delete>
+
+</mapper>

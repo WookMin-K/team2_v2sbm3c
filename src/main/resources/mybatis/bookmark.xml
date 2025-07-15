@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.bookmark.BookmarkDAOInter">
+
+  <!-- 🎯 여행지 즐겨찾기 등록 -->
+  <insert id="create_trip" parameterType="dev.mvc.bookmark.BookmarkVO">
+    INSERT INTO bookmark (bookmark_no, trip_no, user_no)
+    VALUES (bookmark_seq.NEXTVAL, #{trip_no}, #{user_no})
+  </insert>
+
+  <!-- 🎯 게시글 즐겨찾기 등록 -->
+  <insert id="create_post" parameterType="dev.mvc.bookmark.BookmarkVO">
+    INSERT INTO bookmark (bookmark_no, post_no, user_no)
+    VALUES (bookmark_seq.NEXTVAL, #{post_no}, #{user_no})
+  </insert>
+
+  <!-- 📋 사용자 즐겨찾기 목록 (원본 VO 기준) -->
+  <select id="list_by_user" resultType="dev.mvc.bookmark.BookmarkVO">
+    SELECT * FROM bookmark
+    WHERE user_no = #{user_no}
+    ORDER BY bookmark_no DESC
+  </select>
+
+  <!-- 🔍 중복 확인 (여행지) -->
+  <select id="check_duplicate_trip" parameterType="hashmap" resultType="int">
+    SELECT COUNT(*) FROM bookmark
+    WHERE user_no = #{user_no} AND trip_no = #{trip_no}
+  </select>
+
+  <!-- 🔍 중복 확인 (게시글) -->
+  <select id="check_duplicate_post" parameterType="hashmap" resultType="int">
+    SELECT COUNT(*) FROM bookmark
+    WHERE user_no = #{user_no} AND post_no = #{post_no}
+  </select>
+
+  <!-- ❌ 삭제 (여행지) -->
+  <delete id="delete_by_user_and_trip" parameterType="dev.mvc.bookmark.BookmarkVO">
+    DELETE FROM bookmark
+    WHERE user_no = #{user_no} AND trip_no = #{trip_no}
+  </delete>
+
+  <!-- ❌ 삭제 (게시글) -->
+  <delete id="delete_by_user_and_post" parameterType="dev.mvc.bookmark.BookmarkVO">
+    DELETE FROM bookmark
+    WHERE user_no = #{user_no} AND post_no = #{post_no}
+  </delete>
+
+  <!-- 🔗 사용자별 즐겨찾기 목록 (JOIN: 여행지 + 게시글) -->
+  <select id="list_join_by_user" resultType="dev.mvc.bookmark.BookmarkJoinVO">
+    SELECT 
+      b.bookmark_no,
+      u.user_no,
+      u.name AS user_name,
+  
+      -- 타입 구분
+      CASE 
+        WHEN b.trip_no IS NOT NULL THEN 'trip'
+        WHEN b.post_no IS NOT NULL THEN 'post'
+        ELSE 'unknown'
+      END AS type,
+  
+      -- 여행지 관련 컬럼 (LEFT JOIN)
+      t.trip_no,
+      t.tname AS trip_title,
+      t.sname,
+      t.image,
+      t.intro,
+      t.tnew,
+      t.viewcnt,
+  
+      -- 게시글 관련 컬럼 (LEFT JOIN)
+      p.post_no,
+      p.title AS post_title,
+      p.created_day
+  
+    FROM bookmark b
+      JOIN users u ON b.user_no = u.user_no
+      LEFT JOIN trip t ON b.trip_no = t.trip_no
+      LEFT JOIN post p ON b.post_no = p.post_no
+  
+    WHERE b.user_no = #{user_no}
+    ORDER BY b.bookmark_no DESC
+  </select>
+
+
+</mapper>

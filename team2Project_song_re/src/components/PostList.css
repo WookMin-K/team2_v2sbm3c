@@ -1,0 +1,97 @@
+.container {
+  display: flex;         /* 가로 정렬 */
+  align-items: flex-start;
+  justify-content: center; /* 사이드바+콘텐츠 묶음을 중앙으로 */
+  width: 100%;           /* 화면 전체 너비 사용 */
+  max-width: none;       /* (있다면) 제한 해제 */
+  padding: 1rem;         /* 필요에 따라 패딩 조절 */
+  box-sizing: border-box;
+}
+.sidebar {
+  width: 200px;
+  background: #f7f7f7;
+  padding: 20px;
+  height: 100vh;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+}
+.content {
+  flex: 1;
+  padding: 30px;
+}
+.board-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+th, td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+.top-post {
+  color: red;
+  font-weight: bold;
+}
+.btn {
+  padding: 6px 12px;
+  background-color: #5c6bc0;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.search-box input,
+.search-box select {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 4px;
+}
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 20px;
+  gap: 8px;
+}
+.pagination input {
+  width: 40px;
+  padding: 4px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.pagination span,
+.pagination a {
+  font-size: 14px;
+}
+.pagination a {
+  text-decoration: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  color: #5c6bc0;
+  border: 1px solid transparent;
+}
+.pagination a:hover {
+  background-color: #eee;
+  border: 1px solid #ccc;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font: inherit;
+}
+.link-btn:hover {
+  text-decoration: none;
+}

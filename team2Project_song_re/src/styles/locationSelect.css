@@ -1,0 +1,55 @@
+.dropdown {
+  position: absolute;
+  margin-top: 2px;
+  width: 330px;
+  max-height: 210px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #cfd7e3;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+  z-index: 60;
+}
+.option {
+  padding: 8px 14px;
+  font-size: 18px;
+  text-align: center;
+  cursor: pointer;
+}
+.option:hover { 
+  background: #f0f5ff; 
+}
+.selected  { 
+  background: #e4edff;
+  font-weight: 600; 
+  text-align: center;
+}
+
+/* '--' 플레이스홀더를 버튼 안 정중앙에 고정 */
+.placeholder-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;          /* 가운데 정렬 유지 */
+  text-align: center;
+  pointer-events: none; /* 클릭 영역 방해 X */
+}
+
+.input-box {
+  position: relative; 
+}
+
+.arrow-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  padding: 4px;
+  cursor: pointer;
+}
+.arrow-btn:active img { 
+  transform: scale(0.9); 
+}
+

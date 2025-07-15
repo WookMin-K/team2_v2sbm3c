@@ -1,0 +1,86 @@
+/* Top5Components - Top5List, InsightBox 등 */
+
+.top5-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.top5-item {
+  background-color: #f5f7fa;
+  padding: 12px 18px;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.05rem;
+  color: #222;
+}
+
+.top5-rank {
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #007bff;
+  margin-right: 10px;
+  flex-shrink: 0;
+  min-width: 40px;
+  text-align: center;
+}
+
+.top5-name {
+  flex-grow: 1;
+  text-align: left;
+  font-weight: 500;
+}
+
+.top5-count {
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.ai-analysis-container {
+  background-color: #f4f7ff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  animation: fadeIn 0.4s ease-in-out;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.ai-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.ai-title {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #3b82f6;
+  border-left: 4px solid #3b82f6;
+  padding-left: 10px;
+}
+
+.ai-content {
+  white-space: pre-line;
+  overflow-y: auto;
+  max-height: 200px;
+  padding-right: 4px;
+}
+
+.ai-content p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-line;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

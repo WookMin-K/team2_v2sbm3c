@@ -1,0 +1,30 @@
+/* MyScreen1.css */
+
+.custom-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #F4F5F7;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #F4F5F7;
+  border-radius: 6px;
+}
+
+.scroll-indicator {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  margin-bottom: 1rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
