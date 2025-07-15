@@ -4,9 +4,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPostDetail } from '../api/postApi';
 import { useLoginContext } from '../contexts/LoginContext';
+import ReplyLikeButton from './ReplyLikeButton';
 import './PostDetail.css';
 import BookmarkPostButton from './bookmark/bookmarkbutton_post';
-
 
 const PostDetail = () => {
   const { postNo } = useParams();
@@ -19,16 +19,31 @@ const PostDetail = () => {
   const [replyParent, setReplyParent] = useState(null); // 대댓글 대상
   const [editingReplyNo, setEditingReplyNo] = useState(null); // 수정 대상 댓글 번호
   const [editContent, setEditContent] = useState(''); // 수정 내용
-  const userNo = sessionStorage.getItem('userNo');
+  const [prevPost, setPrevPost] = useState(null); // 이전 글
+  const [nextPost, setNextPost] = useState(null); // 다음 글
 
+  // const userNo = sessionStorage.getItem('userNo');
+
+  const userNo    = Number(sessionStorage.getItem('userNo'));
+  // 세션에서 grade 문자열 꺼내기
+  const gradeStr  = sessionStorage.getItem('grade');
+  // 값이 있으면 숫자로, 없으면 음수로(관리자 아님)
+  const userGrade = gradeStr != null ? parseInt(gradeStr, 10) : -1;
   
 
+  // 게시글/댓글 판별 플래그
+  const isAuthor = post && userNo === post.user_no;
+  const isAdmin  = userGrade === 0;
+
+  
 
   // 게시글 및 댓글 데이터 불러오기
   const fetchData = async () => {
     const data = await getPostDetail(postNo);
     setPost(data.post);
     setReplies(data.replies);
+    setPrevPost(data.prev);
+    setNextPost(data.next);
   };
 
   useEffect(() => {
@@ -39,7 +54,7 @@ const PostDetail = () => {
 // 파일 다운로드
 const handleDownload = async (fileName) => {
   try {
-    const response = await fetch(`http://192.168.12.142:9093/post/download/${fileName}`);
+    const response = await fetch(`http://localhost:9093/post/download/${fileName}`);
     if (!response.ok) throw new Error('파일 다운로드 실패');
 
     const blob = await response.blob();
@@ -143,7 +158,7 @@ const handleReplySubmit = async (e, parentReplyNo) => {
         <hr />
         <h4>글 관리</h4>
         <ul>
-          <li><button className="link-btn" onClick={() => alert('즐겨찾기 준비 중')}>즐겨찾기</button></li>
+          <li><button className="link-btn" onClick={() => navigate('/mypage/bookmark')}>즐겨찾기</button></li>
           <li><button className="link-btn" onClick={() => navigate('/post/list')}>내 게시물</button></li>
         </ul>
       </div>
@@ -158,8 +173,7 @@ const handleReplySubmit = async (e, parentReplyNo) => {
 
         {post?.image && (
           <img
-            //src={`http://192.168.12.142:9093/images/${post.image}`} // 여기서 /images/는 WebMvcConfig에 매핑된 이름
-            src={`http://localhost:9093/images/${post.image}`}
+            src={`http://localhost:9093/images/${post.image}`} // 여기서 /images/는 WebMvcConfig에 매핑된 이름
             alt="게시글 이미지"
             style={{ maxWidth: '100%', marginTop: '20px', borderRadius: '8px' }}
           />
@@ -184,13 +198,38 @@ const handleReplySubmit = async (e, parentReplyNo) => {
           </div>
         )}        
 
-        <div className="buttons">
+        {/* <div className="buttons">
           <button onClick={() => navigate(`/post/update/${post.post_no}`)}>수정</button>
           <button onClick={() => navigate(`/post/delete/${post.post_no}`)}>삭제</button>
           <button onClick={() => navigate('/post/list')}>목록</button>
-          <BookmarkPostButton post_no={post.post_no} />
-        </div>
+        </div> */}
 
+        <div className="buttons" >
+          {isAuthor && (
+            <button onClick={() => navigate(`/post/update/${post.post_no}`)}>
+              수정
+            </button>
+          )}
+          {(isAuthor || isAdmin) && (
+            <button onClick={() => navigate(`/post/delete/${post.post_no}`)}>
+              삭제
+            </button>
+          )}
+          <BookmarkPostButton post_no={post.post_no} />
+        <br /><br />
+        
+          {prevPost ? (
+            <button onClick={() => navigate(`/post/read/${prevPost.post_no}`)}>
+              이전글
+            </button>
+          ) : <div /> }
+          <button onClick={() => navigate('/post/list')}>목록</button>
+          {nextPost ? (
+            <button onClick={() => navigate(`/post/read/${nextPost.post_no}`)}>
+              다음글
+            </button>
+          ) : <div /> }
+        </div>
         <hr style={{ margin: '40px 0' }} />
 
         {/* 댓글 입력 폼 */}
@@ -209,107 +248,169 @@ const handleReplySubmit = async (e, parentReplyNo) => {
 
         {/* 댓글 및 대댓글 출력 */}
         <div className="reply-list">
-          {replies.filter(r => !r.parent_reply_no).map(parent => (
-            <div key={parent.reply_no} className="reply-item">
-              <div><strong>{parent.userName || parent.user_id}</strong> | {parent.created_day}</div>
-
-              {editingReplyNo === parent.reply_no ? (
-                <>
-                  <textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    rows="2"
-                  />
-                  <button onClick={() => handleReplyUpdate(parent.reply_no)}>저장</button>
-                  <button onClick={() => setEditingReplyNo(null)}>취소</button>
-                </>
-              ) : (
-                <>
-                  <div>{parent.content}</div>
-                  <div style={{ marginTop: 5 }}>
-                    <button onClick={() => {
-                      setReplyParent(parent.reply_no);
-                      setReplyContent('');
-                    }}>답글</button>
-                    <button onClick={() => {
-                      setEditingReplyNo(parent.reply_no);
-                      setEditContent(parent.content);
-                    }}>수정</button>
-                    <button onClick={() => handleReplyDelete(parent.reply_no)}>삭제</button>
+          {replies
+            .filter(r => !r.parent_reply_no)
+            .map(parent => {
+              const isReplyAuthor = userNo === parent.user_no;
+              return (
+                <div key={parent.reply_no} className="reply-item">
+                  <div>
+                    <strong>{parent.userName || parent.user_id}</strong> | {parent.created_day}
+                    <ReplyLikeButton replyNo={parent.reply_no} userNo={userNo} />
                   </div>
-                </>
-              )}
 
-              {/* 대댓글 입력 폼 */}
-              {replyParent === parent.reply_no && (
-                <form
-                  onSubmit={(e) => handleReplySubmit(e, parent.reply_no)}
-                  className="reply-form"
-                  style={{ marginLeft: '30px', marginTop: '10px' }}
-                >
-                  <textarea
-                    placeholder="답글을 입력하세요"
-                    rows="2"
-                    value={childReplyContent[parent.reply_no] || ''}
-                    onChange={(e) =>
-                      setChildReplyContent({
-                        ...childReplyContent,
-                        [parent.reply_no]: e.target.value,
-                      })
-                    }
-                  />
-                  <div className="right">
-                    <button type="submit">등록</button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setReplyParent(null);
-                        setChildReplyContent({
-                          ...childReplyContent,
-                          [parent.reply_no]: '',
-                        });
-                      }}
+                  {/* 댓글 내용 및 수정/삭제/답글 */}
+                  {editingReplyNo === parent.reply_no ? (
+                    <>
+                      <textarea
+                        value={editContent}
+                        onChange={e => setEditContent(e.target.value)}
+                        rows="2"
+                      />
+                      <button onClick={() => handleReplyUpdate(parent.reply_no)}>저장</button>
+                      <button onClick={() => setEditingReplyNo(null)}>취소</button>
+                    </>
+                  ) : (
+                    <>
+                      <div>{parent.content}</div>
+                      <div style={{ marginTop: 5 }}>
+                        {isLoggedIn && (
+                          <button
+                            onClick={() => {
+                              setReplyParent(parent.reply_no);
+                              setReplyContent('');
+                            }}
+                          >
+                            답글
+                          </button>
+                        )}
+                        {isReplyAuthor && (
+                          <button
+                            onClick={() => {
+                              setEditingReplyNo(parent.reply_no);
+                              setEditContent(parent.content);
+                            }}
+                          >
+                            수정
+                          </button>
+                        )}
+                        {(isReplyAuthor || isAdmin) && (
+                          <button onClick={() => handleReplyDelete(parent.reply_no)}>
+                            삭제
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {/* 대댓글 입력 폼 */}
+                  {replyParent === parent.reply_no && (
+                    <form
+                      onSubmit={e => handleReplySubmit(e, parent.reply_no)}
+                      className="reply-form"
+                      style={{ marginLeft: '30px', marginTop: '10px' }}
                     >
-                      취소
-                    </button>
+                      <textarea
+                        placeholder="답글을 입력하세요"
+                        rows="2"
+                        value={childReplyContent[parent.reply_no] || ''}
+                        onChange={e =>
+                          setChildReplyContent({
+                            ...childReplyContent,
+                            [parent.reply_no]: e.target.value,
+                          })
+                        }
+                      />
+                      <div className="right">
+                        <button type="submit">등록</button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReplyParent(null);
+                            setChildReplyContent({
+                              ...childReplyContent,
+                              [parent.reply_no]: '',
+                            });
+                          }}
+                        >
+                          취소
+                        </button>
+                      </div>
+                    </form>
+                  )}
+
+                  {/* 대댓글 출력 */}
+                  <div
+                    className="replies"
+                    style={{ marginLeft: '30px', marginTop: '10px' }}
+                  >
+                    {replies
+                      .filter(child => child.parent_reply_no === parent.reply_no)
+                      .map(child => {
+                        const isChildAuthor = userNo === child.user_no;
+                        return (
+                          <div
+                            key={child.reply_no}
+                            className="reply-item"
+                            style={{
+                              borderLeft: '2px solid #eee',
+                              paddingLeft: '10px',
+                              marginBottom: '10px',
+                            }}
+                          >
+                            <div>
+                              <strong>{child.userName || child.user_id}</strong> | {child.created_day}
+                              <ReplyLikeButton replyNo={child.reply_no} userNo={userNo} />
+                            </div>
+
+                            {editingReplyNo === child.reply_no ? (
+                              <>
+                                <textarea
+                                  value={editContent}
+                                  onChange={e => setEditContent(e.target.value)}
+                                  rows="2"
+                                />
+                                <button onClick={() => handleReplyUpdate(child.reply_no)}>
+                                  저장
+                                </button>
+                                <button onClick={() => setEditingReplyNo(null)}>
+                                  취소
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                {/* 1) 대댓글 내용 */}
+                                <div>{child.content}</div>
+
+                                {/* 2) 버튼 그룹 */}
+                                <div style={{ marginTop: 5 }}>
+                                  {isChildAuthor && (
+                                    <button
+                                      onClick={() => {
+                                        setEditingReplyNo(child.reply_no);
+                                        setEditContent(child.content);
+                                      }}
+                                    >
+                                      수정
+                                    </button>
+                                  )}
+                                  {(isChildAuthor || isAdmin) && (
+                                    <button onClick={() => handleReplyDelete(child.reply_no)}>
+                                      삭제
+                                    </button>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        );
+                      })}
                   </div>
-                </form>
-              )}
-
-              {/* 대댓글 출력 */}
-              <div className="replies" style={{ marginLeft: '30px', marginTop: '10px' }}>
-                {replies
-                  .filter(child => child.parent_reply_no === parent.reply_no)
-                  .map(child => (
-                    <div key={child.reply_no} className="reply-item" style={{ borderLeft: '2px solid #eee', paddingLeft: '10px', marginBottom: '10px' }}>
-                      <div><strong>{child.userName || child.user_id}</strong> | {child.created_day}</div>
-
-                      {editingReplyNo === child.reply_no ? (
-                        <>
-                          <textarea
-                            value={editContent}
-                            onChange={(e) => setEditContent(e.target.value)}
-                            rows="2"
-                          />
-                          <button onClick={() => handleReplyUpdate(child.reply_no)}>저장</button>
-                          <button onClick={() => setEditingReplyNo(null)}>취소</button>
-                        </>
-                      ) : (
-                        <>
-                          <div>{child.content}</div>
-                          <button onClick={() => {
-                            setEditingReplyNo(child.reply_no);
-                            setEditContent(child.content);
-                          }}>수정</button>
-                          <button onClick={() => handleReplyDelete(child.reply_no)}>삭제</button>
-                        </>
-                      )}
-                    </div>
-                  ))}
-              </div>
-            </div>
-          ))}
+                </div>
+              );
+            })}
         </div>
+
       </div>
     </div>
   );

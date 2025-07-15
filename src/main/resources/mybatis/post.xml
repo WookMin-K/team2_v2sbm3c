@@ -29,18 +29,18 @@
 
 
   <!-- 목록 페이징 -->
-  <select id="list_by_page" resultType="dev.mvc.post.PostVO" parameterType="Map">
-    SELECT * FROM (
-    SELECT
-    ROW_NUMBER() OVER (ORDER BY p.notice_yn DESC, p.post_no DESC) AS rnum,
-    p.post_no, p.title, p.content, p.created_day,
-    p.user_no, p.view_cnt, p.notice_yn,
-    u.name
-    FROM post p
-    JOIN users u ON p.user_no = u.user_no
-    )
-    WHERE rnum BETWEEN #{start} AND #{end}
-  </select>
+<!--  <select id="list_by_page" resultType="dev.mvc.post.PostVO" parameterType="Map">-->
+<!--    SELECT * FROM (-->
+<!--    SELECT-->
+<!--    ROW_NUMBER() OVER (ORDER BY p.notice_yn DESC, p.post_no DESC) AS rnum,-->
+<!--    p.post_no, p.title, p.content, p.created_day,-->
+<!--    p.user_no, p.view_cnt, p.notice_yn,-->
+<!--    u.name-->
+<!--    FROM post p-->
+<!--    JOIN users u ON p.user_no = u.user_no-->
+<!--    )-->
+<!--    WHERE rnum BETWEEN #{start} AND #{end}-->
+<!--  </select>-->
 
 
   <!-- 상세 조회 -->
@@ -147,8 +147,11 @@
           title LIKE #{keyword} OR content LIKE #{keyword}
         </otherwise>
       </choose>
+
     </where>
-    ORDER BY post_no DESC
+    ORDER BY
+     CASE WHEN notice_yn = 'Y' THEN 0 ELSE 1 END,  <!-- 고정글 먼저 -->
+     post_no DESC
     ) a
     WHERE ROWNUM &lt;= #{end}
     ) p
@@ -172,6 +175,26 @@
       </otherwise>
     </choose>
   </select>
+
+  <!-- 이전글  -->
+  <select id="readPrev" parameterType="int" resultType="dev.mvc.post.PostVO">
+    SELECT *
+    FROM post
+    WHERE post_no &lt; #{post_no}
+    ORDER BY post_no DESC
+    FETCH FIRST 1 ROWS ONLY
+  </select>
+
+  <!-- 다음글 -->
+  <select id="readNext" parameterType="int" resultType="dev.mvc.post.PostVO">
+    SELECT *
+    FROM post
+    WHERE post_no > #{post_no}
+    ORDER BY post_no ASC
+    FETCH FIRST 1 ROWS ONLY
+  </select>
+
+
 
 
 </mapper>

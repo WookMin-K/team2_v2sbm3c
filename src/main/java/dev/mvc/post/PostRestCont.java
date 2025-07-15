@@ -2,8 +2,11 @@ package dev.mvc.post;
 
 import dev.mvc.reply.ReplyProcInter;
 import dev.mvc.reply.ReplyVO;
+import dev.mvc.users.UsersProcInter;
+import dev.mvc.users.UsersVO;
 import dev.mvc.util.FileUploadUtil;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +32,7 @@ import java.util.List;
 public class PostRestCont {
 
     private final FileUploadUtil fileUtil;
+    private final UsersProcInter usersProc;
     private final PostProcInter postProc;
     private final ReplyProcInter replyProc;
 
@@ -38,10 +42,12 @@ public class PostRestCont {
     @Autowired
     public PostRestCont(
             FileUploadUtil fileUtil,
+            @Qualifier("dev.mvc.users.UsersProc")UsersProcInter usersProc,
             @Qualifier("dev.mvc.post.PostProc") PostProcInter postProc,
             @Qualifier("dev.mvc.reply.ReplyProc") ReplyProcInter replyProc
     ) {
         this.fileUtil = fileUtil;
+        this.usersProc = usersProc;
         this.postProc = postProc;
         this.replyProc = replyProc;
     }
@@ -52,16 +58,18 @@ public class PostRestCont {
             @RequestParam("title") String title,
             @RequestParam("content") String content,
             @RequestParam("user_no") int user_no,
-            @RequestParam(value = "notice_yn", defaultValue = "0") String notice_yn,
+            @RequestParam(value = "notice_yn", defaultValue = "N") String notice_yn,
             @RequestParam(value = "image", required = false) MultipartFile imageFile,
             @RequestParam(value = "files", required = false) MultipartFile normalFile
     ) {
         HashMap<String, Object> result = new HashMap<>();
+        System.out.println(">>> notice_yn param = " + notice_yn);
         PostVO vo = new PostVO();
         vo.setTitle(title);
         vo.setContent(content);
         vo.setUser_no(user_no);
         vo.setNotice_yn(notice_yn);
+        System.out.println(">>> vo.getNotice_yn() = " + vo.getNotice_yn());
 
         try {
             // 이미지 저장
@@ -135,9 +143,16 @@ public class PostRestCont {
         PostVO postVO = postProc.read(post_no);
         List<ReplyVO> replyList = replyProc.list_by_post(post_no);
 
+        // 이전글, 다음글 조회
+        PostVO prevPost = postProc.readPrev(post_no);
+        PostVO nextPost = postProc.readNext(post_no);
+
+
         HashMap<String, Object> result = new HashMap<>();
         result.put("post", postVO);
         result.put("replies", replyList);
+        result.put("prev", prevPost);
+        result.put("next", nextPost);
         return result;
     }
 
@@ -200,13 +215,43 @@ public class PostRestCont {
     }
 
     // ✅ 게시글 삭제
+//    @DeleteMapping("/delete/{post_no}")
+//    public HashMap<String, Object> delete(@PathVariable("post_no") int post_no) {
+//        HashMap<String, Object> result = new HashMap<>();
+//        int cnt = postProc.delete(post_no);
+//        result.put("result", cnt == 1 ? "success" : "fail");
+//        return result;
+//    }
     @DeleteMapping("/delete/{post_no}")
-    public HashMap<String, Object> delete(@PathVariable("post_no") int post_no) {
+    public HashMap<String, Object> delete(@PathVariable("post_no") int post_no, HttpSession session) {
         HashMap<String, Object> result = new HashMap<>();
+
+        // 로그인 확인
+        Integer loginUserNo = (Integer) session.getAttribute("user_no");
+        if (loginUserNo == null) {
+            result.put("result", "loginRequired");
+            return result;
+        }
+        // 게시글 존재 여부 확인
+        PostVO post = postProc.read(post_no);
+        if (post == null) {
+            result.put("result", "notFound");
+            return result;
+        }
+        // 작성자 여부, 관리자 여부 체크
+        boolean isWriter = loginUserNo.equals(post.getUser_no());
+        boolean isAdmin  = usersProc.isAdmin(session);
+        if (!isWriter && !isAdmin) {
+            result.put("result", "forbidden");
+            return result;
+        }
+        // 실제 삭제
         int cnt = postProc.delete(post_no);
         result.put("result", cnt == 1 ? "success" : "fail");
         return result;
     }
+
+
 
     // ✅ 이미지 서빙
     @GetMapping("/post/image/{filename:.+}")

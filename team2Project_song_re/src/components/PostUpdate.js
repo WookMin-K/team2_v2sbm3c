@@ -11,7 +11,7 @@ function PostUpdate() {
     content: ''
   });
   const [image, setImage] = useState(null);
-  const [files, setFiles] = useState(null);
+  const [file, setFile] = useState(null);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -29,7 +29,6 @@ function PostUpdate() {
   const handleDeleteImage = async () => {
     if (window.confirm("이미지를 삭제하시겠습니까?")) {
       try {
-        //const res = await axios.delete(`http://192.168.12.142:9093/post/delete/image/${postNo}`);
         const res = await axios.delete(`http://localhost:9093/post/delete/image/${postNo}`);
         if (res.data.result === 'success') {
           alert("이미지가 삭제되었습니다.");
@@ -45,7 +44,7 @@ function PostUpdate() {
   const handleDeleteFile = async () => {
     if (window.confirm("파일을 삭제하시겠습니까?")) {
       try {
-        const res = await axios.delete(`http://192.168.12.142:9093/post/delete/file/${postNo}`);
+        const res = await axios.delete(`http://localhost:9093/post/delete/file/${postNo}`);
         if (res.data.result === 'success') {
           alert("파일이 삭제되었습니다.");
           setPost((prev) => ({ ...prev, file_org: null }));
@@ -56,21 +55,8 @@ function PostUpdate() {
     }
   };  
 
-const MAX_SIZE = 50 * 1024 * 1024; 
-
 const handleSubmit = async (e) => {
   e.preventDefault();
-
-    // 1) 클라이언트 사전 검증
-  if (image && image.size > MAX_SIZE) {
-    alert('이미지 파일 크기가 너무 큽니다. 최대 50MB까지 업로드 가능합니다.');
-    return;
-  }
-  if (files && files.size > MAX_SIZE) {
-    alert('첨부 파일 크기가 너무 큽니다. 최대 50MB까지 업로드 가능합니다.');
-    return;
-  }
-  
 
   const payload = new FormData();
   payload.append("post_no", postNo);
@@ -82,15 +68,12 @@ const handleSubmit = async (e) => {
   // 파일 교체 / 삭제 의도 표시
   if (image)  payload.append("image", image);
   else        payload.append("image", "");
-  if (files)   payload.append("files", files);
+  if (file)   payload.append("files", file);
   else        payload.append("files", "");
-
-  
 
   try {
     // multipart/form-data 로 POST
     const res = await axios.post(
-      //"http://192.168.12.142:9093/post/update",
       "http://localhost:9093/post/update",
       payload
       // 헤더는 axios가 자동으로 잡아줍니다
@@ -154,7 +137,7 @@ const handleSubmit = async (e) => {
         )}
         <input
           type="file"
-          onChange={(e) => setFiles(e.target.files[0])}
+          onChange={(e) => setFile(e.target.files[0])}
           className="mb-4"
         />
 

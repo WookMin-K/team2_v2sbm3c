@@ -7,24 +7,10 @@ const PostCreate = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const {userName, userNo, grade} = useLoginContext();
-  const [noticeYn, setNoticeYn] = useState('N');
+  const [notice_yn, setNotice_yn] = useState('N');
   const [image, setImage] = useState(null);
   const [files, setFiles] = useState(null);
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if (!isLoggedIn) {
-  //      alert('로그인 후 이용 가능합니다.');
-  //      sessionStorage.setItem('openLoginModal', 'true');
-  //      sessionStorage.setItem('redirectAfterLogin', '/post/create');
-  //      navigate('/');
-  //      return;
-  //    }
-
-
-
-  // }, [navigate]);
-
 
 
   const handleCancel = () => {
@@ -42,55 +28,26 @@ const PostCreate = () => {
   };
   
 
-  const MAX_SIZE = 50 * 1024 * 1024; 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
 
-        // 1) 클라이언트 사전 검증
-  if (image && image.size > MAX_SIZE) {
-    alert('이미지 파일 크기가 너무 큽니다. 최대 50MB까지 업로드 가능합니다.');
-    return;
-  }
-  if (files && files.size > MAX_SIZE) {
-    alert('첨부 파일 크기가 너무 큽니다. 최대 50MB까지 업로드 가능합니다.');
-    return;
-  }
-  
-    // 2) 파일(image/files)이 하나라도 있으면 FormData, 없으면 JSON
-    // if (image || files) {
-    //   payload = new FormData();
-    //   payload.append("title", title);
-    //   payload.append("content", content);
-    //   payload.append("user_no", userNo);
-    //   payload.append("notice_yn", noticeYn);
-    //   if (image) payload.append("image", image);
-    //   if (files) payload.append("files", files);
-
-    //   headers = {};
-    // } else {
-    //   payload = {
-    //     title,
-    //     content,
-    //     user_no: userNo,
-    //     notice_yn: noticeYn,
-    //   };
-    //   headers = { 'Content-Type': 'application/json' };
-    // }
        // — 무조건 FormData 로만 보냅니다
     const payload = new FormData();
     payload.append("title", title);
     payload.append("content", content);
     payload.append("user_no", userNo);
-    payload.append("notice_yn", noticeYn);
+    payload.append("notice_yn", notice_yn);
     if (image) payload.append("image", image);
     if (files) payload.append("files", files);
 
+  for (let [k, v] of payload.entries()) {
+    console.log(k, v);
+  }
     try {
      // 헤더 옵션 없이 보내면 axios가 multipart/form-data; boundary=… 까지 자동 처리해 줍니다
      const response = await axios.post(
-       //'http://192.168.12.142:9093/post/create',
+      //'http://192.168.12.142:9093/post/create',
        'http://localhost:9093/post/create',
        payload
       );
@@ -140,7 +97,7 @@ const PostCreate = () => {
         {grade === 0 && (
           <div style={{ marginBottom: '10px' }}>
             <label>공지 여부: </label>
-            <select value={noticeYn} onChange={(e) => setNoticeYn(e.target.value)}>
+            <select value={notice_yn} onChange={(e) => setNotice_yn(e.target.value)}>
               <option value="N">일반글</option>
               <option value="Y">고정글</option>
             </select>

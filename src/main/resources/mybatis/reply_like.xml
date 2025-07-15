@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.reply_like.ReplyLikeDAOInter">
+    <!-- 좋아요 추가 -->
+    <insert id="insertLike" parameterType="map">
+        INSERT INTO reply_like (reply_like_no, reply_no, user_no)
+        VALUES (reply_like_seq.NEXTVAL, #{reply_no}, #{user_no})
+    </insert>
+
+    <!-- 좋아요 취소 -->
+    <delete id="deleteLike" parameterType="map">
+        DELETE FROM reply_like
+        WHERE reply_no = #{reply_no} AND user_no = #{user_no}
+    </delete>
+
+    <!-- 좋아요 수 -->
+    <select id="countLikes" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM reply_like WHERE reply_no = #{reply_no}
+    </select>
+
+    <!-- 유저가 좋아요 눌렀는지 확인 -->
+    <select id="isLiked" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM reply_like
+        WHERE reply_no = #{reply_no} AND user_no = #{user_no}
+    </select>
+
+</mapper>

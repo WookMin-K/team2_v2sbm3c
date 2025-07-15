@@ -100,4 +100,18 @@ public interface PostDAOInter {
    */
   public int search_count(Map<String, Object> paramMap);
 
+  /**
+   * 이전 글 조회
+   * @param post_no
+   * @return
+   */
+  public PostVO readPrev(int post_no);
+
+  /**
+   * 다음 글 조회
+   * @param post_no
+   * @return
+   */
+  public PostVO readNext(int post_no);
+
 }

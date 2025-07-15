@@ -80,4 +80,14 @@ public class PostProc implements PostProcInter {
     return postDAO.search_count(paramMap);
   }
 
+  @Override
+  public PostVO readPrev(int post_no) {
+    return postDAO.readPrev(post_no);
+  }
+
+  @Override
+  public PostVO readNext(int post_no) {
+    return postDAO.readNext(post_no);
+  }
+
 }

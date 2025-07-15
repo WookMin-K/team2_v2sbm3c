@@ -17,13 +17,33 @@ function PostDelete() {
   }, [postNo]);
 
   const handleDelete = async () => {
-    try {
-    //await axios.delete(`http://192.168.12.142:9093/post/delete/${postNo}`);
-    await axios.delete(`http://localhost:9093/post/delete/${postNo}`);
+    if (!window.confirm('정말 삭제하시겠습니까?')) return;
 
-      navigate('/post/list');
-    } catch (error) {
-      console.error('삭제 실패:', error);
+    try {
+      const res = await axios.delete(`/post/delete/${postNo}`);  // axios.delete 로 변경
+      const data = res.data;
+
+      switch (data.result) {
+        case 'loginRequired':
+          alert('로그인이 필요합니다.');
+          return;
+        case 'notFound':
+          alert('삭제할 대상이 없습니다.');
+          return;
+        case 'forbidden':
+          alert('권한이 없습니다.');
+          return;
+        case 'success':
+          alert('삭제되었습니다.');
+          navigate('/post/list');
+          return;
+        default:
+          alert('삭제 실패');
+      }
+    }
+    catch (err) {
+      console.error(err);
+      alert('서버 오류로 삭제에 실패했습니다.');
     }
   };
 
@@ -39,8 +59,13 @@ function PostDelete() {
       <p className="mb-4">이 게시글을 삭제하시겠습니까?</p>
       <p className="text-lg font-semibold mb-6">{post.title}</p>
       <div className="flex justify-center gap-4">
-        <button onClick={handleDelete} className="bg-red-500 text-white px-4 py-2 rounded">삭제</button>
-        <button onClick={handleCancel} className="bg-gray-300 px-4 py-2 rounded">취소</button>
+        {/* postNo를 handleDelete 내부에서 바로 사용하므로 인자 없이 호출 */}
+        <button onClick={handleDelete} className="bg-red-500 text-white px-4 py-2 rounded">
+          삭제
+        </button>
+        <button onClick={handleCancel} className="bg-gray-300 px-4 py-2 rounded">
+          취소
+        </button>
       </div>
     </div>
   );
