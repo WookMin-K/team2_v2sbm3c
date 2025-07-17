@@ -8,7 +8,6 @@ import re
 import openai
 from openai import OpenAI
 
-
 # ✅ .env 로드
 load_dotenv()
 
@@ -164,8 +163,3 @@ app.include_router(recommend_router)
 # ✅ 새로 추가
 from translate import router as translate_router
 app.include_router(translate_router)
-
-
-# /support/chat 호출 시 CORS 적용된 router
-from langchain_support_chat import router as chat_router 
-app.include_router(chat_router, prefix="/support", tags=["support"])
