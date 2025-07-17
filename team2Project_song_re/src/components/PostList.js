@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { getPostListPaged } from '../api/postApi';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -13,6 +14,8 @@ const PostList = () => {
   const [recordPerPage, setRecordPerPage] = useState(10);
   const [searchType, setSearchType] = useState("all");
   const [searchKeyword, setSearchKeyword] = useState("");
+  const [originalPosts, setOriginalPosts] = useState([]);     // ← 원본 보관
+  const [isTranslating, setIsTranslating] = useState(false);  // ← 번역 중 플래그
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,7 +63,20 @@ const PostList = () => {
 
   const fetchPosts = async (page, type = "all", keyword = "") => {
     const data = await getPostListPaged(page, type, keyword);
-    setPosts(data.list);
+    // ① 원본 저장
+    setOriginalPosts(data.list);
+
+    // ② LocalStorage에 남은 번역 결과 있으면 덮어쓰기
+    const map = JSON.parse(localStorage.getItem('translatedPosts') || '{}');
+
+    const applied = data.list.map(post =>
+      map[post.post_no]
+        ? { ...post,
+            title:   map[post.post_no].title,
+            content: map[post.post_no].content }
+        : post
+    );
+    setPosts(applied);
     setNowPage(data.now_page);
     setTotalPostCount(data.total);
     setRecordPerPage(data.record_per_page);
@@ -81,6 +97,51 @@ const PostList = () => {
 
     fetchPosts(page, type, keyword);
   }, [location.search]);
+
+  // ③ 번역 버튼 핸들러
+  const handleTranslate = async (targetLanguage) => {
+    if (isTranslating) return;
+    setIsTranslating(true);
+
+    try {
+      const translated = await Promise.all(posts.map(async post => {
+        const [{ data: tRes }, { data: cRes }] = await Promise.all([
+          axios.post('http://localhost:8000/api/translate', {
+            text: post.title, target_language: targetLanguage
+          }),
+          axios.post('http://localhost:8000/api/translate', {
+            text: post.content, target_language: targetLanguage
+          }),
+        ]);
+        return {
+          ...post,
+          title:   tRes.translated_text,
+          content: cRes.translated_text,
+        };
+      }));
+
+      setPosts(translated);
+
+      // LocalStorage에 번역 저장
+      const newMap = {};
+      translated.forEach(p => {
+        newMap[p.post_no] = { title: p.title, content: p.content };
+      });
+      localStorage.setItem('translatedPosts', JSON.stringify(newMap));
+
+    } catch (err) {
+      console.error(err);
+      alert('번역 중 오류가 발생했습니다.');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  // ④ “원래대로” 버튼 핸들러
+  const handleResetTranslation = () => {
+    setPosts(originalPosts);
+    localStorage.removeItem('translatedPosts');
+  };
 
   const totalPage = Math.ceil(totalPostCount / recordPerPage);
 
@@ -140,6 +201,26 @@ const PostList = () => {
                flex flex-col justify-between h-[720px]" >
           {/* 제목 + 비번 버튼 */}
             <h2 className="text-3xl font-bold ml-1">자유 게시판</h2>
+
+              {/* ===== 번역 버튼 ===== */}
+              <div className="translate-buttons mb-4">
+                <button
+                  onClick={() => handleTranslate('en')}
+                  disabled={isTranslating}
+                >
+                  {isTranslating ? '번역 중…' : '영어로 번역'}
+                </button>
+                <button
+                  onClick={() => handleTranslate('ja')}
+                  disabled={isTranslating}
+                >
+                  {isTranslating ? '번역 중…' : '일본어로 번역'}
+                </button>
+                <button onClick={handleResetTranslation}>
+                  원래대로
+                </button>
+              </div>
+
               <div className="flex items-center justify-center gap-2 my-4">
                 {/* 검색 조건 선택창 */}                 
                   <select value={searchType} onChange={(e) => setSearchType(e.target.value)}

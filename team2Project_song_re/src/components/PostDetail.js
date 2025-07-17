@@ -22,6 +22,11 @@ const PostDetail = () => {
   const [prevPost, setPrevPost] = useState(null); // 이전 글
   const [nextPost, setNextPost] = useState(null); // 다음 글
 
+  // ✅ LocalStorage에서 번역 데이터 꺼내기
+  const translationMap = JSON.parse(
+    localStorage.getItem('translatedPosts') || '{}'
+  );
+
   // const userNo = sessionStorage.getItem('userNo');
 
   const userNo    = Number(sessionStorage.getItem('userNo'));
@@ -147,6 +152,10 @@ const handleReplySubmit = async (e, parentReplyNo) => {
 
   if (!post) return <div>로딩 중...</div>;
 
+  // 해당 포스트에 번역 데이터가 있으면 사용, 없으면 원본 사용
+  const translatedTitle = translationMap[post.post_no]?.title || post.title;
+  const translatedContent = translationMap[post.post_no]?.content || post.content;
+
   return (
     <div className="post-detail-container">
       {/* 사이드바 */}
@@ -165,11 +174,11 @@ const handleReplySubmit = async (e, parentReplyNo) => {
 
       {/* 본문 */}
       <div className="content">
-        <div className="post-title">{post.title}</div>
+        <div className="post-title">{translatedTitle}</div>
         <div className="post-meta">
           작성자: {post.name} | 작성일: {post.created_day} | 조회수: {post.view_cnt}
         </div>
-        <div className="post-content">{post.content}</div>
+        <div className="post-content">{translatedContent}</div>
 
         {post?.image && (
           <img

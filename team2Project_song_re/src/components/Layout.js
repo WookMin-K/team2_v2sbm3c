@@ -48,9 +48,9 @@ const Layout = () => {
 
   // 로그아웃
   const handleLogoutClick = () => {
-    if (window.confirm('로그아웃하시면 메인페이지로 이동합니다. 계속하시겠습니까?')) {
+    if (window.confirm('로그아웃 하시겠습니까?')) {
       logout();
-      navigate('/');  // 로그아웃 후 홈으로
+      // navigate('/');  // 로그아웃 후 홈으로
     }
   };
 

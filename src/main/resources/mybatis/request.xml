@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.request.RequestDAOInter">
+
+    <!-- insert -->
+    <insert id="create" parameterType="dev.mvc.request.RequestVO">
+        INSERT INTO request (
+        request_no,
+        user_no,
+        title,
+        content,
+        created_at,
+        answer
+        )
+        VALUES (
+        REQUEST_SEQ.NEXTVAL,
+        #{user_no},
+        #{title},
+        #{content},
+        SYSDATE,
+        NULL
+        )
+    </insert>
+
+    <!-- select list by user -->
+    <select id="listByUser" resultType="dev.mvc.request.RequestVO" parameterType="int">
+        SELECT
+        request_no,
+        user_no,
+        title,
+        content,
+        answer,
+        created_at
+        FROM request
+        WHERE user_no = #{user_no}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 관리자 전체 목록 -->
+    <select id="listAll" resultType="dev.mvc.request.RequestVO">
+        SELECT
+        request_no,
+        user_no,
+        title,
+        content,
+        answer,
+        created_at
+        FROM request
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- Read One -->
+    <select id="read" parameterType="int" resultType="dev.mvc.request.RequestVO">
+        SELECT
+        request_no,
+        user_no,
+        title,
+        content,
+        answer,
+        created_at
+        FROM request
+        WHERE request_no = #{request_no}
+    </select>
+
+    <!-- Update -->
+    <update id="update" parameterType="dev.mvc.request.RequestVO">
+        UPDATE request
+        SET title = #{title},
+        content = #{content}
+        WHERE request_no = #{request_no}
+    </update>
+
+    <!-- Delete -->
+    <delete id="delete" parameterType="int">
+        DELETE FROM request
+        WHERE request_no = #{request_no}
+    </delete>
+
+    <!-- ✅ 관리자 답변 업데이트 -->
+    <update id="updateAnswer" parameterType="dev.mvc.request.RequestVO">
+        UPDATE request
+        SET answer = #{answer}
+        WHERE request_no = #{request_no}
+    </update>
+</mapper>

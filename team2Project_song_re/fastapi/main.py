@@ -159,3 +159,7 @@ for route in app.routes:
     
 from analyzer.agent_recommend import router as recommend_router
 app.include_router(recommend_router)
+
+# ✅ 새로 추가
+from translate import router as translate_router
+app.include_router(translate_router)

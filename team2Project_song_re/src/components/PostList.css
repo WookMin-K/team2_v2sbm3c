@@ -95,3 +95,32 @@ th, td {
 .link-btn:hover {
   text-decoration: none;
 }
+
+/* 번역 버튼 컨테이너 */
+.translate-buttons {
+  display: flex;
+  gap: 8px;                /* 버튼 간격 */
+  margin-bottom: 16px;     /* 상단 요소와 띄우기 */
+}
+
+/* 번역 버튼 공통 스타일 */
+.translate-buttons button {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+/* hover 시 강조 */
+.translate-buttons button:hover {
+  background-color: #e0e0e0;
+}
+
+/* 활성(번역 중)일 때 */
+.translate-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
