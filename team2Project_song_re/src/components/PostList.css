@@ -1,23 +1,29 @@
 .container {
-  display: flex;         /* 가로 정렬 */
+  display: flex;            /* 사이드바+콘텐츠를 가로로 */
   align-items: flex-start;
-  justify-content: center; /* 사이드바+콘텐츠 묶음을 중앙으로 */
-  width: 100%;           /* 화면 전체 너비 사용 */
-  max-width: none;       /* (있다면) 제한 해제 */
-  padding: 1rem;         /* 필요에 따라 패딩 조절 */
+  justify-content: center;  /* 중앙 정렬 */
+  width: 100%;
+  min-height: 100vh;        /* 화면 높이만큼 */
+  background: #f9f9f9;
   box-sizing: border-box;
+  padding: 0;               /* 필요하면 상하 패딩만 주세요 */
 }
+
 .sidebar {
   width: 200px;
   background: #f7f7f7;
   padding: 20px;
-  height: 100vh;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
+
 .content {
   flex: 1;
-  padding: 30px;
+  padding: 40px;
+  background: #fff;
+  box-sizing: border-box;
 }
+
 .board-header {
   display: flex;
   justify-content: space-between;

@@ -262,7 +262,7 @@ const PostList = () => {
                 <tr key={post.post_no} className={post.notice_yn === 'Y' ? 'top-post' : ''}>
                   <td>{post.notice_yn === 'Y' ? '📌' : post.post_no}</td>
                   <td>
-                    <Link to={`/post/read/${post.post_no}`} className="link-btn">
+                    <Link to={`/post/read/${post.post_no}${location.search}`} className="link-btn">
                       {post.title}
                     </Link>
                   </td>

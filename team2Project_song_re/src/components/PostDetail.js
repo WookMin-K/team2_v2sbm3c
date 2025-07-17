@@ -1,7 +1,7 @@
 // 📁 src/components/PostDetail.js
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getPostDetail } from '../api/postApi';
 import { useLoginContext } from '../contexts/LoginContext';
 import ReplyLikeButton from './ReplyLikeButton';
@@ -21,6 +21,7 @@ const PostDetail = () => {
   const [editContent, setEditContent] = useState(''); // 수정 내용
   const [prevPost, setPrevPost] = useState(null); // 이전 글
   const [nextPost, setNextPost] = useState(null); // 다음 글
+  const location = useLocation(); // 목록클릭 시 페이지 유지
 
   // ✅ LocalStorage에서 번역 데이터 꺼내기
   const translationMap = JSON.parse(
@@ -228,13 +229,13 @@ const handleReplySubmit = async (e, parentReplyNo) => {
         <br /><br />
         
           {prevPost ? (
-            <button onClick={() => navigate(`/post/read/${prevPost.post_no}`)}>
+            <button onClick={() => navigate(`/post/read/${prevPost.post_no}${location.search}`)}>
               이전글
             </button>
           ) : <div /> }
-          <button onClick={() => navigate('/post/list')}>목록</button>
+          <button onClick={() => navigate(`/post/list${location.search}`)}>목록</button>
           {nextPost ? (
-            <button onClick={() => navigate(`/post/read/${nextPost.post_no}`)}>
+            <button onClick={() => navigate(`/post/read/${nextPost.post_no}${location.search}`)}>
               다음글
             </button>
           ) : <div /> }
