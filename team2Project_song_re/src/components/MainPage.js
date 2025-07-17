@@ -26,15 +26,6 @@ const MainPage = () => {
     setStage(2);
     setIsLoginOpen(false);
 
-    const prevPath = sessionStorage.getItem('postLogoutPath');
-    if (prevPath) {
-      sessionStorage.removeItem('postLogoutPath');
-      if (window.confirm('로그인 후 이전 페이지로 돌아가시겠습니까?')) {
-        navigate(prevPath);
-        return;
-      }
-    }
-
     const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
     if (redirectUrl) {
       sessionStorage.removeItem('redirectAfterLogin');
@@ -44,7 +35,6 @@ const MainPage = () => {
 
   const handleLogoutClick = () => {
     if (window.confirm('정말 로그아웃 하시겠습니까?')) {
-      sessionStorage.setItem('postLogoutPath', location.pathname);
       logout();
       navigate('/');
     }
@@ -144,6 +134,7 @@ const MainPage = () => {
                 <button onClick={handleStartClick}>일정 생성</button>
                 <button onClick={() => navigate('/triplistregion')}>여행지</button>
                 <button onClick={() => navigate('/post/list')}>게시판</button>
+                <button onClick={() => navigate('/request/create')}>문의사항</button>
               </nav>
             </div>
           </header>

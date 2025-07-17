@@ -21,4 +21,6 @@ CREATE SEQUENCE request_seq
 
 
 ALTER TABLE request ADD file_name VARCHAR2(300)
+
+ALTER TABLE request ADD answer CLOB;
 commit;

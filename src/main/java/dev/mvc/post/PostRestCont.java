@@ -332,15 +332,49 @@ public class PostRestCont {
     }
     
     // 내 글 목록 (페이징)
+//    @GetMapping("/mylist")
+//    public Map<String,Object> mylist(
+//        @RequestParam(value="page", defaultValue="1") int page,
+//        HttpSession session) {
+//      
+//      Integer userNo = (Integer) session.getAttribute("user_no");
+//      if (userNo == null) {
+//        throw new RuntimeException("로그인 필요");
+//      }
+//      return postProc.listByUser(page, userNo);
+//    }
+    
+ // 내 글 목록 (페이징 + 검색)
     @GetMapping("/mylist")
     public Map<String,Object> mylist(
-        @RequestParam(value="page", defaultValue="1") int page,
+        @RequestParam(value="page", defaultValue="1")    int page,
+        @RequestParam(value="type", defaultValue="all")  String type,
+        @RequestParam(value="keyword", defaultValue="")  String keyword,
         HttpSession session) {
-      
+
       Integer userNo = (Integer) session.getAttribute("user_no");
-      if (userNo == null) {
-        throw new RuntimeException("로그인 필요");
-      }
-      return postProc.listByUser(page, userNo);
+      if (userNo == null) throw new RuntimeException("로그인 필요");
+
+      int recordPerPage = 10;
+      int start = (page - 1) * recordPerPage + 1;
+      int end   = page * recordPerPage;
+
+      Map<String,Object> param = new HashMap<>();
+      param.put("userNo", userNo);
+      param.put("start",   start);
+      param.put("end",     end);
+      param.put("type",    type);
+      param.put("keyword", "%" + keyword + "%");
+
+      List<PostVO> list  = postProc.searchMyByPage(param);
+      int total          = postProc.searchMyCount(param);
+
+      Map<String,Object> result = new HashMap<>();
+      result.put("list",            list);
+      result.put("now_page",        page);
+      result.put("record_per_page", recordPerPage);
+      result.put("total",           total);
+      return result;
     }
+    
 }

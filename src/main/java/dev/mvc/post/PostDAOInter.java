@@ -122,5 +122,8 @@ public interface PostDAOInter {
 
   // 내가 쓴 글 전체 건수
   int countByUser(int userNo);
+  
+  List<PostVO> searchMyByPage(Map<String,Object> param);
+  int          searchMyCount (Map<String,Object> param);
 
 }

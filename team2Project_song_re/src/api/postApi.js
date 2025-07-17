@@ -49,7 +49,12 @@ export const getPostListPaged = async (page = 1, type = 'all', keyword = '') => 
   return await res.json();
 };
 
-export function getMyPostListPaged(page) {
-  return axios.get(`/post/mylist?page=${page}`)
-              .then(res => res.data);
+export function getMyPostListPaged(
+  page,
+  type = 'all',      // 기본 검색 타입
+  keyword = ''       // 기본 검색 키워드
+) {
+  return axios
+    .get(`/post/mylist?page=${page}&type=${type}&keyword=${keyword}`)
+    .then(res => res.data);
 };

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getPostListPaged } from '../api/postApi';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-
+import { useLoginContext } from '../contexts/LoginContext';
 
 import './PostList.css';
 
@@ -15,11 +15,48 @@ const PostList = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const { isLoggedIn, setIsLoginOpen } = useLoginContext();
 
   const handleSearch = (e) => {
     e.preventDefault();
     navigate(`/post/list?type=${searchType}&keyword=${searchKeyword}`);
   };
+
+  // 글쓰기 버튼 눌렀을 때
+  const handleWriteClick = () => {
+    if (isLoggedIn) {
+      navigate('/post/create');
+    } else {
+      alert('로그인 후 이용 가능합니다 😊');
+      sessionStorage.setItem('redirectAfterLogin', '/post/create');
+      setIsLoginOpen(true);
+    }
+  };
+
+  // 즐겨찾기
+  const handleBookmarkClick = () => {
+    if (isLoggedIn) {
+      navigate('/mypage/bookmark');
+    } else {
+      alert('로그인 후 이용 가능합니다 😊');
+      sessionStorage.setItem('redirectAfterLogin', '/mypage/bookmark');
+      setIsLoginOpen(true);
+    }
+  };
+
+  // 내 게시글
+  const handleMyPostsClick = () => {
+    if (isLoggedIn) {
+      navigate('/mypage/postlist');
+    } else {
+      alert('로그인 후 이용 가능합니다 😊');
+      sessionStorage.setItem('redirectAfterLogin', '/mypage/postlist');
+      setIsLoginOpen(true);
+    }
+  };
+
 
   const fetchPosts = async (page, type = "all", keyword = "") => {
     const data = await getPostListPaged(page, type, keyword);
@@ -29,7 +66,8 @@ const PostList = () => {
     setRecordPerPage(data.record_per_page);
   };
 
-  const location = useLocation();
+
+
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -47,32 +85,42 @@ const PostList = () => {
   const totalPage = Math.ceil(totalPostCount / recordPerPage);
 
 
+
   return (
     <div className="flex w-screen h-[800px] bg-[#f4f5f7]">
       {/* 왼쪽 사이드바 */}
       <aside className="w-64 bg-white p-6 shadow-md">
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4 text-[#3B3B58]">게시판</h2>
-          <button className="btn mb-2" onClick={() => navigate('/post/create')}>글쓰기</button>
-            <div className="flex gap-4">
-              <div className="flex justify-center gap-6 mt-4 ml-10">
-                {/* 즐겨찾기 버튼 */}
-                <button
-                  onClick={() => navigate('/mypage/bookmark')}
-                  className="btn-star flex flex-col items-center gap-1 text-sm"
-                >
-                  <span className="icon w-6 h-6" />
-                  <span>즐겨찾기</span>
-                </button>
 
-                {/* 내 게시글 버튼 */}
-                <button
-                  onClick={() => navigate('/mypage/postlist')}
-                  className="btn-post flex flex-col items-center gap-1 text-sm"
-                >
-                  <span className="icon w-6 h-6" />
-                  <span>내 게시글</span>
-                </button>
+              {/* 글쓰기 */}
+              <button
+                className="btn mb-2"
+                onClick={handleWriteClick}
+              >
+                글쓰기
+              </button>
+
+              <div className="flex gap-4">
+                
+              <div className="flex justify-center gap-6 mt-4 ml-10">
+              {/* 즐겨찾기 */}
+              <button
+                className="btn-star flex flex-col items-center gap-1 text-sm"
+                onClick={handleBookmarkClick}
+              >
+                <span className="icon w-6 h-6" />
+                <span>즐겨찾기</span>
+              </button>
+
+              {/* 내 게시글 */}
+              <button
+                className="btn-post flex flex-col items-center gap-1 text-sm"
+                onClick={handleMyPostsClick}
+              >
+                <span className="icon w-6 h-6" />
+                <span>내 게시글</span>
+              </button>
               </div>
             </div>          
           <div className="-mx-6 border-t border-gray-300 my-6" />

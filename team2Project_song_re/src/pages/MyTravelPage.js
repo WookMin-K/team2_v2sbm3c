@@ -9,23 +9,22 @@ const MyTravelPage = () => {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 검색어, 페이지 상태
+  // 검색창 입력값과 실제 검색어 분리
+  const [searchInput, setSearchInput] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // 페이징 상태
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (!loginUser) return;
     axios.get(`/travel/list/${loginUser.user_no}`)
-      .then(res => {
-        setPlans(res.data);
-      })
-      .catch(err => {
-        console.error('❌ 여행 일정 가져오기 실패:', err);
-      })
+      .then(res => setPlans(res.data))
+      .catch(err => console.error('❌ 여행 일정 가져오기 실패:', err))
       .finally(() => setLoading(false));
   }, [loginUser]);
 
-  // 1) 검색어로 플랜 필터링
+  // 1) 입력값(searchInput)이 아닌, 확인 버튼으로 설정된 searchTerm 으로 필터링
   const filtered = useMemo(() => {
     if (!searchTerm.trim()) return plans;
     const term = searchTerm.toLowerCase();
@@ -35,40 +34,32 @@ const MyTravelPage = () => {
     );
   }, [plans, searchTerm]);
 
-// 2) 제목(title)별로 그룹핑 → 그 안에서 trip_day별 & 시간순 정렬
-const groupedByTitle = useMemo(() => {
-  // 1) 제목별로 모으기
-  const titleMap = {};
-  filtered.forEach(item => {
-    if (!titleMap[item.title]) titleMap[item.title] = [];
-    titleMap[item.title].push(item);
-  });
-
-  // 2) 제목별 → 일차별 → 시간순 정렬
-  return Object.entries(titleMap).map(([title, items]) => {
-    // 일차별로 묶고
-    const dayMap = {};
-    items.forEach(it => {
-      if (!dayMap[it.trip_day]) dayMap[it.trip_day] = [];
-      dayMap[it.trip_day].push(it);
+  // 2) 제목별 → 일별 정렬/그룹핑
+  const groupedByTitle = useMemo(() => {
+    const titleMap = {};
+    filtered.forEach(item => {
+      if (!titleMap[item.title]) titleMap[item.title] = [];
+      titleMap[item.title].push(item);
     });
+    return Object.entries(titleMap).map(([title, items]) => {
+      const dayMap = {};
+      items.forEach(it => {
+        if (!dayMap[it.trip_day]) dayMap[it.trip_day] = [];
+        dayMap[it.trip_day].push(it);
+      });
+      const days = Object.entries(dayMap)
+        .map(([day, dayItems]) => ({
+          day: Number(day),
+          items: dayItems.sort(
+            (a,b) => new Date(a.start_date) - new Date(b.start_date)
+          )
+        }))
+        .sort((a,b) => a.day - b.day);
+      return { title, days };
+    });
+  }, [filtered]);
 
-    // 일차블록 배열로 변환 후 시간순 정렬
-    const days = Object.entries(dayMap)
-      .map(([day, dayItems]) => ({
-        day: Number(day),
-        items: dayItems.sort(
-          (a,b) => new Date(a.start_date) - new Date(b.start_date)
-        )
-      }))
-      .sort((a,b) => a.day - b.day);
-
-    return { title, days };
-  });
-}, [filtered]);
-
-
- // 3) 페이징 (제목 블록 단위로 페이징)
+  // 3) 페이징 (제목 블록 단위)
   const totalPages = Math.ceil(groupedByTitle.length / PAGE_SIZE);
   const pageData = groupedByTitle.slice(
     (currentPage - 1) * PAGE_SIZE,
@@ -89,88 +80,97 @@ const groupedByTitle = useMemo(() => {
     <div className="w-full p-6">
       <h2 className="text-2xl font-bold mb-4">✈️ 내 여행 일정</h2>
 
-     {/* 검색창 추가 */}
-     <div className="mb-4">
-       <input
-         type="text"
-         placeholder="제목 또는 장소 검색..."
-         value={searchTerm}
-         onChange={e => {
-           setSearchTerm(e.target.value);
-           setCurrentPage(1);        // 검색 시 페이지 초기화
-         }}
-         className="border p-2 w-full rounded"
-       />
-     </div>
+      {/* 검색창 + 확인 버튼 */}
+      <div className="mb-4 flex space-x-2">
+        <input
+          type="text"
+          placeholder="제목 또는 장소 검색..."
+          value={searchInput}
+          onChange={e => setSearchInput(e.target.value)}
+          className="border p-2 flex-1 rounded"
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              setSearchTerm(searchInput);
+              setCurrentPage(1);
+            }
+          }}
+        />
+        <button
+          onClick={() => {
+            setSearchTerm(searchInput);
+            setCurrentPage(1);
+          }}
+          className="bg-blue-500 text-white px-4 rounded"
+        >
+          확인
+        </button>
+      </div>
 
-     {/* 제목 → 일차별 카드 */}
-    {pageData.map(({ title, days }) => (
-      <section key={title} className="mb-8 p-4 border rounded-md">
-        {/* 1️⃣ 제목 */}
-        <h3 className="text-xl font-bold mb-4">📁 {title}</h3>
+      {/* 페이징된 데이터 렌더 */}
+      {pageData.map(({ title, days }) => (
+        <section key={title} className="mb-8 p-4 border rounded-md">
+          <h3 className="text-xl font-bold mb-4">📁 {title}</h3>
+          <div className="w-full flex justify-center space-x-6 overflow-x-auto">
+            {days.map(({ day, items }) => (
+              <div
+                key={day}
+                className="min-w-[200px] bg-white rounded shadow flex-shrink-0"
+              >
+                <h4 className="px-4 py-2 bg-gray-100 font-medium text-center">
+                  {day}일차
+                </h4>
+                <ul className="divide-y">
+                  {items.map(p => (
+                    <li
+                      key={p.plan_no}
+                      className="flex justify-between px-4 py-2 hover:bg-gray-50"
+                    >
+                      <span>
+                        {new Date(p.start_date).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit"
+                        })}
+                      </span>
+                      <span>{p.place}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
 
-        {/* 2️⃣ 일차 카드 가로 스크롤 (가운데 정렬) */}
-        <div className="w-full flex justify-center space-x-6 overflow-x-auto">
-          {days.map(({ day, items }) => (
-            <div
-              key={day}
-              className="min-w-[200px] bg-white rounded shadow flex-shrink-0"
+      {/* 페이징 UI */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center space-x-2 mt-4">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            이전
+          </button>
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`px-3 py-1 border rounded ${
+                currentPage === i + 1 ? 'bg-blue-500 text-white' : ''
+              }`}
             >
-              <h4 className="px-4 py-2 bg-gray-100 font-medium text-center">
-                {day}일차
-              </h4>
-              <ul className="divide-y">
-                {items.map(p => (
-                  <li
-                    key={p.plan_no}
-                    className="flex justify-between px-4 py-2 hover:bg-gray-50"
-                  >
-                    <span>
-                      {new Date(p.start_date).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit"
-                      })}
-                    </span>
-                    <span>{p.place}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+              {i + 1}
+            </button>
           ))}
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            다음
+          </button>
         </div>
-      </section>
-    ))}
-
-     {/* 페이징 UI 추가 */}
-     {totalPages > 1 && (
-       <div className="flex justify-center items-center space-x-2 mt-4">
-         <button
-           onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-           disabled={currentPage === 1}
-           className="px-3 py-1 border rounded disabled:opacity-50"
-         >
-           이전
-         </button>
-         {[...Array(totalPages)].map((_, i) => (
-           <button
-             key={i}
-             onClick={() => setCurrentPage(i + 1)}
-             className={`px-3 py-1 border rounded ${
-               currentPage === i + 1 ? 'bg-blue-500 text-white' : ''
-             }`}
-           >
-             {i + 1}
-           </button>
-         ))}
-         <button
-           onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-           disabled={currentPage === totalPages}
-           className="px-3 py-1 border rounded disabled:opacity-50"
-         >
-           다음
-         </button>
-       </div>
-     )}
+      )}
     </div>
   );
 };

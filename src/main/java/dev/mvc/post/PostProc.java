@@ -110,5 +110,14 @@ public class PostProc implements PostProcInter {
     map.put("record_per_page", recordPerPage);
     return map;
   }
+  
+  @Override
+  public List<PostVO> searchMyByPage(Map<String,Object> param) {
+    return postDAO.searchMyByPage(param);
+  }
+  @Override
+  public int searchMyCount(Map<String,Object> param) {
+    return postDAO.searchMyCount(param);
+  }
 
 }

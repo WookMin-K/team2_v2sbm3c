@@ -27,7 +27,7 @@ function BookmarkListPage() {
         setBookmarks(bookmarkArray);
       })
       .catch(err => console.error('❌ 북마크 목록 불러오기 실패:', err));
-  }, [user_no]);
+  }, [user_no, loginUser]);
 
   const handleClick = async (item) => {
     if (item.type === 'trip') {

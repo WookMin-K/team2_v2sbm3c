@@ -102,6 +102,7 @@ const MyPage = () => {
           <button onClick={() => navigate('/mypage/bookmark')} className="block w-full text-left">⭐ 즐겨찾기</button>
           <button onClick={() => navigate('/mypage/postlist')} className="block w-full text-left">📝 내 게시글</button>
           <button onClick={() => navigate('/mypage/mytravel')} className="block w-full text-left">✈️ 내 여행 일정</button>
+          <button onClick={() => navigate('/request/list')} className="block w-full text-left">✈️ 내 문의</button> 
         </nav>
       </aside>
 
