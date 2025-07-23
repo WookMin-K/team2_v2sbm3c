@@ -4,6 +4,7 @@
 .btn-user  .icon { content:url('./icon/user.png'); }
 .btn_plane  .icon { content:url('./icon/plane_line.png'); }
 .btn_inquiry  .icon { content:url('./icon/inquiry_line.png'); }
+.btn_report .icon { content:url('./icon/report_line.png'); }
 
 /* 호버 & 활성 상태 아이콘 */
 .btn-star:hover  .icon,
@@ -20,6 +21,11 @@
 
 .btn_inquiry:hover  .icon,
 .btn_inquiry.active .icon { content:url('./icon/inquiry.png'); }
+
+
+.btn_report:hover  .icon,
+.btn_report.active  .icon { content:url('./icon/report.png'); }
+
 .custom-file-input {
   display: none; /* 실제 파일 입력은 숨기고 */
 }

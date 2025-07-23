@@ -185,6 +185,13 @@ const MyPage = () => {
             <button onClick={() => navigate('/mypage/users')} className="btn-user flex items-center gap-2 text-lg ml-4">
               <span className="icon w-6 h-6" />
               회원 목록
+            </button>          
+          )}
+
+          {isAdmin && (
+            <button onClick={() => navigate('/admin/reports')} className="btn_report flex items-center gap-2 text-lg ml-4">
+              <span className="icon w-6 h-6" />
+              신고 목록
             </button>
           )}
 
@@ -209,18 +216,7 @@ const MyPage = () => {
             내 문의
           </button>
 
-          {/* 관리자일 때만 신고 목록 */}
-          {isAdmin && (
-            <>
-              <button
-                onClick={() => navigate('/admin/reports')}
-                className="block w-full text-left"
-            >
-              🚩 신고 목록
-            </button>
 
-           </>
-          )}
 
         </nav>
       </aside>

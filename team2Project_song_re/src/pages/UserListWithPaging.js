@@ -94,6 +94,14 @@ const UserListWithPaging = () => {
             </button>
           )}
 
+          {isAdmin && (
+            <button onClick={() => navigate('/admin/reports')} className="btn_report flex items-center gap-2 text-lg ml-4">
+              <span className="icon w-6 h-6" />
+              신고 목록
+            </button>
+          )}
+          
+
           <h3 className="text-xl font-semibold">글 관리</h3>
           <button onClick={() => navigate('/mypage/bookmark')} className="btn-star flex items-center gap-2 text-lg ml-4">
             <span className="icon w-6 h-6" />
