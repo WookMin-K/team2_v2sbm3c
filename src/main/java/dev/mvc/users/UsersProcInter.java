@@ -53,6 +53,8 @@ package dev.mvc.users;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -82,9 +84,6 @@ public interface UsersProcInter {
   /** 회원 / 관리자인지 검사 */
   public boolean isUsers(HttpSession session);
 
-  /** 관리자인지 검사 */
-  public boolean isAdmin(HttpSession session);
-
   /** 마이페이지 사용자 정보 수정 */
   public int update_User(UsersVO usersVO);
 
@@ -108,5 +107,20 @@ public interface UsersProcInter {
 
   /** 암호화하여 비밀번호 변경 처리 */
   public int passwd_update(int user_no, String newPassword);
+  
+  /** 회원 목록 검색 및 페이징 */
+  public List<UsersVO> listWithPaging(Map<String, Object> map);
+
+  public int countAll(Map<String, Object> map);
+
+  /** 관리자인지 검사 */
+  public boolean isAdmin(HttpSession session);
+
+  public int updateProfileUrl(UsersVO usersVO);
+
+  public int checkSnsId(String provider_no);
+
+
+  public UsersVO readByEmail(String email);
 }
 

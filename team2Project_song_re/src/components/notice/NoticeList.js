@@ -22,7 +22,7 @@ const NoticeList = () => {
     const safeType = selectedType || '공지';
 
     try {
-      const res = await fetch(`http://localhost:9093/notice/list?type=${safeType}&now_page=${safePage}`);
+      const res = await fetch(`http://192.168.12.142:9093/notice/list?type=${safeType}&now_page=${safePage}`);
       const data = await res.json();
       setNotices(data.list || []);
       setNowPage(data.now_page);

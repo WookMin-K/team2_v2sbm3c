@@ -4,7 +4,6 @@ import pandas as pd
 
 from analyzer.chart_generator import generate_monthly_chart, generate_pie_and_top5
 from analyzer.insight_generator import generate_insight
-from analyzer.agent_recommend import multi_vs_recommend, generate_trip_summary  # ✅ GPT 요약 함수 재사용
 from analyzer.schemas import MultiVSInput
 import traceback
 import os
@@ -37,10 +36,6 @@ def analyze_trip(region_code: str = Query(...), trip_no: int = Query(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# ✅ 2. VS 성향 기반 추천 API
-@router.post("/agent-recommend")
-def agent_recommend_endpoint(input: MultiVSInput):
-    return multi_vs_recommend(input)
 
 trip_no_to_tname = {
     1: "GANGNAM",
@@ -130,7 +125,6 @@ trip_no_to_tname = {
 @router.get("/agent-analysis")
 def analyze_trip_by_trip_no(trip_no: int = Query(...)):
     try:
-        # ✅ tname 매핑 확인
         if trip_no not in trip_no_to_tname:
             raise HTTPException(status_code=404, detail="해당 trip_no에 대한 tname 없음")
 
@@ -138,16 +132,9 @@ def analyze_trip_by_trip_no(trip_no: int = Query(...)):
         region_code = f"{trip_no}{tname.strip().upper()}"
         file_path = f"csv/{region_code}.csv"
 
-        print("📌 trip_no:", trip_no)
-        print("📌 tname:", tname)
-        print("📌 region_code:", region_code)
-        print("📌 file_path:", file_path)
-        
-
         if not os.path.exists(file_path):
             raise HTTPException(status_code=404, detail=f"분석용 CSV 파일 {file_path} 없음")
 
-        # 👇 분석 로직 실행
         chart = generate_monthly_chart(region_code)
         pie_top = generate_pie_and_top5(trip_no)
         insight = generate_insight(
@@ -171,38 +158,3 @@ def analyze_trip_by_trip_no(trip_no: int = Query(...)):
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
-
-
-# # ✅ 4. 추천 요약 문구 API (TripDetailPage에서 사용)
-# @router.get("/agent-recommend/summary")
-# def recommend_summary(trip_no: int = Query(...)):
-#     try:
-#         df = pd.read_csv("csv/totaldata.csv")
-#         row = df[df["trip_no"] == trip_no]
-
-#         if row.empty:
-#             raise HTTPException(status_code=404, detail="해당 trip_no 없음")
-
-#         trip_name = row.iloc[0]["관광지명"]
-#         region = row.iloc[0]["광역시/도"]
-#         district = row.iloc[0]["시/군/구"]
-#         category = row.iloc[0]["중분류 카테고리"]
-#         search_volume_raw = row.iloc[0]["검색건수"]
-#         try:
-#             search_volume = int(str(search_volume_raw).replace(",", ""))
-#         except:
-#             search_volume = 1000  # 기본값으로 대체
-
-#         summary = generate_trip_summary(
-#             trip_name=trip_name,
-#             region=region,
-#             district=district,
-#             category=category,
-#             search_volume=search_volume
-#         )
-
-#         return JSONResponse({ "summary": summary })
-#     except FileNotFoundError:
-#         raise HTTPException(status_code=404, detail="CSV 파일이 존재하지 않습니다.")
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))

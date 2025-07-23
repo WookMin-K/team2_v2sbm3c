@@ -1,5 +1,7 @@
 package dev.mvc.reply;
 
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 public interface ReplyProcInter {
@@ -53,4 +55,20 @@ public interface ReplyProcInter {
    */
   public ReplyVO read(int reply_no);
 
+  int updateHiddenYn(@Param("replyNo") int replyNo,
+                     @Param("hiddenYn") String hiddenYn);
+
+  /**
+   * 대댓글 개수
+   * @param reply_no
+   * @return
+   */
+  int countChildren(int reply_no);
+
+  /**
+   * 소프트 삭제
+   * @param reply_no
+   * @return
+   */
+  int softDelete(int reply_no);
 }

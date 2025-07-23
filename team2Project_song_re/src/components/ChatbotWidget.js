@@ -1,77 +1,115 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLoginContext } from '../contexts/LoginContext';
+import { useChatbotContext } from '../contexts/ChatbotContext';
 
-const OPENAI_API_KEY = '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';
 
 function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [userInput, setUserInput] = useState('');
-  const [messages, setMessages] = useState([
-    { type: 'bot', text: 'trAveI에 오신것을 환영합니다! 무엇을 도와드릴까요?' },
-  ]);
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const { userNo, userName } = useLoginContext();
+  const [showQuickQuestions, setShowQuickQuestions] = useState(false);
+  const { messages, setMessages } = useChatbotContext();
+  
+
+  // // 1) 새로고침 후에도 저장된 이력을 가져오는 useEffect
+  // useEffect(() => {
+  //   if (!userNo) {
+  //     // 비로그인 시 기본 환영 메시지
+  //     setMessages([{ type: 'bot', text: 'trAveI에 오신것을 환영합니다! 무엇을 도와드릴까요?' }]);
+  //     return;
+  //   }
+  //   // 로그인한 회원 → DB에서 history 호출
+  //   fetch(`http://192.168.12.142:8000/api/chat/history?user_no=${userNo}`)
+  //     .then(res => {
+  //       if (!res.ok) throw new Error('이력 조회 실패');
+  //       return res.json();  // [{ role, content, created_at}, …]
+  //     })
+  //     .then(history => {
+  //       if (history.length === 0) {
+  //         // 첫 대화인 경우, 사용자 이름을 넣어서 인사
+  //         setMessages([{
+  //           type: 'bot',
+  //           text: `${userName}님, 반갑습니다! 무엇을 도와드릴까요?`
+  //         }]);
+  //       } else {
+  //         // 기존 대화 이력을 보여줌
+  //         const msgs = history.map(h => ({
+  //           type: h.role === 'human' ? 'user' : 'bot',
+  //           text: h.content
+  //         }));
+  //         setMessages(msgs);
+  //       }
+  //     })
+  //     .catch(() => {
+  //       // 에러 나도 최소 인사는 보여주기
+  //       setMessages([{
+  //         type: 'bot',
+  //         text: `${userName || '손님'}님, 반갑습니다! 무엇을 도와드릴까요?`
+  //       }]);
+  //     });
+  // }, [userNo, userName]);
+
+  const handleQuickQuestion = async (label) => {
+    if (loading) return;
+    // 바로 전송: userInput을 비우고, 메시지 업데이트, API 호출
+    const updatedMessages = [...messages, { type: 'user', text: label }];
+    setMessages(updatedMessages);
+    setUserInput('');
+    setLoading(true);
+
+    try {
+      const res = await fetch('http://192.168.12.142:8000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_no: userNo ? parseInt(userNo, 10) : null,
+          user_name: userName || null,
+          query: label,
+        }),
+      });
+      if (!res.ok) throw new Error(`API 에러: ${res.status}`);
+      const { answer } = await res.json();
+      setMessages([...updatedMessages, { type: 'bot', text: answer }]);
+    } catch (err) {
+      setMessages([...updatedMessages, { type: 'bot', text: '오류가 발생했어요. 다시 시도해주세요.' }]);
+    } finally {
+      setLoading(false);
+      setShowQuickQuestions(false); // 전송 후 닫기
+    }
+  };
+
 
   const handleSend = async () => {
     if (!userInput.trim()) return;
 
+    // 1) 사용자 메시지 추가
     const updatedMessages = [...messages, { type: 'user', text: userInput }];
     setMessages(updatedMessages);
     setUserInput('');
     setLoading(true);
 
     try {
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      // 2) 로컬 FastAPI 챗봇 호출
+      console.log('🔍 요청 보냄 → http://192.168.12.142:8000/api/chat', userInput);
+      const res = await fetch('http://192.168.12.142:8000/api/chat', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-              {
-                role: 'system',
-                content: `
-                  너는 'trAveI'라는 여행 자동 일정 생성 사이트의 챗봇이야.
-                  자주 묻는 질문(FAQ)을 기준으로 먼저 짧고 정확하게 답하고,
-                  사용자가 추가 설명을 원하거나 이해 못할 경우엔 자세히 풀어서 설명해 줘.
-
-                  ---
-
-                  Q: 여행 일정은 어떻게 생성하나요?
-                  A: 메인에서 'trAveI 시작하기' 또는 '일정 생성'를 클릭하고, 여행지와 날짜를 입력하면 자동으로 일정이 생성돼요.
-
-                  Q: 일정을 저장하려면 어떻게 하나요?
-                  A: 회원가입 후 로그인한 상태에서 일정을 생성하면 자동으로 저장돼요.
-
-                  Q: 저장한 일정은 어디서 볼 수 있나요?
-                  A: 상단 메뉴 '마이페이지 > 내 일정'에서 확인할 수 있어요.
-
-                  Q: PDF로 저장할 수 있나요?
-                  A: '내 일정' 화면에서 'PDF 저장' 버튼을 누르면 바로 저장됩니다.
-
-                  Q: 친구와 일정 공유할 수 있나요?
-                  A: 네! 일정 상세보기에서 '공유하기' 버튼을 누르면 공유 링크가 복사돼요.
-
-                  ---
-
-                  ※ 사용자가 이해하지 못하거나 '자세히 알려줘', '예시 보여줘' 같은 요청을 하면, AI답게 친절하고 쉽게 풀어서 설명해 주세요.
-                `.trim()
-              },
-            ...updatedMessages.map((m) => ({
-              role: m.type === 'user' ? 'user' : 'assistant',
-              content: m.text,
-            })),
-          ],
-        }),
+          user_no:    userNo ? parseInt(userNo, 10) : null,
+          user_name:  userName || null,
+          query: userInput }),
       });
-
-      const data = await res.json();
-      const gptReply = data.choices?.[0]?.message?.content?.trim();
-
-      setMessages([...updatedMessages, { type: 'bot', text: gptReply || '답변 생성 실패 😢' }]);
+        console.log('🔍 fetch 응답:', res.status, res.statusText);
+      if (!res.ok) throw new Error(`API 에러: ${res.status}`);
+      const { answer } = await res.json();
+      
+      // 3) 봇 답변 추가
+      setMessages([...updatedMessages, { type: 'bot', text: answer }]);
     } catch (err) {
+      console.error(err);
       setMessages([...updatedMessages, { type: 'bot', text: '오류가 발생했어요. 다시 시도해주세요.' }]);
     } finally {
       setLoading(false);
@@ -91,19 +129,19 @@ function ChatbotWidget() {
   return (
     <>
       {/* 챗봇 열기 버튼 */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-6 right-6 z-100">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-14 h-14 rounded-full bg-blue-600 text-white shadow-lg flex items-center justify-center hover:bg-blue-700 transition-all"
+          className="w-20 h-20 rounded-full bg-white border border-[#EDE1E1] text-white shadow-lg flex items-center justify-center hover:bg-blue-200 transition-all"
           title="챗봇"
         >
-          💬챗봇
+          <img src="/icon/chatbot.png" alt="챗봇" className="w-12 h-12" />
         </button>
       </div>
 
       {/* 챗봇 UI 창 */}
       {isOpen && (
-        <div className={`fixed bottom-24 right-6
+        <div className={`fixed bottom-24 right-6 z-100
           ${isExpanded ? 'w-[500px] h-[500px]' : 'w-80 h-96'}
           bg-white border border-gray-300 rounded-xl shadow-xl p-4 z-50 transition-all duration-300 flex flex-col`}
         >
@@ -112,8 +150,14 @@ function ChatbotWidget() {
           <div className="flex justify-between items-center mb-2">
             <h2 className="font-bold text-lg text-blue-700">trAveI 챗봇</h2>
             <div className="flex items-center gap-2">
-              <button onClick={() => setIsExpanded(!isExpanded)} title="확장/축소" className="mt-[-4px]">
-                <span className="text-xl text-gray-500 hover:text-black">🗖</span>
+              <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                title={isExpanded ? '창 축소' : '창 확장'}
+                className="mt-[-4px]"
+              >
+                <span className="text-xl text-gray-500 hover:text-black">
+                  {isExpanded ? '🗕' : '🗖'}
+                </span>
               </button>
               <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-black text-xl" title="닫기">✖</button>
             </div>
@@ -137,6 +181,37 @@ function ChatbotWidget() {
             ))}
             {loading && <div className="text-sm text-gray-400 italic">답변 생성 중...</div>}
           </div>
+
+            {/* 빠른 질문 토글 */}
+            <div className="flex justify-end mb-1">
+              <button
+                onClick={() => setShowQuickQuestions(v => !v)}
+                className="text-xs text-blue-500 border border-blue-200 px-2 py-1 rounded hover:bg-blue-50"
+                disabled={loading}
+              >
+                {showQuickQuestions ? "빠른 질문 닫기 ▲" : "빠른 질문 열기 ▼"}
+              </button>
+            </div>
+            {showQuickQuestions && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {[
+                  '여행 일정 생성 방법',
+                  '일정 저장하는 법',
+                  '저장된 일정 보기',
+                  'PDF 저장하기',
+                  '공유하기'
+                ].map(label => (
+                  <button
+                    key={label}
+                    onClick={() => handleQuickQuestion(label)}
+                    className="px-3 py-1 bg-gray-200 rounded-full text-sm hover:bg-gray-300"
+                    disabled={loading}
+                  >
+                    {label}
+                  </button>
+            ))}
+          </div>
+          )}
 
           {/* 입력창 */}
           <div className="flex gap-2 mt-2">

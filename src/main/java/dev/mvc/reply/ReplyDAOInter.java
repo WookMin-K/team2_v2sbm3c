@@ -1,6 +1,7 @@
 package dev.mvc.reply;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -46,7 +47,7 @@ public interface ReplyDAOInter {
    * @param reply_no
    * @return 삭제된 레코드 수
    */
-  public int delete(int reply_no );
+  public int delete(int reply_no);
 
   /**
    * 댓글/대댓글 1건 조회 (수정 전 데이터 불러올 때 사용)
@@ -54,4 +55,24 @@ public interface ReplyDAOInter {
    * @return ReplyVO
    */
   public ReplyVO read(int reply_no);
+
+  /** 댓글 블라인드 */
+  int updateHiddenYn(@Param("replyNo") int replyNo,
+                     @Param("hiddenYn") String hiddenYn);
+
+  /**
+   * 대댓글 개수
+   * @param reply_no
+   * @return
+   */
+  int countChildren(int reply_no);
+
+  /**
+   * 소프트 삭제
+   * @param reply_no
+   * @return
+   */
+  int softDelete(int reply_no);
+
+
 }

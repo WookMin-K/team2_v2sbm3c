@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import LoginModal from '../pages/Login';
 import { useLoginContext } from '../contexts/LoginContext';
 import VSQuestionModal from '../components/recommend/VSQuestionModal'; // ✅ 추가
+import ChatbotWidget from '../components/ChatbotWidget';
 
 const MainPage = () => {
   const [stage, setStage] = useState(0);
@@ -87,8 +88,8 @@ const MainPage = () => {
             <video className="absolute top-0 left-0 w-full h-full object-cover -z-10" src="/video/intro4.mp4" autoPlay muted loop playsInline />
           )}
 
-          <div className={`absolute z-30 transition-all duration-[1500ms] ease-in-out ${stage === 1 ? 'top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-[2]' : 'top-6 left-1/2 transform -translate-x-1/2 scale-100'}`}>
-            <img src="/logo.png" alt="logo" className="w-[50px] md:w-[90px]" />
+          <div className={`absolute z-30 transition-all duration-[1500ms] ease-in-out ${stage === 1 ? 'top-[45%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-[4]' : 'top-5 left-1/2 transform -translate-x-1/2 scale-100'}`}>
+            <img src="/logo.png" alt="logo" className="w-[40px] md:w-[80px]" />
           </div>
 
           {stage === 0 && (
@@ -164,6 +165,10 @@ const MainPage = () => {
               <video className="w-full h-full object-cover" src="/video/intro4.mp4" autoPlay muted loop playsInline />
             </div>
           </main>
+           {/* ↓ 2 스테이지에서만 렌더링 */}
+           <div className="fixed bottom-4 right-4 z-50">
+             <ChatbotWidget currentStep={stage} />
+           </div>
 
           <LoginModal
             isOpen={isLoginOpen}

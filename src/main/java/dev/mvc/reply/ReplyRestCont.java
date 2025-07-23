@@ -43,6 +43,7 @@ public class ReplyRestCont {
     @DeleteMapping("/delete/{reply_no}")
     public Map<String, Object> delete(@PathVariable("reply_no") int reply_no) {
         int cnt = replyProc.delete(reply_no);
+
         Map<String, Object> result = new HashMap<>();
         result.put("result", cnt == 1 ? "success" : "fail");
         return result;

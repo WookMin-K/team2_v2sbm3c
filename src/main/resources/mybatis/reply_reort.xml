@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.reply_report.ReplyReportDAOInter">
+
+    <insert id="insertReport" parameterType="dev.mvc.reply_report.ReplyReportVO">
+        INSERT INTO reply_report(
+        report_no, reply_no, user_no, reason
+        ) VALUES (
+        reply_report_seq.NEXTVAL,
+        #{reply_no}, #{user_no}, #{reason}
+        )
+    </insert>
+
+    <select id="countByReplyNo" resultType="int" parameterType="int">
+        SELECT COUNT(*) FROM reply_report WHERE reply_no = #{reply_no}
+    </select>
+
+    <select id="countByReplyNoAndUserNo" resultType="int" parameterType="map">
+        SELECT COUNT(*)
+        FROM reply_report
+        WHERE reply_no = #{reply_no}
+        AND user_no  = #{user_no}
+    </select>
+
+    <update id="updateStatusByReplyNo" parameterType="int">
+        UPDATE reply_report
+        SET status = 'Y'
+        WHERE reply_no = #{reply_no}
+    </update>
+
+    <select id="listAll" resultType="dev.mvc.reply_report.ReplyReportVO">
+        SELECT
+        rr.report_no,
+        rr.reply_no,
+        r.post_no,
+        rr.user_no,
+        rr.reason,
+        TO_CHAR(rr.report_date, 'YYYY.MM.DD HH24:MI:SS') AS report_date,
+        rr.status
+        FROM reply_report rr
+        JOIN reply r
+        ON rr.reply_no = r.reply_no
+        ORDER BY rr.report_no DESC
+    </select>
+
+</mapper>

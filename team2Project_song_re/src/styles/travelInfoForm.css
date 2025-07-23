@@ -1,7 +1,7 @@
 /* ───────── 컨테이너 ───────── */
 .form-container {
-  width: 95vw;
-  height: 80vh;
+  width: 97vw;
+  height: 83vh;
   box-sizing: border-box;
   padding: 80px 40px;
   margin: 0 auto;
@@ -19,7 +19,7 @@
   overflow: hidden;
 }
 
-/* ───── 상단 3칸 ───── */
+/* ───── 상단 2칸 ───── */
 .grid-1 {
   display: grid;
   grid-template-columns: repeat(2, auto);
@@ -61,8 +61,8 @@
 .input-box,
 select,
 .cost-input {
-  width: 340px;
-  height: 56px;
+  width: 350px;
+  height: 60px;
   padding: 0 16px;
   font-size: 17px;
   border: 1px solid #DFD3D3;
@@ -76,7 +76,7 @@ select,
 
 /* ───── 달력 박스 전용 ───── */
 .date-range-box {
-  width: 360px;
+  width: 350px;
   height: 60px;
   padding: 0 16px;
   font-size: 17px;
@@ -111,7 +111,7 @@ select:hover,
   width: 100%;
   padding: 0 40px;
   margin-top: 30px;
-  gap: 24px;
+  gap: 30px;
 }
 
 /* 이전/다음 버튼 공통 */
@@ -131,16 +131,4 @@ select:hover,
 .nav-btns .prev:hover,
 .nav-btns .next:hover {
   background-color: #accbee;
-}
-
-/* ─── 좌상단 로고 ─── */
-.logo-area {
-  position: absolute;
-  top: 23px;
-  left: 25px;
-  z-index: 100;
-}
-.logo-area img {
-  height: 28px;
-  object-fit: contain;
 }

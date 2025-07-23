@@ -23,18 +23,28 @@
   <result property="user_no"       column="user_no"/>
   <result property="parent_reply_no" column="parent_reply_no"/>
   <result property="user_id"       column="user_id"/>
-  <result property="userName"      column="user_name"/> 
+  <result property="userName"      column="user_name"/>
+  <result property="hiddenYn"      column="hidden_yn"/>
+  <result property="deletedYn"         column="deleted_yn"/>
 </resultMap>
 
   <!-- 게시글에 달린 댓글 + 대댓글 조회 -->
   <select id="list_by_post" resultMap="ReplyMap" parameterType="int">
-  SELECT 
-    r.*, 
+    SELECT
+    r.reply_no,
+    r.content,
+    r.hidden_yn,
+    r.deleted_yn,
+    r.created_day,
+    r.post_no,
+    r.user_no,
+    r.parent_reply_no,
     u.user_id,
-    u.name      AS user_name   
+    u.name  AS user_name
     FROM reply r
     JOIN users u ON r.user_no = u.user_no
     WHERE r.post_no = #{post_no}
+
     ORDER BY NVL(r.parent_reply_no, r.reply_no), r.reply_no
   </select>
 
@@ -63,5 +73,26 @@
   <select id="read" resultType="dev.mvc.reply.ReplyVO">
     SELECT * FROM reply WHERE reply_no = #{reply_no}
   </select>
+
+  <update id="updateHiddenYn" parameterType="map">
+    UPDATE reply
+    SET hidden_yn = #{hiddenYn}
+    WHERE reply_no  = #{replyNo}
+  </update>
+
+  <!-- 대댓글 개수 조회 -->
+  <select id="countChildren" parameterType="int" resultType="int">
+    SELECT COUNT(*)
+    FROM reply
+    WHERE parent_reply_no = #{reply_no}
+  </select>
+
+  <!-- 대댓글이 있을 때 댓글 삭제: deleted_yn = 'Y' -->
+  <update id="softDelete" parameterType="int">
+    UPDATE reply
+    SET deleted_yn = 'Y'
+    WHERE reply_no = #{reply_no}
+  </update>
+
 
 </mapper>

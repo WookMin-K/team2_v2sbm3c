@@ -60,6 +60,9 @@ public class PostVO {
   /** 크기 */
   private Long file_size;
 
+ /** 신고 블라인드 */
+  private String hidden_yn;
+
   /** 작성자 회원 번호 (FK) */
   @NotNull(message = "작성자 번호는 필수 항목입니다.")
   private Integer user_no;

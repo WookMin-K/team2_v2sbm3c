@@ -1,29 +1,17 @@
 .container {
-  display: flex;            /* 사이드바+콘텐츠를 가로로 */
-  align-items: flex-start;
-  justify-content: center;  /* 중앙 정렬 */
-  width: 100%;
-  min-height: 100vh;        /* 화면 높이만큼 */
-  background: #f9f9f9;
-  box-sizing: border-box;
-  padding: 0;               /* 필요하면 상하 패딩만 주세요 */
+  display: flex;
 }
-
 .sidebar {
   width: 200px;
   background: #f7f7f7;
   padding: 20px;
+  height: 100vh;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-  box-sizing: border-box;
 }
-
 .content {
   flex: 1;
-  padding: 40px;
-  background: #fff;
-  box-sizing: border-box;
+  padding: 30px;
 }
-
 .board-header {
   display: flex;
   justify-content: space-between;
@@ -45,8 +33,9 @@ th, td {
 }
 .btn {
   padding: 6px 12px;
-  background-color: #5c6bc0;
-  color: white;
+  background-color: #AFC8E0;
+  color: black;
+  width: 90%;
   border: none;
   border-radius: 4px;
   text-decoration: none;
@@ -58,35 +47,6 @@ th, td {
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-right: 4px;
-}
-.pagination {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-top: 20px;
-  gap: 8px;
-}
-.pagination input {
-  width: 40px;
-  padding: 4px;
-  text-align: center;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.pagination span,
-.pagination a {
-  font-size: 14px;
-}
-.pagination a {
-  text-decoration: none;
-  padding: 4px 6px;
-  border-radius: 4px;
-  color: #5c6bc0;
-  border: 1px solid transparent;
-}
-.pagination a:hover {
-  background-color: #eee;
-  border: 1px solid #ccc;
 }
 
 .link-btn {
@@ -102,31 +62,59 @@ th, td {
   text-decoration: none;
 }
 
-/* 번역 버튼 컨테이너 */
-.translate-buttons {
+/* 기본 아이콘 */
+.btn-star  .icon { content:url('../../public/icon/star_line.png'); }
+.btn-post  .icon { content:url('../../public/icon/post_line.png'); }
+
+/* 호버 & 활성 상태 아이콘 */
+.btn-star:hover  .icon,
+.btn-star.active .icon { content:url('../../public/icon/star.png'); }
+
+.btn-post:hover  .icon,
+.btn-post.active .icon { content:url('../../public/icon/post.png'); }
+
+.pagination {
   display: flex;
-  gap: 8px;                /* 버튼 간격 */
-  margin-bottom: 16px;     /* 상단 요소와 띄우기 */
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 20px;
+  gap: 8px;
 }
 
-/* 번역 버튼 공통 스타일 */
-.translate-buttons button {
-  padding: 6px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #f9f9f9;
-  font-size: 0.9rem;
+/* 버튼 공통 */
+.page-btn {
+  width: 20px;
+  height: 28px;
+  border: none;
+  background: #eee;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* hover 시 강조 */
-.translate-buttons button:hover {
-  background-color: #e0e0e0;
+/* 버튼 비활성화 스타일 */
+.page-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
-/* 활성(번역 중)일 때 */
-.translate-buttons button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* 페이지 정보 텍스트 */
+.page-info {
+  width: 20px;
+  height: 28px;
+  border: 2px solid #E6E6E6;
+  background: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 전체 건수 텍스트 */
+.total-count {
+  color: #666;
+  font-size: 0.9rem;
 }

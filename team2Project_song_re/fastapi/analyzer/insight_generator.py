@@ -44,7 +44,7 @@ def generate_insight(
     """LLM 기반 관광 분석 문구 생성 (5~7문장)"""
 
     # 1) 지역명 / 데이터 요약
-    region_name = ''.join(filter(str.isalpha, region_code))
+    region_name = re.sub(r'[^가-힣]', '', region_code)
     summary = ", ".join([f"{d['month']}월: {d['visitors']:,}명" for d in chart_data])
 
     main_categories = ", ".join([c['name'] for c in piechart[:2]]) or "정보 없음"

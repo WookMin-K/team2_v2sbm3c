@@ -48,7 +48,7 @@ const PostCreate = () => {
      // 헤더 옵션 없이 보내면 axios가 multipart/form-data; boundary=… 까지 자동 처리해 줍니다
      const response = await axios.post(
       //'http://192.168.12.142:9093/post/create',
-       'http://localhost:9093/post/create',
+       'http://192.168.12.142:9093/post/create',
        payload
       );
       if (response.status === 200 || response.status === 201) {

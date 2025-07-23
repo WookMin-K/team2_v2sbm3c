@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import LoginModal from '../pages/Login';
 import { useLoginContext } from '../contexts/LoginContext'; // ✅ 전역 로그인 Context 불러오기
+import ChatbotWidget from './ChatbotWidget';
 
 // ProtectedRoute로 감싼 경로 목록
 const protectedPaths = ['/mypage', '/schedule', '/post/create'];
@@ -144,6 +145,7 @@ const Layout = () => {
               alt="logo"
               className="h-8 cursor-pointer"
               onClick={() => {
+                sessionStorage.setItem('fromLogo', 'true');
                 navigate('/');
               }}
             />
@@ -158,7 +160,7 @@ const Layout = () => {
       )}
 
       {/* 메인 콘텐츠 */}
-      <main className={`${isSchedulePage ? 'pt-24' : 'pt-[120px]'} flex-1 w-full px-6`}>
+      <main className='pt-[108px] px-0'>
         <Outlet />
       </main>
 
@@ -170,6 +172,9 @@ const Layout = () => {
         onLoginSuccess={handleLoginSuccess}
       />
 
+      {/* 🌟 레이아웃을 쓰는 모든 페이지 하단에 항상 렌더링 */}
+      <ChatbotWidget />
+      
       {/* 하단 문구 */}
       <footer className="fixed bottom-4 left-1/2 -translate-x-1/2 text-lg text-gray-500 z-40">
         모두를 위한 여행

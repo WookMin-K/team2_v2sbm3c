@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useLoginContext } from '../../contexts/LoginContext';
 import './bookmark.css';  // ✅ 공통 스타일
 
-const API_BASE = 'http://localhost:9093';
+const API_BASE = 'http://192.168.12.142:9093';
 
 function BookmarkPostButton({ post_no }) {
   const { loginUser } = useLoginContext();

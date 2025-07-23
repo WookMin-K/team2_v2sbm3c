@@ -1,0 +1,96 @@
+/* ── 테이블 fixed layout + sticky header ── */
+.table-wrapper {
+  flex: 1;               /* 남은 세로 공간을 모두 채워 스크롤 */
+  overflow-y: auto;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;   /* 6개 컬럼을 균등 분할 */
+}
+
+/* 칼럼 너비를 6등분 */
+.user-table th,
+.user-table td {
+  width: calc(100% / 6);
+  padding: 8px;
+  text-align: center;
+  box-sizing: border-box;
+  border-bottom: 1px solid #ddd;
+}
+
+/* 헤더 고정(스크롤 시에도 상단에) */
+.user-table thead th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1;
+  border-bottom: 2px solid #333;
+}
+
+/* 검색폼 스타일 (기존) */
+.search-form {
+  display: flex;
+  justify-content: center;
+}
+.search-form input {
+  width: 300px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px 0 0 6px;
+}
+.search-form button {
+  padding: 8px 16px;
+  background: #4a90e2;
+  color: #fff;
+  border: none;
+  border-radius: 0 6px 6px 0;
+  cursor: pointer;
+}
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 20px;
+  gap: 8px;
+}
+
+/* 버튼 공통 */
+.page-btn {
+  width: 20px;
+  height: 28px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 버튼 비활성화 스타일 */
+.page-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* 페이지 정보 텍스트 */
+.page-info {
+  width: 20px;
+  height: 28px;
+  border: 2px solid #E6E6E6;
+  background: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 전체 건수 텍스트 */
+.total-count {
+  color: #666;
+  font-size: 0.9rem;
+}

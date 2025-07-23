@@ -29,7 +29,7 @@ function PostUpdate() {
   const handleDeleteImage = async () => {
     if (window.confirm("이미지를 삭제하시겠습니까?")) {
       try {
-        const res = await axios.delete(`http://localhost:9093/post/delete/image/${postNo}`);
+        const res = await axios.delete(`http://192.168.12.142:9093/post/delete/image/${postNo}`);
         if (res.data.result === 'success') {
           alert("이미지가 삭제되었습니다.");
           setPost((prev) => ({ ...prev, image_org: null }));
@@ -44,7 +44,7 @@ function PostUpdate() {
   const handleDeleteFile = async () => {
     if (window.confirm("파일을 삭제하시겠습니까?")) {
       try {
-        const res = await axios.delete(`http://localhost:9093/post/delete/file/${postNo}`);
+        const res = await axios.delete(`http://192.168.12.142:9093/post/delete/file/${postNo}`);
         if (res.data.result === 'success') {
           alert("파일이 삭제되었습니다.");
           setPost((prev) => ({ ...prev, file_org: null }));
@@ -74,7 +74,7 @@ const handleSubmit = async (e) => {
   try {
     // multipart/form-data 로 POST
     const res = await axios.post(
-      "http://localhost:9093/post/update",
+      "http://192.168.12.142:9093/post/update",
       payload
       // 헤더는 axios가 자동으로 잡아줍니다
     );

@@ -1,25 +1,75 @@
-/* ChartComponents - 선형/파이 차트 외부 영역 스타일 */
+/* 📊 ChartComponents - 선형/파이 차트 감성 스타일 */
 
 .chart-container {
   width: 100%;
-  height: 320px;
-  margin-bottom: 18px;
-  background: #fcfcfc;
-  border-radius: 14px;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.07);
-  padding: 10px 16px 24px 16px;
+  height: 340px;
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #fdfdfd, #f7faff);
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 16px 20px 28px 20px;
   position: relative;
+  transition: box-shadow 0.3s ease;
+}
+.chart-container:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* 차트 출처 표시 */
+/* 🔍 차트 제목 공통 스타일 */
+.chart-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+/* 🔹 출처 텍스트 */
 .chart-source {
   text-align: right;
-  margin-right: 20px;
-  font-size: 10px;
-  color: #666;
+  margin-top: 10px;
+  margin-right: 8px;
+  font-size: 11px;
+  color: #888;
+  font-style: italic;
 }
 
-/* 파이차트 내부 legend, label 조정 (옵션) */
+/* 🥧 파이차트 Legend 위치 조정 */
 .recharts-legend-wrapper {
   bottom: 0 !important;
+  font-size: 12px;
+}
+
+/* ✅ 툴팁 스타일 공통 */
+.recharts-tooltip-wrapper {
+  z-index: 10;
+  pointer-events: none;
+}
+.recharts-default-tooltip {
+  background: #fffefb !important;
+  border: 1px solid #ddd !important;
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+  font-size: 13px;
+  color: #333;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* 📍 최대/최소 라벨 강조용 (red, blue) */
+.chart-label-max {
+  fill: red;
+  font-weight: bold;
+  font-size: 12px;
+}
+.chart-label-min {
+  fill: blue;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+/* ⚪ 차트 점 스타일 (애니메이션용 선택) */
+.chart-dot {
+  transition: r 0.2s ease;
+}
+.chart-dot:hover {
+  r: 6;
 }

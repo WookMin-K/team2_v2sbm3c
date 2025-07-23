@@ -50,7 +50,7 @@ const NoticeCreate = () => {
       });
 
       const res = await axios.post(
-        'http://localhost:9093/notice/create', // ⛳ API 주소 주의!
+        'http://192.168.12.142:9093/notice/create', // ⛳ API 주소 주의!
         //'http://192.168.12.142:9093';
         formData
       );

@@ -55,7 +55,10 @@ dependencies {
   implementation 'com.sun.mail:javax.mail:1.6.2'
   // https://mvnrepository.com/artifact/javax.activation/activation
   implementation 'javax.activation:activation:1.1.1'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+  implementation 'org.springframework.security:spring-security-oauth2-client'
+  
 }
 
 

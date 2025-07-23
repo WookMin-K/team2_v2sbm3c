@@ -1,0 +1,49 @@
+/* 기본 아이콘 */
+.btn-star  .icon { content:url('./icon/star_line.png'); }
+.btn-post  .icon { content:url('./icon/post_line.png'); }
+.btn-user  .icon { content:url('./icon/user.png'); }
+.btn_plane  .icon { content:url('./icon/plane_line.png'); }
+.btn_inquiry  .icon { content:url('./icon/inquiry_line.png'); }
+
+/* 호버 & 활성 상태 아이콘 */
+.btn-star:hover  .icon,
+.btn-star.active .icon { content:url('./icon/star.png'); }
+
+.btn-post:hover  .icon,
+.btn-post.active .icon { content:url('./icon/post.png'); }
+
+.btn-user:hover  .icon,
+.btn-user.active .icon { content:url('./icon/user2.png'); }
+
+.btn_plane:hover  .icon,
+.btn_plane.active .icon { content:url('./icon/plane.png'); }
+
+.btn_inquiry:hover  .icon,
+.btn_inquiry.active .icon { content:url('./icon/inquiry.png'); }
+.custom-file-input {
+  display: none; /* 실제 파일 입력은 숨기고 */
+}
+
+.custom-file-label {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #AFC8E0;
+  color: #000;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.custom-file-label:hover {
+  background: #96B6D7;
+}
+
+.modal-box {
+  width: 400px;    /* 원하는 고정 너비 */
+  max-width: 90%;  /* 반응형 여유 */
+  padding: 1.5rem; /* 기존 p-6 */
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

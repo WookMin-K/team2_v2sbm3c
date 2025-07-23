@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.users_sns.UsersSnsDAOInter">
+
+    <insert id="create" parameterType="dev.mvc.users_sns.UsersSnsVO">
+        INSERT INTO users_sns(sns_no, provider, provider_no, user_no, created_at)
+        VALUES (USERS_SNS_SEQ.nextval, #{provider}, #{provider_no}, #{user_no}, sysdate)
+    </insert>
+
+    <select id="checkSnsId" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM users_sns WHERE provider_no = #{provider_no}
+    </select>
+
+</mapper>

@@ -2,13 +2,10 @@ package dev.mvc.bookmark;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
-import jakarta.servlet.http.HttpSession;
-import dev.mvc.users.UsersVO;
 
 @RestController
 @RequestMapping("/bookmark")
@@ -19,17 +16,14 @@ public class BookmarkCont {
   private BookmarkProcInter bookmarkProc;
 
   /** 즐겨찾기 등록 (trip 또는 post) */
-  public int create(@RequestBody HashMap<String, Object> data, HttpSession session) {
-    // 1) 세션에서 로그인 사용자 VO 꺼내기
-    UsersVO loginUser = (UsersVO) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      throw new RuntimeException("로그인이 필요합니다");
-    }
+  @PostMapping("/create")
+  public int create(@RequestBody HashMap<String, Object> data) {
+    int user_no = (int) data.get("user_no");
+    String type = (String) data.get("type");
 
     BookmarkVO vo = new BookmarkVO();
-    vo.setUser_no(loginUser.getUser_no());  // ← 세션 유저 번호로 채움
+    vo.setUser_no(user_no);
 
-    String type = (String) data.get("type");
     if ("trip".equals(type)) {
       vo.setTrip_no((Integer) data.get("trip_no"));
       return bookmarkProc.create_trip(vo);
@@ -40,25 +34,6 @@ public class BookmarkCont {
       return 0; // 유효하지 않은 타입
     }
   }
-  
-//  @PostMapping("/create")
-//  public int create(@RequestBody HashMap<String, Object> data) {
-//    int user_no = (int) data.get("user_no");
-//    String type = (String) data.get("type");
-//
-//    BookmarkVO vo = new BookmarkVO();
-//    vo.setUser_no(user_no);
-//
-//    if ("trip".equals(type)) {
-//      vo.setTrip_no((Integer) data.get("trip_no"));
-//      return bookmarkProc.create_trip(vo);
-//    } else if ("post".equals(type)) {
-//      vo.setPost_no((Integer) data.get("post_no"));
-//      return bookmarkProc.create_post(vo);
-//    } else {
-//      return 0; // 유효하지 않은 타입
-//    }
-//  }
 
   /** 중복 체크 (trip 또는 post) */
   @PostMapping("/check")
@@ -72,39 +47,21 @@ public class BookmarkCont {
   }
 
   /** 즐겨찾기 삭제 (trip 또는 post) */
-  @DeleteMapping("/delete")
-  public int deletePost(
-      @RequestBody Map<String,Object> data,
-      HttpSession session
-  ) {
-    UsersVO loginUser = (UsersVO) session.getAttribute("loginUser");
-    if (loginUser == null) {
-      throw new RuntimeException("로그인 필요");
+  @PostMapping("/delete")
+  public int delete(@RequestBody HashMap<String, Integer> map) {
+    BookmarkVO vo = new BookmarkVO();
+    vo.setUser_no(map.get("user_no"));
+
+    if (map.containsKey("trip_no")) {
+      vo.setTrip_no(map.get("trip_no"));
+      return bookmarkProc.delete_by_user_and_trip(vo);
+    } else if (map.containsKey("post_no")) {
+      vo.setPost_no(map.get("post_no"));
+      return bookmarkProc.delete_by_user_and_post(vo);
     }
 
-    int postNo = (Integer) data.get("post_no");
-    BookmarkVO vo = new BookmarkVO();
-    vo.setPost_no(postNo);
-    vo.setUser_no(loginUser.getUser_no());  
-
-    return bookmarkProc.delete_by_user_and_post(vo);
+    return 0;
   }
-  
-//  @PostMapping("/delete")
-//  public int delete(@RequestBody HashMap<String, Integer> map) {
-//    BookmarkVO vo = new BookmarkVO();
-//    vo.setUser_no(map.get("user_no"));
-//
-//    if (map.containsKey("trip_no")) {
-//      vo.setTrip_no(map.get("trip_no"));
-//      return bookmarkProc.delete_by_user_and_trip(vo);
-//    } else if (map.containsKey("post_no")) {
-//      vo.setPost_no(map.get("post_no"));
-//      return bookmarkProc.delete_by_user_and_post(vo);
-//    }
-//
-//    return 0;
-//  }
 
   /** 즐겨찾기 목록 (단순 VO 목록) */
   @GetMapping("/list")

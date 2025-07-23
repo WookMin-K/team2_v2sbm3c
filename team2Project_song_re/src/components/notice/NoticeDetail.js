@@ -12,7 +12,7 @@ const NoticeDetail = () => {
   useEffect(() => {
     const fetchNotice = async () => {
       try {
-        const res = await fetch(`http://localhost:9093/notice/read/${notice_no}`);
+        const res = await fetch(`http://192.168.12.142:9093/notice/read/${notice_no}`);
         if (!res.ok) throw new Error("공지사항을 불러올 수 없습니다.");
         const data = await res.json();
         setNotice(data.notice);
@@ -55,7 +55,7 @@ const NoticeDetail = () => {
           if (!origin || !saved) return null;
 
           const isImage = type && type.startsWith("image/");
-          const fileUrl = `http://localhost:9093/uploads/notice/${saved}`;
+          const fileUrl = `http://192.168.12.142:9093/uploads/notice/${saved}`;
 
           return (
             <div key={index} className="notice-file-block" style={{ marginBottom: '1rem' }}>

@@ -61,6 +61,7 @@
     p.file_org,
     p.file_type,
     p.file_size,
+    p.hidden_yn,
     u.name
     FROM post p
     JOIN users u ON p.user_no = u.user_no
@@ -270,6 +271,10 @@
 </select>
 
 
-
+  <update id="updateHiddenYn" parameterType="map">
+    UPDATE post
+      SET hidden_yn = #{hiddenYn}
+    WHERE post_no = #{postNo}
+  </update>
 
 </mapper>

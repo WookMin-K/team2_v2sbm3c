@@ -15,6 +15,9 @@ const MyTravelPage = () => {
 
   // 페이징 상태
   const [currentPage, setCurrentPage] = useState(1);
+  
+  // (추가) 일자별 열림/닫힘 상태
+  const [opened, setOpened] = useState({});
 
   useEffect(() => {
     if (!loginUser) return;
@@ -33,6 +36,7 @@ const MyTravelPage = () => {
       p.place.toLowerCase().includes(term)
     );
   }, [plans, searchTerm]);
+
 
   // 2) 제목별 → 일별 정렬/그룹핑
   const groupedByTitle = useMemo(() => {

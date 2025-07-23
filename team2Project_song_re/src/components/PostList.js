@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { getPostListPaged } from '../api/postApi';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link  } from 'react-router-dom';
 import { useLoginContext } from '../contexts/LoginContext';
-
+import prev5Icon from '../pages/icon/left2.png';
+import prev1Icon from '../pages/icon/left.png';
+import next1Icon from '../pages/icon/right.png';
+import next5Icon from '../pages/icon/right2.png';
 import './PostList.css';
 
 const PostList = () => {
@@ -19,7 +21,6 @@ const PostList = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  
   const { isLoggedIn, setIsLoginOpen } = useLoginContext();
 
   const handleSearch = (e) => {
@@ -106,10 +107,10 @@ const PostList = () => {
     try {
       const translated = await Promise.all(posts.map(async post => {
         const [{ data: tRes }, { data: cRes }] = await Promise.all([
-          axios.post('http://localhost:8000/api/translate', {
+          axios.post('http://192.168.12.142:8000/api/translate', {
             text: post.title, target_language: targetLanguage
           }),
-          axios.post('http://localhost:8000/api/translate', {
+          axios.post('http://192.168.12.142:8000/api/translate', {
             text: post.content, target_language: targetLanguage
           }),
         ]);
@@ -145,6 +146,12 @@ const PostList = () => {
 
   const totalPage = Math.ceil(totalPostCount / recordPerPage);
 
+  const jumpToPage = (delta) => {
+    let page = nowPage + delta;
+    if (page < 1) page = 1;
+    if (page > totalPage) page = totalPage;
+    navigate(`/post/list?page=${page}&type=${searchType}&keyword=${searchKeyword}`);
+  };
 
 
   return (
@@ -200,20 +207,14 @@ const PostList = () => {
         <div className="w-full max-w-[1180px] bg-white p-6 rounded shadow
                flex flex-col justify-between h-[720px]" >
           {/* 제목 + 비번 버튼 */}
-            <h2 className="text-3xl font-bold ml-1">자유 게시판</h2>
+          <h2 className="text-3xl font-bold ml-1">자유 게시판</h2>
 
               {/* ===== 번역 버튼 ===== */}
               <div className="translate-buttons mb-4">
-                <button
-                  onClick={() => handleTranslate('en')}
-                  disabled={isTranslating}
-                >
+                <button onClick={() => handleTranslate('en')} disabled={isTranslating}>
                   {isTranslating ? '번역 중…' : '영어로 번역'}
                 </button>
-                <button
-                  onClick={() => handleTranslate('ja')}
-                  disabled={isTranslating}
-                >
+                <button onClick={() => handleTranslate('ja')} disabled={isTranslating}>
                   {isTranslating ? '번역 중…' : '일본어로 번역'}
                 </button>
                 <button onClick={handleResetTranslation}>
@@ -262,7 +263,9 @@ const PostList = () => {
                 <tr key={post.post_no} className={post.notice_yn === 'Y' ? 'top-post' : ''}>
                   <td>{post.notice_yn === 'Y' ? '📌' : post.post_no}</td>
                   <td>
-                    <Link to={`/post/read/${post.post_no}${location.search}`} className="link-btn">
+                    <Link to={`/post/read/${post.post_no}`} 
+                    state={{ fromSearch: location.search }}
+                    className="link-btn">
                       {post.title}
                     </Link>
                   </td>
@@ -276,25 +279,43 @@ const PostList = () => {
         </div>
         
           {/* 페이징 영역 */}
-          <div className="pagination flex justify-center items-center gap-4 pt-0">
-          <button
-            className="page-btn"
-            onClick={() => navigate(`/post/list?page=${nowPage - 1}&type=${searchType}&keyword=${searchKeyword}`)}
-            disabled={nowPage === 1}
-          >
-            ◀
-          </button>
-          <span>{nowPage} / {totalPage}</span>
-          <button
-            className="page-btn"
-            onClick={() => navigate(`/post/list?page=${nowPage + 1}&type=${searchType}&keyword=${searchKeyword}`)}
-            disabled={nowPage === totalPage}
-          >
-            ▶
-          </button>
+          <div className="pagination flex items-center gap-4 absolute bottom-4 right-4">
+            <span>{nowPage}</span>
             <span>전체 {totalPostCount}건</span>
-          </div>  
-        </div>
+
+            <button
+              className="page-btn"
+              onClick={() => jumpToPage(-5)}
+              disabled={nowPage === 1}
+            >
+              <img src={prev5Icon} alt="◀◀" className="w-6 h-6" />
+            </button>
+
+            <button
+              className="page-btn"
+              onClick={() => jumpToPage(-1)}
+              disabled={nowPage === 1}
+            >
+              <img src={prev1Icon} alt="◀" className="w-6 h-6" />
+            </button>
+
+            <button
+              className="page-btn"
+              onClick={() => jumpToPage(1)}
+              disabled={nowPage === totalPage}
+            >
+              <img src={next1Icon} alt="▶" className="w-6 h-6" />
+            </button>
+
+            <button
+              className="page-btn"
+              onClick={() => jumpToPage(5)}
+              disabled={nowPage >= totalPage}
+            >
+              <img src={next5Icon} alt="▶▶" className="w-6 h-6" />
+            </button>
+            </div>  
+          </div>
       </section>
     </div>
   );

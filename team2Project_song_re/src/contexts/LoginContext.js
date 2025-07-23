@@ -58,6 +58,7 @@ export const LoginProvider = ({ children }) => {
   const logout = () => {
     console.log("🚪 로그아웃 실행");
     setLoginUser(null);
+    localStorage.removeItem('chatbot_guest_history');
     alert('로그아웃 되었습니다!');
   };
 

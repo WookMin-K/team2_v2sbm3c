@@ -112,7 +112,6 @@ const Map = ({
   setSpotList,
   setCurrentAreaCode,
   setCurrentSigunguCode,
-  handleDistrictClick,
   fetchSpotList,
 }) => {
   const [showGuide, setShowGuide] = useState(false);   // 팝업 상태
@@ -198,8 +197,8 @@ const Map = ({
 
           {/* 통영시 추가 텍스트 예시 */}
           {selectedRegion === '경상남도' && (
-            <div className="absolute pointer-events-none z-[999]" style={{ top: '76%', left: '45.3%' }}>
-              <span className="text-white text-lg font-medium">통영시</span>
+            <div className="absolute pointer-events-none z-[999]" style={{ top: '73%', left: '45.7%' }}>
+              <span className="text-white text-md font-medium">통영시</span>
             </div>
           )}
 

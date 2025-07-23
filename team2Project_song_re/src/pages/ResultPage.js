@@ -52,7 +52,7 @@ const handleSave = async () => {
     console.log('✅ 보낼 planList:', planList);
 
     // ✅ POST 요청
-    const res = await fetch('http://localhost:9093/travel/createList', {
+    const res = await fetch('http://192.168.12.142:9093/travel/createList', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(planList)

@@ -5,7 +5,7 @@ import { useLoginContext } from '../../contexts/LoginContext';
 import TripModal from '../TripModal';
 import './bookmark.css';
 
-const API_BASE = 'http://localhost:9093';
+const API_BASE = 'http://192.168.12.142:9093';
 
 function BookmarkListPage() {
   const [bookmarks, setBookmarks] = useState([]);
@@ -34,7 +34,7 @@ function BookmarkListPage() {
       try {
         setLoading(true); // ✅ 로딩 시작
         const regionCode = `${item.trip_no}${item.trip_title?.toUpperCase?.() || ''}`;
-        const res = await fetch(`http://localhost:8000/trip/analysis?region_code=${regionCode}&region_name=${item.trip_title}&trip_no=${item.trip_no}`);
+        const res = await fetch(`http://192.168.12.142:8000/trip/analysis?region_code=${regionCode}&region_name=${item.trip_title}&trip_no=${item.trip_no}`);
         const data = await res.json();
 
         const trip = {
@@ -101,8 +101,8 @@ function BookmarkListPage() {
               {item.trip_title || '제목 없음'}
             </h3>
             <div className="bookmark-meta">
-              <span>📌 지역: {item.sname || '미지정'}</span>
-              <span>👤 등록자: {item.user_name || '이름 없음'}</span>
+              <span>📌 즐겨찾기 지역: {item.sname || '미지정'}</span>
+              
             </div>
           </li>
         ))}
@@ -121,8 +121,8 @@ function BookmarkListPage() {
               <li key={item.bookmark_no} className="bookmark-card" onClick={() => handleClick(item)}>
                 <h3 className="bookmark-title-text">{item.post_title}</h3>
                 <div className="bookmark-meta">
-                  <span>📅 작성일: {new Date(item.created_day).toLocaleDateString()}</span>
-                  <span>👤 작성자: {item.user_name || '이름 없음'}</span>
+                  <span>📌 즐겨찾기 글: {item.post_title || '미지정'}</span>
+          
                 </div>
               </li>
             ))}
@@ -135,7 +135,7 @@ function BookmarkListPage() {
         <TripModal
           trip={activeTrip}
           onClose={() => setShowModal(false)}
-          user_no={user_no}
+          user_no={loginUser?.user_no ?? null}
         />
       )}
     </div>

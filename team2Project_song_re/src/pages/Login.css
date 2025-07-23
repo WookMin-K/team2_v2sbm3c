@@ -14,7 +14,7 @@
 
 /* 모달 박스 */
 .login-modal {
-  background-color: #f1f3f5;
+  background-color: #ECEDF0;
   width: 400px;
   padding: 40px 30px;
   border-radius: 12px;
@@ -49,25 +49,42 @@
   width: 100%;
   padding: 12px 14px;
   margin-bottom: 18px;
-  border: 1px solid #ccc;
+  border: 1px solid #DFD3D3;
   border-radius: 8px;
   font-size: 15px;
   outline: none;
 }
 
 .login-input:focus {
-  border-color: #4c73ff;
-  box-shadow: 0 0 0 2px rgba(76, 115, 255, 0.2);
+  border-color: #dfcaca;
+  box-shadow: 0 0 0 1px #ecb2b3;
+}
+
+/* 아이디 저장 체크박스 영역 */
+.login-save-row {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin-top: -14px;
+  margin-bottom: 14px;
+  margin-left: 4px;
+  color: #444;
+}
+
+.login-save-row input[type="checkbox"] {
+  accent-color: #ccc;
+  margin-right: 6px;
+  cursor: pointer;
 }
 
 /* 로그인 버튼 */
 .login-button {
   width: 100%;
-  padding: 12px 0;
-  background-color: #ccc;
-  color: #fff;
+  padding: 10px 0;
+  background-color: #D9D9D9;
+  color: #000;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 15px;
   border: none;
   border-radius: 6px;
   margin-top: 10px;
@@ -76,7 +93,15 @@
 }
 
 .login-button:hover {
-  background-color: #999;
+  background-color: #919090;
+}
+
+/* 에러 메시지 */
+.login-error {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
 }
 
 /* 하단 버튼 줄 */
@@ -91,7 +116,7 @@
   background: none;
   border: none;
   color: #333;
-  font-size: 13px;
+  font-size: 15px;
   cursor: pointer;
   padding: 4px 8px;
   transition: color 0.2s ease;
@@ -101,15 +126,159 @@
   color: #4c73ff;
 }
 
-/* 가입하기 버튼 */
-.SignUp-button {
-  background-color: #cbd5e0; /* Tailwind의 bg-gray-400 */
-  color: white;              /* text-white */
-  padding: 0.5rem 1.5rem;    /* py-2 = 0.5rem, px-6 = 1.5rem */
-  border-radius: 0.25rem;    /* rounded */
-  transition: background-color 150ms ease-in-out; /* transition */
+/* 로그인 처리 중 오버레이 */
+.login-loading-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(1.5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
 }
 
-.SignUp-button:hover {
-  background-color: #4b5563; /* hover:bg-gray-600 */
+.login-loading-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000;
+  text-align: center;
+}
+.login-test-btn {
+  width: 100%;
+  padding: 10px 0;
+  margin-top: 8px;
+  background-color: #b7d4e3;
+  color: #000;
+  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.login-test-btn:hover {
+  background-color: #6ca5be;
+}
+
+/* 공통 소셜 버튼 */
+
+.social-login {
+  display: flex;
+  justify-content: center;   /* 가로 가운데 정렬 */
+  align-items: center;       /* 세로 정렬 */
+  gap: 12px;                 /* 버튼 사이 간격 */
+  margin-top: 20px;
+}
+
+.naver-login-btn,
+.kakao-login-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;      /* 원형 버튼 */
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;        /* 내부 요소가 넘치지 않도록 */
+  padding: 0;
+}
+
+/* 이미지 크기 */
+.naver-login-btn img,
+.kakao-login-btn img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+/* 공통 hover 효과 */
+.naver-login-btn::after,
+.kakao-login-btn::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.08); /* 반투명 오버레이 */
+  border-radius: 50%;                    /* 원형 효과 */
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.naver-login-btn:hover::after,
+.kakao-login-btn:hover::after {
+  opacity: 1;
+}
+
+.gsi-material-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  height: 60px;  /* 버튼 크기 */
+  width: 60px;   /* 버튼 크기 */
+  border-radius: 50%; /* 원형 버튼 */
+  background-color: #ffffff;
+  box-sizing: border-box;
+  padding: 0;
+  position: relative;
+  transition: background-color .218s, border-color .218s, box-shadow .218s;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.gsi-material-button .gsi-material-button-icon img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+
+.gsi-material-button .gsi-material-button-content-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 가운데 정렬 */
+  height: 100%;
+  width: 100%;
+}
+
+.gsi-material-button .gsi-material-button-state {
+  transition: opacity .218s;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  border-radius: 50%;   /* 원형 hover 효과 */
+}
+
+.gsi-material-button:disabled {
+  cursor: default;
+  background-color: #ffffff61;
+}
+
+.gsi-material-button:disabled .gsi-material-button-state {
+  background-color: #1f1f1f1f;
+}
+
+.gsi-material-button:disabled .gsi-material-button-icon {
+  opacity: 38%;
+}
+
+.gsi-material-button:not(:disabled):active .gsi-material-button-state, 
+.gsi-material-button:not(:disabled):focus .gsi-material-button-state {
+  background-color: #001d35;
+  opacity: 12%;
+}
+
+.gsi-material-button:not(:disabled):hover {
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, .30), 0 1px 3px 1px rgba(60, 64, 67, .15);
+}
+
+.gsi-material-button:not(:disabled):hover .gsi-material-button-state {
+  background-color: #001d35;
+  opacity: 8%;
 }

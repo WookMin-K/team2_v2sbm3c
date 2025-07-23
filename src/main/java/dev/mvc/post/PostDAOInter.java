@@ -126,4 +126,6 @@ public interface PostDAOInter {
   List<PostVO> searchMyByPage(Map<String,Object> param);
   int          searchMyCount (Map<String,Object> param);
 
+  int updateHiddenYn(@Param("postNo") int postNo,
+                     @Param("hiddenYn") String hiddenYn);
 }

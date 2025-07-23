@@ -2,6 +2,8 @@ package dev.mvc.post;
 
 
 
+import org.apache.ibatis.annotations.Param;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,5 +128,8 @@ public interface PostProcInter {
    * 검색 건수
    */
   int searchMyCount(Map<String,Object> param);
-  
+
+  int updateHiddenYn(@Param("postNo") int postNo,
+                     @Param("hiddenYn") String hiddenYn);
+
 }

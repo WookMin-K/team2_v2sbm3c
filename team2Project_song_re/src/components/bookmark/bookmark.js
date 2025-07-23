@@ -1,8 +1,8 @@
 // 📁 src/api/bookmark.js
 import axios from 'axios';
 
-const API = 'http://localhost:9093/bookmark';
-//const API = 'http://192.168.12.142:9093';
+const API = 'http://192.168.12.142:9093/bookmark';
+//const API = 'http://localhost:9093';
 
 // ✅ 즐겨찾기 등록
 export const createBookmark = ({ user_no, trip_no, post_no }) => {

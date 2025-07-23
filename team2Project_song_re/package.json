@@ -2,7 +2,7 @@
   "name": "screen1",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:9093",
+  "proxy": "http://192.168.12.142:9093",
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -16,6 +16,7 @@
     "rc-slider": "^11.1.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-draggable": "^4.5.0",
     "react-intersection-observer": "^9.16.0",
     "react-router-dom": "^7.6.3",
     "react-scripts": "^5.0.1",

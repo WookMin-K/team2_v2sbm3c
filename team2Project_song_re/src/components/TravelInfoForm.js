@@ -51,7 +51,7 @@ const handleSubmit = async () => {
   try {
     console.log('✅ 보낼 payload:', payload);
 
-    const response = await fetch('http://localhost:8000/api/generate-schedule', {
+    const response = await fetch('http://192.168.12.142:8000/api/generate-schedule', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

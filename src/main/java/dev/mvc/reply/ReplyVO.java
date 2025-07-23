@@ -41,6 +41,12 @@ public class ReplyVO {
   /** 내가 쓴 댓글 조회용 */
   private String post_title;
   
-  private String userName; 
+  private String userName;
+
+  /** 신고 블라인드 */
+  private String hiddenYn;
+
+  /** 댓글 삭제 시 대댓글 고정 */
+  private String deletedYn;
 
 }

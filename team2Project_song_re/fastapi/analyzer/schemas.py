@@ -24,8 +24,17 @@ class InsightResponse(BaseModel):
     piechart: List[PieItem]     # 파이차트 데이터
     top5: List[Top5Item]        # 인기 장소 Top5
 
+# ✅ 질문/응답 쌍 (VS 기반 감성 문항)
+class QuestionAnswerPair(BaseModel):
+    question: str
+    answer: str
+
 # ✅ AI 추천 요청 입력 스키마
 class MultiVSInput(BaseModel):
-    score_keywords: List[str]           # 예: ['핫플', '산', ...]
-    emotional_keywords: List[str]       # 예: ['감성', '힐링', ...]
-    user_id: Optional[int] = None       # 비회원일 경우 None 가능
+    score_keywords: List[str]
+    emotional_keywords: List[str]
+    selected_questions: Optional[List[QuestionAnswerPair]] = []
+    user_name: Optional[str] = None  # ✅ 이 라인 추가
+    last_trip: Optional[str] = None  # ✅ 이것도 썼다면 함께 추가
+    user_no: Optional[int] = None         # 🔥 추가
+    session_id: Optional[str] = None      # 🔥 추가

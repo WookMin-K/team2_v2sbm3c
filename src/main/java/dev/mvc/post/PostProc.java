@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 @Service("dev.mvc.post.PostProc")
+@Primary
 public class PostProc implements PostProcInter {
 
   @Autowired
@@ -118,6 +120,11 @@ public class PostProc implements PostProcInter {
   @Override
   public int searchMyCount(Map<String,Object> param) {
     return postDAO.searchMyCount(param);
+  }
+
+  @Override
+  public int updateHiddenYn(int postNo, String hiddenYn) {
+    return postDAO.updateHiddenYn(postNo, hiddenYn);
   }
 
 }

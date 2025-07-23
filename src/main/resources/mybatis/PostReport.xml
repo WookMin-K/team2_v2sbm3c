@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dev.mvc.post_report.PostReportDAOInter">
+    <!-- 신고 등록 -->
+    <insert id="insertReport" parameterType="dev.mvc.post_report.PostReportVO">
+        INSERT INTO post_report
+        (report_no, post_no, user_no, reason)
+        VALUES
+        (post_report_seq.NEXTVAL, #{post_no}, #{user_no}, #{reason})
+    </insert>
+
+    <!-- 게시글별 신고 개수 -->
+    <select id="countByPostNo" parameterType="int" resultType="int">
+        SELECT COUNT(*) FROM post_report
+        WHERE post_no = #{post_no}
+    </select>
+
+    <!-- 관리자용 전체 신고 목록 -->
+    <select id="listAll" resultType="dev.mvc.post_report.PostReportVO">
+        SELECT * FROM post_report
+        ORDER BY report_date DESC
+    </select>
+
+    <!-- 중복 신고 방지용 카운트 -->
+    <select id="countByPostNoAndUserNo" resultType="int" parameterType="map">
+        SELECT COUNT(*)
+        FROM post_report
+        WHERE post_no = #{post_no}
+        AND user_no = #{user_no}
+    </select>
+
+    <update id="updateStatusByPostNo" parameterType="int">
+        UPDATE post_report
+        SET status = 'Y'
+        WHERE post_no = #{post_no}
+    </update>
+</mapper>
