@@ -1,8 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback  } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useLoginContext } from '../contexts/LoginContext';
 import './MyPage.css';
+import getCroppedImg from '../utils/cropImage';
+import Cropper from 'react-easy-crop';
 
 axios.defaults.withCredentials = true;
 const DEFAULT_PROFILE = '/icon/user2.png';
@@ -31,24 +33,11 @@ const MyPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef();
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
 
-  // 1) 페이지 로드 시 사용자 정보 및 프로필 URL 불러오기
-  // useEffect(() => {
-  //   if (!loginUser?.user_id) return;
-  //   axios.get(`/users/${loginUser.user_id}`)
-  //     .then(res => {
-  //       const data = res.data;
-  //       // 서버가 반환하는 필드 중 camelCase 또는 snake_case 프로필 URL 매핑
-  //       const profileUrl = data.profileUrl ?? data.profile_url ?? null;
-  //       setLoadedUser({ ...data, profileUrl });
-  //     })
-  //     .catch(err => {
-  //       console.error('사용자 정보 불러오기 실패:', err);
-  //       alert('사용자 정보를 불러올 수 없습니다.');
-  //     });
-  // }, [loginUser]);
 
-   // 1) 페이지 로드 시 사용자 정보 및 프로필 URL 불러오기
    useEffect(() => {
      if (!loginUser?.user_id) return;
      axios.get(`/users/${loginUser.user_id}`)
@@ -64,12 +53,35 @@ const MyPage = () => {
        });
    }, [loginUser]);
 
+  const onCropComplete = useCallback((_, areaPixels) => {
+    setCroppedAreaPixels(areaPixels);
+  }, []);
+
+  const showCroppedImage = useCallback(async () => {
+    try {
+      const croppedBlob = await getCroppedImg(
+        URL.createObjectURL(selectedFile),
+        croppedAreaPixels
+      );
+      // blob → File 로 변환
+      const croppedFile = new File([croppedBlob], selectedFile.name, {
+        type: selectedFile.type,
+      });
+      // 여기서 croppedFile 을 업로드 폼에 넣고 handleUpload 호출
+      setSelectedFile(croppedFile);
+    } catch (e) {
+      console.error(e);
+    }
+  }, [croppedAreaPixels, selectedFile]);
+
+
   // **로딩 처리: loginUser 또는 loadedUser가 없으면 렌더 중단**
   if (!loginUser || !loadedUser) {
     return <div className="text-center mt-20">로딩 중...</div>;
   }
 
   const isAdmin = loadedUser.grade === 0;
+
 
   // 2) 필드 저장
   const handleSave = async () => {
@@ -136,11 +148,24 @@ const MyPage = () => {
         alert('업로드 실패');
       }
     };
-
-    const handleReset = () => {
+    const handleReset = async () => {
       if (!window.confirm('기본 이미지로 변경하시겠습니까?')) return;
-      // DB 업데이트 없이, 프론트 state만 DEFAULT_PROFILE로 리셋
-      setLoadedUser(prev => ({ ...prev, profileUrl: null }));
+
+      try {
+        // 서버에 reset 요청
+        const { data } = await axios.post('/users/reset-profile', {
+          user_id: loadedUser.user_id
+        });
+        if (data.status === 'success') {
+          // state 리셋
+          setLoadedUser(prev => ({ ...prev, profileUrl: null }));
+        } else {
+          alert('초기화 실패: ' + (data.message || ''));
+        }
+      } catch (err) {
+        console.error('초기화 에러:', err);
+        alert('초기화 오류');
+      }
     };
 
   // 등급 아이콘 & 등급명
@@ -342,58 +367,73 @@ const MyPage = () => {
 
       {/* 모달 */}  
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          {/* modal-box에 flex-col, items-center, p-6, w-96 추가 */}
-          <div className="bg-white modal-box">
-            <h3 className="text-2xl font-bold mb-6">프로필 이미지 변경</h3>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="bg-white modal-box p-6">
+          <h3 className="text-2xl font-bold mb-4">프로필 이미지 변경</h3>
 
-          {/* 선택된 파일이 있으면 바로 미리보기, 없으면 기존(또는 기본) */}
-          <img
-            src={
-              selectedFile
-                ? URL.createObjectURL(selectedFile)
-                : (loadedUser.profileUrl || DEFAULT_PROFILE)
-            }
-            alt="프로필 미리보기"
-            className="w-80 h-80 mx-auto mb-8 object-cover rounded"
-          />
-
-            {/* 숨긴 파일 입력 */}
-            <input
-              id="fileInput"
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              className="hidden"
-            />
-
-            {/* 파일선택 레이블 (버튼처럼) */}
-            <label
-              htmlFor="fileInput"
-              className="px-4 py-2 bg-[#AFC8E0] hover:bg-[#96B6D7] text-blue-700 rounded cursor-pointer"
-            >
-              파일 선택
-            </label>
-
-            {/* 버튼 그룹을 맨 아래로 밀기 위해 mt-auto */}
-            <div className="mt-auto flex space-x-4">
-              <button
-                onClick={handleUpload}
-                className="px-4 py-2 bg-[#AFC8E0] hover:bg-[#96B6D7] text-white rounded"
-              >
-                업로드
-              </button>
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
-              >
-                취소
-              </button>
+          {/* 1. 업로드한 파일이 있으면 크롭퍼 띄우기 */}
+          {selectedFile ? (
+            <div className="relative w-80 h-80 bg-gray-200">
+              <Cropper
+                image={URL.createObjectURL(selectedFile)}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
             </div>
+          ) : (
+            <div className="w-80 h-80 bg-gray-100 flex items-center justify-center">
+              <span className="text-gray-500">이미지를 선택하세요</span>
+            </div>
+          )}
+
+          {/* 2. 크롭 영역 확정 버튼 */}
+          {selectedFile && (
+            <button
+              onClick={showCroppedImage}
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              영역 선택 완료
+            </button>
+          )}
+
+          {/* 3. 파일 입력 */}
+          <input
+            id="fileInput"
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <label
+            htmlFor="fileInput"
+            className="mt-4 block text-center bg-[#AFC8E0] hover:bg-[#96B6D7] text-white px-4 py-2 rounded cursor-pointer"
+          >
+            파일 선택
+          </label>
+
+          {/* 4. 업로드 / 취소 */}
+          <div className="mt-6 flex justify-center space-x-4">
+            <button
+              onClick={handleUpload}
+              className="px-4 py-2 bg-green-500 text-white rounded"
+            >
+              업로드
+            </button>
+            <button
+              onClick={closeModal}
+              className="px-4 py-2 bg-gray-300 text-gray-800 rounded"
+            >
+              취소
+            </button>
           </div>
         </div>
-      )}
+      </div>
+    )}
     </div>
   );
 };

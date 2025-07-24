@@ -554,24 +554,22 @@ public class UsersCont {
     /** 프로필 이미지 초기화 */
     @PostMapping("/reset-profile")
     public Map<String, Object> resetProfile(@RequestBody Map<String, String> body) {
-        Map<String, Object> res = new HashMap<>();
-        try {
-            String userId = body.get("user_id");
-            // 1) DB 상의 profile_url 컬럼을 null 또는 '' 로 업데이트
-            UsersVO user = usersProc.readById(userId);
-            user.setProfile_url(null);
-            usersProc.updateProfileUrl(user);
+      Map<String, Object> res = new HashMap<>();
+      try {
+          String userId = body.get("user_id");
+          
+          // 오직 파일만 삭제!
+          storageService.deleteProfileImage(userId);
 
-            // 2) 클라이언트에 상태 리턴
-            res.put("status", "success");
-        } catch (Exception e) {
-            // 예외 잡아서 상태+메시지 리턴
-            res.put("status", "fail");
-            res.put("message", e.getMessage());
-            e.printStackTrace();
-        }
-        return res;
-    }
+          // 성공 리턴
+          res.put("status", "success");
+      } catch (Exception e) {
+          res.put("status", "fail");
+          res.put("message", e.getMessage());
+          e.printStackTrace();
+      }
+      return res;
+  }
 
 
 }

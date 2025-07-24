@@ -39,4 +39,22 @@ public class StorageService {
     // 5) 클라이언트에서 사용하는 URL
     return "/images/profiles/" + userId + ext;
   }
+  
+  /** userId 기반으로 저장된 프로필 이미지를 모두 삭제 */
+  public void deleteProfileImage(String userId) {
+    // 1) 업로드 루트 경로
+    String uploadRoot = staticLocations.replace("file:///", ""); // "C:/kd/upload/"
+    File profilesDir = Paths.get(uploadRoot, "profiles").toFile();
+
+    // 2) userId로 시작하는 파일 모두 찾기
+    File[] files = profilesDir.listFiles((dir, name) -> name.startsWith(userId + "."));
+    if (files != null) {
+      for (File f : files) {
+        if (!f.delete()) {
+          System.err.println("삭제 실패: " + f.getAbsolutePath());
+        }
+      }
+    }
+  }
+  
 }

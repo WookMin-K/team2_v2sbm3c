@@ -148,12 +148,6 @@
   </where>
 </select>
 
-  <!-- 프로필 URL 업데이트 -->
-  <update id="updateProfileUrl" parameterType="dev.mvc.users.UsersVO">
-    UPDATE users
-    SET profile_url = #{profile_url}
-    WHERE user_no     = #{user_no}
-  </update>
 
 
 </mapper>
