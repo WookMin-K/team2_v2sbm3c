@@ -29,35 +29,17 @@ const Login = ({ isOpen, onClose, onSignUpClick, onLoginSuccess }) => {
   // SNS Oauth2 팝업에서 로그인 성공 시 처리
   useEffect(() => {
     const handleMessage = (e) => {
-      if (e.data === 'OAUTH2_LOGIN_SUCCESS') {
-        axios.get('/users/me', { withCredentials: true })
-          .then(res => {
-            if (res.data.name) {
-              const user = res.data;
-              login({
-                user_no: user.user_no,
-                name: user.name,
-                user_id: user.user_id,
-                grade: Number(user.grade),
-              });
-              const payload = {
-                name: user.name,
-                no: user.user_no,
-                grade: Number(user.grade),
-              };
-              onLoginSuccess?.(payload); // null-safe
-              onClose();
-            } else {
-              alert('로그인에 실패했습니다.');
-            }
-          })
-          .catch(err => {
-            if (err.response?.status === 401) {
-              // 인증 안 된 상태 (모달 유지)
-            } else {
-              console.error('유저 정보 불러오기 실패', err);
-            }
-          });
+      // 출처 검사
+      if (e.origin !== window.location.origin) return;
+      if (e.data?.type === 'OAUTH2_LOGIN_SUCCESS') {
+        const { user_no, user_id, name, grade } = e.data.payload;
+        // 1) 컨텍스트에 로그인 상태 저장
+        login({ user_no, user_id, name, grade });
+        // 2) 부모 컴포넌트 콜백 (필요에 따라 화면 이동 등)
+        onLoginSuccess?.(e.data.payload);
+        onClose();
+      } else if (e.data === 'OAUTH2_LOGIN_FAILURE') {
+        alert('소셜 로그인 실패');
       }
     };
     window.addEventListener('message', handleMessage);
@@ -65,6 +47,8 @@ const Login = ({ isOpen, onClose, onSignUpClick, onLoginSuccess }) => {
   }, [login, onClose, onLoginSuccess]);
 
   if (!isOpen) return null;
+
+  
 
   // 일반(아이디/비밀번호) 로그인
   const handleLogin = async () => {

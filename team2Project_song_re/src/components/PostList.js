@@ -209,15 +209,28 @@ const PostList = () => {
           {/* 제목 + 비번 버튼 */}
           <h2 className="text-3xl font-bold ml-1">자유 게시판</h2>
 
-              {/* ===== 번역 버튼 ===== */}
-              <div className="translate-buttons mb-4">
-                <button onClick={() => handleTranslate('en')} disabled={isTranslating}>
-                  {isTranslating ? '번역 중…' : '영어로 번역'}
+              {/* ===== 번역 버튼 (스타일 업그레이드) ===== */}
+              <div className="flex justify-end gap-3 mb-4">
+                <button
+                  onClick={() => handleTranslate('en')}
+                  disabled={isTranslating}
+                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 transition"
+                >
+                  {isTranslating ? '번역 중…' : 'English'}
                 </button>
-                <button onClick={() => handleTranslate('ja')} disabled={isTranslating}>
-                  {isTranslating ? '번역 중…' : '일본어로 번역'}
+
+                <button
+                  onClick={() => handleTranslate('ja')}
+                  disabled={isTranslating}
+                  className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg shadow hover:bg-green-700 disabled:opacity-50 transition"
+                >
+                  {isTranslating ? '翻訳中…' : '日本語'}
                 </button>
-                <button onClick={handleResetTranslation}>
+
+                <button
+                  onClick={handleResetTranslation}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg shadow hover:bg-gray-300 transition"
+                >
                   원래대로
                 </button>
               </div>

@@ -1,5 +1,6 @@
 package dev.mvc.users;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.beans.factory.annotation.Value;
+import java.io.File;
+import java.nio.file.Paths;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -26,6 +31,13 @@ public class UsersCont {
     @Autowired
     @Qualifier("dev.mvc.users.UsersProc")
     private UsersProcInter usersProc;
+    
+    @Autowired
+    private StorageService storageService;
+    
+     // application.properties 에 정의된 정적 리소스 루트
+     @Value("${spring.web.resources.static-locations}")
+     private String staticLocations; // ex: "file:///C:/kd/upload/"
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -128,19 +140,46 @@ public class UsersCont {
 //         response.put("status", "duplicate");
 //     } 중복 검사 까지 되는 코드
 
+    
     /**
      * [React 전용] 아이디로 회원 정보 조회 - JSON 반환
      */
+//    @GetMapping("/{user_id}")
+//    public ResponseEntity<UsersVO> getUserInfo(@PathVariable("user_id") String user_id) {
+//        UsersVO user = usersProc.readById(user_id); // DB에서 회원 정보 조회
+//        if (user != null) {
+//            return ResponseEntity.ok(user); // 200 OK + JSON 응답
+//        } else {
+//            return ResponseEntity.notFound().build(); // 404 Not Found
+//        }
+//    }
+    /**
+     * [React 전용] 아이디로 회원 정보 조회 - 이미지추가
+     */
     @GetMapping("/{user_id}")
     public ResponseEntity<UsersVO> getUserInfo(@PathVariable("user_id") String user_id) {
-        UsersVO user = usersProc.readById(user_id); // DB에서 회원 정보 조회
-        if (user != null) {
-            return ResponseEntity.ok(user); // 200 OK + JSON 응답
-        } else {
-            return ResponseEntity.notFound().build(); // 404 Not Found
-        }
-    }
-
+          UsersVO user = usersProc.readById(user_id);
+          if (user == null) {
+              return ResponseEntity.notFound().build();
+          }
+      
+          // 2) 파일시스템에서 업로드된 프로필 이미지 찾아서 profile_url 세팅
+          //    (spring.web.resources.static-locations 에 설정된 파일 루트 사용)
+          String uploadRoot = staticLocations.replace("file:///", "");  // "C:/kd/upload/"
+          
+          File profilesDir = Paths.get(uploadRoot, "profiles").toFile();
+          if (profilesDir.exists() && profilesDir.isDirectory()) {
+            File[] files = profilesDir.listFiles((dir, name) -> name.startsWith(user_id + "."));
+            if (files != null && files.length > 0) {
+              String filename = files[0].getName();
+              // 경로는 /images/** 로 매핑돼 있으므로
+              user.setProfile_url("/images/profiles/" + filename);
+            }
+          }
+      
+          // 3) JSON으로 응답
+          return ResponseEntity.ok(user);
+       }
 
     /**
      * 전체 회원 목록 조회
@@ -159,7 +198,7 @@ public class UsersCont {
             return  "redirect:/users/login_cookie_need?url=/users/list";
         }
     }
-
+    
     /**
      * 회원번호로 상세 조회
      * @param model
@@ -449,6 +488,89 @@ public class UsersCont {
         }
         ArrayList<UsersVO> list = usersProc.list();
         return ResponseEntity.ok(list);
+    }
+    
+    @GetMapping("/me")
+    public ResponseEntity<Map<String,Object>> getCurrentUser(HttpSession session) {
+        Integer userNo = (Integer) session.getAttribute("user_no");
+        String userId = (String)  session.getAttribute("user_id");
+        String name   = (String)  session.getAttribute("name");
+        Integer grade = (Integer) session.getAttribute("grade");
+
+        if (userNo == null) {
+            // 로그인이 안 된 상태
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                 .body(Map.of("message", "로그인이 필요합니다."));
+        }
+
+        Map<String,Object> userMap = new HashMap<>();
+        userMap.put("user_no", userNo);
+        userMap.put("user_id", userId);
+        userMap.put("name",   name);
+        userMap.put("grade",  grade);
+
+        return ResponseEntity.ok(userMap);
+    }
+    
+//    /** 프로필 이미지 업로드 */
+//    @PostMapping(value="/upload-profile", consumes="multipart/form-data")
+//    public ResponseEntity<Map<String,Object>> uploadProfile(
+//            @RequestParam("user_id") String userId,
+//            @RequestParam("profile") MultipartFile file
+//    ) throws IOException {
+//        Map<String,Object> res = new HashMap<>();
+//
+//        // 1) 실제 파일 저장 (로컬, S3 등)
+//        String savedPath = storageService.saveProfileImage(userId, file);
+//
+//        // 2) DB에 profile_url 업데이트
+//        UsersVO user = usersProc.readById(userId);
+//        user.setProfile_url(savedPath);
+//        int cnt = usersProc.updateProfileUrl(user);
+//
+//        if (cnt == 1) {
+//            res.put("status", "success");
+//            res.put("profileUrl", savedPath);
+//        } else {
+//            res.put("status", "fail");
+//        }
+//        return ResponseEntity.ok(res);
+//    }
+    
+    @PostMapping(value="/upload-profile", consumes="multipart/form-data")
+    public ResponseEntity<Map<String,Object>> uploadProfile(
+        @RequestParam("user_id") String userId,
+        @RequestParam("profile") MultipartFile file
+    ) throws IOException {
+      String url = storageService.saveProfileImage(userId, file);
+      Map<String,Object> res = Map.of(
+        "status", "success",
+        "profileUrl", url
+      );
+      return ResponseEntity.ok(res);
+    }
+
+
+    /** 프로필 이미지 초기화 */
+    @PostMapping("/reset-profile")
+    public Map<String, Object> resetProfile(@RequestBody Map<String, String> body) {
+        Map<String, Object> res = new HashMap<>();
+        try {
+            String userId = body.get("user_id");
+            // 1) DB 상의 profile_url 컬럼을 null 또는 '' 로 업데이트
+            UsersVO user = usersProc.readById(userId);
+            user.setProfile_url(null);
+            usersProc.updateProfileUrl(user);
+
+            // 2) 클라이언트에 상태 리턴
+            res.put("status", "success");
+        } catch (Exception e) {
+            // 예외 잡아서 상태+메시지 리턴
+            res.put("status", "fail");
+            res.put("message", e.getMessage());
+            e.printStackTrace();
+        }
+        return res;
     }
 
 

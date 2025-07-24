@@ -1,11 +1,41 @@
 import React, { useEffect } from 'react';
+import axios from 'axios';
 
 const OAuth2RedirectHandler = () => {
   useEffect(() => {
-    // 부모창에 메시지 보내기
-    window.opener.postMessage('OAUTH2_SIGNUP_SUCCESS', window.location.origin);
-    // 팝업 창 닫기
-    window.close();
+    // 1) 백엔드에서 로그인된 유저 정보 가져오기
+    axios.get('/users/me', { withCredentials: true })
+      .then(res => {
+        const user = res.data;
+        if (user && user.user_no) {
+          // 2) 부모창에 로그인 성공 메시지와 페이로드 전달
+          window.opener.postMessage(
+            { type: 'OAUTH2_LOGIN_SUCCESS', payload: {
+                user_no: user.user_no,
+                name:    user.name,
+                user_id: user.user_id,
+                grade:   Number(user.grade),
+              }
+            },
+            window.location.origin
+          );
+        } else {
+          window.opener.postMessage(
+            { type: 'OAUTH2_LOGIN_FAILURE' },
+            window.location.origin
+          );
+        }
+      })
+      .catch(() => {
+        window.opener.postMessage(
+          { type: 'OAUTH2_LOGIN_FAILURE' },
+          window.location.origin
+        );
+      })
+      .finally(() => {
+        // 3) 팝업 창 닫기
+        window.close();
+      });
   }, []);
 
   return (

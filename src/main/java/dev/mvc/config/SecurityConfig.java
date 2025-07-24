@@ -1,4 +1,3 @@
-// src/main/java/dev/mvc/config/SecurityConfig.java
 package dev.mvc.config;
 
 import dev.mvc.users.CustomOAuth2UserService;
@@ -36,21 +35,21 @@ public class SecurityConfig {
           )
           .oauth2Login(oauth2 -> oauth2
             // 로그인 성공 후 리다이렉트될 URL
-            .defaultSuccessUrl("http://192.168.12.142:3000", true)
+            .defaultSuccessUrl("http://192.168.12.142:3000/oauth2/redirect", true)
             .userInfoEndpoint(userInfo -> userInfo
               // 커스텀 서비스 주입
               .userService(context.getBean(CustomOAuth2UserService.class))
             )
-            .successHandler((request, response, authentication) -> {
-              // 팝업 닫기 스크립트만 실행
-              response.setContentType("text/html;charset=UTF-8");
-              response.getWriter().write("""
-                <script>
-                  window.opener.postMessage('OAUTH2_LOGIN_SUCCESS', '*');
-                  window.close();
-                </script>
-              """);
-            })
+//            .successHandler((request, response, authentication) -> {
+//              // 팝업 닫기 스크립트만 실행
+//              response.setContentType("text/html;charset=UTF-8");
+//              response.getWriter().write("""
+//                <script>
+//                  window.opener.postMessage('OAUTH2_LOGIN_SUCCESS', '*');
+//                  window.close();
+//                </script>
+//              """);
+//            })
           )
           .logout(logout -> logout
             .logoutSuccessUrl("/")

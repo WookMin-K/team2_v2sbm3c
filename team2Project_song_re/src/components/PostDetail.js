@@ -1,4 +1,4 @@
-
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getPostDetail } from '../api/postApi';
@@ -24,6 +24,10 @@ const PostDetail = () => {
   const [prevPost, setPrevPost] = useState(null);
   const [nextPost, setNextPost] = useState(null);
 
+  // 댓글 원본 보관 + 번역 중 플래그
+  const [originalReplies, setOriginalReplies] = useState([]);
+  const [isTranslatingReplies, setIsTranslatingReplies] = useState(false);
+
   // 게시글 신고 모달 
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
@@ -42,14 +46,49 @@ const PostDetail = () => {
   const location = useLocation(); // 목록클릭 시 페이지 유지
   const fromSearch = location.state?.fromSearch || location.search;
 
+
+  // ✅ LocalStorage에서 번역 데이터 꺼내기
+  const translationMap = JSON.parse(
+    localStorage.getItem('translatedPosts') || '{}'
+  );
+
   // 데이터 로드
   const fetchData = async () => {
     const data = await getPostDetail(postNo);
     setPost(data.post);
     setReplies(data.replies);
+    setOriginalReplies(data.replies);
     setPrevPost(data.prev);
     setNextPost(data.next);
   };
+
+  // 댓글 번역
+const translateReplies = async (lang) => {
+  if (isTranslatingReplies) return;
+  setIsTranslatingReplies(true);
+  try {
+    const translated = await Promise.all(
+      replies.map(async r => {
+        const { data } = await axios.post(
+          'http://192.168.12.142:8000/api/translate',
+          { text: r.content, target_language: lang }
+        );
+        return { ...r, content: data.translated_text };
+      })
+    );
+    setReplies(translated);
+  } catch (err) {
+    console.error(err);
+    alert('댓글 번역 중 오류가 발생했습니다.');
+  } finally {
+    setIsTranslatingReplies(false);
+  }
+};
+
+// 댓글 원래대로
+const resetReplyTranslation = () => {
+  setReplies(originalReplies);
+};
 
   useEffect(() => {
     fetchData();
@@ -217,6 +256,10 @@ const PostDetail = () => {
 
   if (!post) return <div>로딩 중...</div>;
 
+  // 해당 포스트에 번역 데이터가 있으면 사용, 없으면 원본 사용
+  const translatedTitle = translationMap[post.post_no]?.title || post.title;
+  const translatedContent = translationMap[post.post_no]?.content || post.content;
+
   return (
     <div className="post-detail-container">
       {/* 사이드바 */}
@@ -244,11 +287,11 @@ const PostDetail = () => {
           </div>
         ) : (
           <>
-            <div className="post-title">{post.title}</div>
+            <div className="post-title">{translatedTitle}</div>
             <div className="post-meta">
               작성자: {post.name} | 작성일: {post.created_day} | 조회수: {post.view_cnt}
             </div>
-            <div className="post-content">{post.content}</div>
+            <div className="post-content">{translatedContent}</div>
 
             {post.image && (
               <img
@@ -318,6 +361,30 @@ const PostDetail = () => {
                 <button type="submit">등록</button>
               </div>
             </form>
+
+            {/* 댓글 번역 버튼들 */}
+            <div className="flex justify-end gap-3 mb-4">
+              <button
+                onClick={() => translateReplies('en')}
+                disabled={isTranslatingReplies}
+                className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition"
+              >
+                {isTranslatingReplies ? '번역 중…' : '댓글 영어로'}
+              </button>
+              <button
+                onClick={() => translateReplies('ja')}
+                disabled={isTranslatingReplies}
+                className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition"
+              >
+                {isTranslatingReplies ? '翻訳中…' : '댓글 일본어'}
+              </button>
+              <button
+                onClick={resetReplyTranslation}
+                className="px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
+              >
+                원래대로
+              </button>
+            </div>
 
             {/* 댓글 및 대댓글 */}
             <div className="reply-list">

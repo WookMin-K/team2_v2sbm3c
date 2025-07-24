@@ -11,28 +11,32 @@ import java.util.UUID;
 
 @Service
 public class StorageService {
-  // application.properties 에 이미 file:// 설정이 되어 있으므로
-  // 업로드 경로는 C:/kd/upload
   @Value("${spring.web.resources.static-locations}")
-  private String staticLocations; // ex: "file:///C:/kd/upload/"
+  private String staticLocations; // file:///C:/kd/upload/
 
+  /**
+   * 프로필 이미지를 userId 기반 고정 이름으로 저장.
+   *
+   * @return 덮어쓴 후의 URL (프론트는 이 URL 고정 사용)
+   */
   public String saveProfileImage(String userId, MultipartFile file) throws IOException {
-    // 원본 확장자
+    // 1) 확장자 추출
     String original = file.getOriginalFilename();
-    String ext = original.substring(original.lastIndexOf('.'));
-    // 랜덤한 파일명
-    String filename = UUID.randomUUID().toString() + ext;
+    String ext      = original.substring(original.lastIndexOf('.'));  // ".png"
 
-    // 실제 파일을 저장할 디렉토리: C:/kd/upload/profiles/{userId}/
-    // staticLocations 은 "file:///C:/kd/upload/" 형태이므로 앞 7글자("file:///") 제거
-    String uploadRoot = staticLocations.replace("file:///", "");
-    File userDir = Paths.get(uploadRoot, "profiles", userId).toFile();
-    if (!userDir.exists()) userDir.mkdirs();
+    // 2) 실제 파일 저장 루트 경로 추출  ← 수정됨
+    //    staticLocations: "file:///C:/kd/upload/"
+    String uploadRoot = staticLocations.replace("file:///", "");      // "C:/kd/upload/"
 
-    File dest = new File(userDir, filename);
+    // 3) profiles 폴더만 사용 (userId 하위 폴더 없이 덮어쓰기)  ← 수정됨
+    File profilesDir = Paths.get(uploadRoot, "profiles").toFile();
+    if (!profilesDir.exists()) profilesDir.mkdirs();
+
+    // 4) 고정된 파일명(userId + ext)으로 저장  ← 수정됨
+    File dest = new File(profilesDir, userId + ext);
     file.transferTo(dest);
 
-    // 클라이언트에서 접근할 URL 경로: /images/profiles/{userId}/{filename}
-    return "/images/profiles/" + userId + "/" + filename;
+    // 5) 클라이언트에서 사용하는 URL
+    return "/images/profiles/" + userId + ext;
   }
 }

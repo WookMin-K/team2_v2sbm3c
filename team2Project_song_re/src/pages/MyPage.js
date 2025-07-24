@@ -33,21 +33,38 @@ const MyPage = () => {
   const fileInputRef = useRef();
 
   // 1) 페이지 로드 시 사용자 정보 및 프로필 URL 불러오기
-  useEffect(() => {
-    if (!loginUser?.user_id) return;
-    axios.get(`/users/${loginUser.user_id}`)
-      .then(res => {
-        const data = res.data;
-        // 서버가 반환하는 필드 중 camelCase 또는 snake_case 프로필 URL 매핑
-        const profileUrl = data.profileUrl ?? data.profile_url ?? null;
-        setLoadedUser({ ...data, profileUrl });
-      })
-      .catch(err => {
-        console.error('사용자 정보 불러오기 실패:', err);
-        alert('사용자 정보를 불러올 수 없습니다.');
-      });
-  }, [loginUser]);
+  // useEffect(() => {
+  //   if (!loginUser?.user_id) return;
+  //   axios.get(`/users/${loginUser.user_id}`)
+  //     .then(res => {
+  //       const data = res.data;
+  //       // 서버가 반환하는 필드 중 camelCase 또는 snake_case 프로필 URL 매핑
+  //       const profileUrl = data.profileUrl ?? data.profile_url ?? null;
+  //       setLoadedUser({ ...data, profileUrl });
+  //     })
+  //     .catch(err => {
+  //       console.error('사용자 정보 불러오기 실패:', err);
+  //       alert('사용자 정보를 불러올 수 없습니다.');
+  //     });
+  // }, [loginUser]);
 
+   // 1) 페이지 로드 시 사용자 정보 및 프로필 URL 불러오기
+   useEffect(() => {
+     if (!loginUser?.user_id) return;
+     axios.get(`/users/${loginUser.user_id}`)
+       .then(res => {
+         const data = res.data;
+         // 서버가 내려주는 profileUrl (camelCase) 혹은 profile_url (snake_case) 중 하나로 통일
+         const profileUrl = data.profileUrl ?? data.profile_url ?? null;
+         setLoadedUser({ ...data, profileUrl });
+       })
+       .catch(err => {
+         console.error('사용자 정보 불러오기 실패:', err);
+         alert('사용자 정보를 불러올 수 없습니다.');
+       });
+   }, [loginUser]);
+
+  // **로딩 처리: loginUser 또는 loadedUser가 없으면 렌더 중단**
   if (!loginUser || !loadedUser) {
     return <div className="text-center mt-20">로딩 중...</div>;
   }
@@ -101,48 +118,30 @@ const MyPage = () => {
   const closeModal = () => { setIsModalOpen(false); setSelectedFile(null); };
   const handleFileChange = e => setSelectedFile(e.target.files[0]);
 
-  const handleUpload = async () => {
-    if (!selectedFile) return alert('파일을 선택하세요.');
-    const form = new FormData();
-    form.append('profile', selectedFile);
-    form.append('user_id', loadedUser.user_id);
-    try {
-      const res = await axios.post('/users/upload-profile', form);
-      if (res.data.status === 'success') {
-        // 타임스탬프 쿼리로 캐시 방지
-        const newUrl = `${res.data.profileUrl}?t=${new Date().getTime()}`;
+    const handleUpload = async () => {
+      if (!selectedFile) return alert('파일을 선택하세요.');
+      const form = new FormData();
+      form.append('profile', selectedFile);
+      form.append('user_id', loadedUser.user_id);  // 서버 저장용 userId
+
+      try {
+        // 1) 서버가 리턴해주는 URL을 받아오고
+        const res = await axios.post('/users/upload-profile', form);
+        // 2) 캐시 방지를 위해 timestamp만 덧붙여 그대로 사용
+        const newUrl = res.data.profileUrl + '?t=' + Date.now();
         setLoadedUser(prev => ({ ...prev, profileUrl: newUrl }));
         closeModal();
-      } else {
-        alert(res.data.message || '업로드 실패');
+      } catch (err) {
+        console.error('업로드 에러:', err);
+        alert('업로드 실패');
       }
-    } catch (err) {
-      console.error('업로드 에러:', err);
-      alert('업로드 실패');
-    }
-  };
+    };
 
-  // 5) 기본 이미지로 초기화
-  const handleReset = async () => {
-    if (!window.confirm('기본 이미지로 변경하시겠습니까?')) return;
-
-    try {
-      const res = await axios.post('/users/reset-profile', { user_id: loadedUser.user_id });
-      if (res.data.status === 'success') {
-        // 서버에서도 profile_url 컬럼을 null로 업데이트했으니
-        // 바로 프론트 state 만 갱신
-        setLoadedUser(prev => ({
-          ...prev,
-          profileUrl: null,    // ← 이 한 줄이면 충분합니다
-        }));
-      } else {
-        alert('초기화에 실패했습니다.');
-      }
-    } catch (err) {
-      console.error('초기화 에러:', err);
-      alert('초기화 오류');
-    }
-  };
+    const handleReset = () => {
+      if (!window.confirm('기본 이미지로 변경하시겠습니까?')) return;
+      // DB 업데이트 없이, 프론트 state만 DEFAULT_PROFILE로 리셋
+      setLoadedUser(prev => ({ ...prev, profileUrl: null }));
+    };
 
   // 등급 아이콘 & 등급명
   const iconSrc = gradeIcons[loadedUser.grade] || gradeIcons[1];
@@ -153,11 +152,11 @@ const MyPage = () => {
       <aside className="w-64 bg-white p-6 shadow-md">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-6 text-[#3B3B58]">마이페이지</h2>
-          <img
-            src={loadedUser.profileUrl || DEFAULT_PROFILE}
+           <img  // ← 변경: 기본 프로필 처리도 guard 뒤로 이동
+            src={loadedUser.profileUrl ?? DEFAULT_PROFILE}
             alt="profile"
             className="w-20 h-20 mx-auto"
-          />
+            />
           <p className="mt-4 font-semibold text-lg">{loadedUser.name}</p>
           <button
             onClick={openModal}
@@ -347,19 +346,17 @@ const MyPage = () => {
           {/* modal-box에 flex-col, items-center, p-6, w-96 추가 */}
           <div className="bg-white modal-box">
             <h3 className="text-2xl font-bold mb-6">프로필 이미지 변경</h3>
+
+          {/* 선택된 파일이 있으면 바로 미리보기, 없으면 기존(또는 기본) */}
           <img
-            src={loadedUser.profileUrl || DEFAULT_PROFILE}
-            alt="profile"
-            className="w-80 h-80 mx-auto mb-8"
+            src={
+              selectedFile
+                ? URL.createObjectURL(selectedFile)
+                : (loadedUser.profileUrl || DEFAULT_PROFILE)
+            }
+            alt="프로필 미리보기"
+            className="w-80 h-80 mx-auto mb-8 object-cover rounded"
           />
-            {/* 선택된 파일이 있으면 미리보기 */}
-            {selectedFile && (
-              <img
-                src={URL.createObjectURL(selectedFile)}
-                alt="미리보기"
-                className="w-80 h-80 object-cover rounded mb-8"
-              />
-            )}
 
             {/* 숨긴 파일 입력 */}
             <input

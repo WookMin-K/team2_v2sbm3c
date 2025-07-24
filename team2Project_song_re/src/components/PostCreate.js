@@ -12,6 +12,8 @@ const PostCreate = () => {
   const [files, setFiles] = useState(null);
   const navigate = useNavigate();
 
+  const MAX_SIZE = 50 * 1024 * 1024; // 50MB
+
 
   const handleCancel = () => {
     if (window.confirm('작성 중인 내용이 사라집니다. 취소하시겠습니까?')) {
@@ -19,12 +21,26 @@ const PostCreate = () => {
     }
   };
 
+
+
   const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file && file.size > MAX_SIZE) {
+      alert('이미지는 최대 50MB까지 업로드 가능합니다.');
+      e.target.value = null;
+      return;
+    }
+    setImage(file);
   };
 
   const handleFileChange = (e) => {
-    setFiles(e.target.files[0]);  // 단일 파일 기준 (다중 파일이면 배열 처리 필요)
+    const file = e.target.files[0];
+    if (file && file.size > MAX_SIZE) {
+      alert('파일은 최대 50MB까지 업로드 가능합니다.');
+      e.target.value = null;
+      return;
+    }
+    setFiles(file);
   };
   
 

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SignUp.css';
 import { useNavigate } from 'react-router-dom';
+import { useLoginContext } from '../contexts/LoginContext';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -12,10 +13,33 @@ const SignUp = () => {
   });
 
   const navigate = useNavigate(); // 페이지 이동을 위한 함수 생성
+  const { login } = useLoginContext(); // 로그인 상태 업데이트
 
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+
+  // 팝업에서 소셜 로그인 성공 시 메시지 수신
+  useEffect(() => {
+    const handleMessage = (e) => {
+      // 출처 검사
+      if (e.origin !== window.location.origin) return;
+
+      if (e.data?.type === 'OAUTH2_LOGIN_SUCCESS') {
+        const { user_no, user_id, name, grade } = e.data.payload;
+        // 1) Context에 로그인 정보 저장
+        login({ user_no, user_id, name, grade });
+        // 2) 메인 페이지로 바로 이동
+        navigate('/');
+      }
+      else if (e.data?.type === 'OAUTH2_LOGIN_FAILURE') {
+        alert('소셜 회원가입(로그인)에 실패했습니다.');
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [login, navigate]);
 
   // 인풋 변경 처리
   const handleChange = (e) => {
@@ -29,7 +53,6 @@ const SignUp = () => {
   // 가입 버튼 클릭 처리
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
-
     // 필수 항목 누락 시 안내
     if (!formData.user_id.trim()) {
     alert('🛑 아이디를 입력해주세요.');

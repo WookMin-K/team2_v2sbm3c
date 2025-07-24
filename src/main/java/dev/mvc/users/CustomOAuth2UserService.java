@@ -78,12 +78,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         // 4) SNS 연동 테이블에도 없다면 등록
-        if (usersProc.checkSnsId(snsId) == 0) {  // 아직 연동 정보가 없으면
-            UsersSnsVO snsVO = new UsersSnsVO();
-            snsVO.setProvider(provider);
-            snsVO.setProvider_no(snsId);
-            snsVO.setUser_no(user.getUser_no());
-            usersSnsProc.create(snsVO);
+        if (usersSnsProc.checkSnsId(snsId) == 0) {
+          UsersSnsVO snsVO = new UsersSnsVO();
+          snsVO.setProvider(provider);
+          snsVO.setProvider_no(snsId);
+          snsVO.setUser_no(user.getUser_no());
+          usersSnsProc.create(snsVO);
         }
 
         // 5) **무조건** 세션에 로그인 정보 저장

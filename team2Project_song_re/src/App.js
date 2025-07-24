@@ -43,7 +43,7 @@ function App() {
       <ChatbotProvider>
         <Router>
           <Routes>
-            <Route path="/login/oauth2/code/:provider" element={<OAuth2RedirectHandler />} />
+            <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
             <Route path="/" element={<MainPage />} />
 
             <Route element={<Layout />}>

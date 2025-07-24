@@ -21,6 +21,30 @@ function PostUpdate() {
     fetchPost();
   }, [postNo]);
 
+  const MAX_SIZE = 50 * 1024 * 1024; // 50MB
+
+  // 컴포넌트 최상단에 추가
+  const handleImageChange = (e) => {
+    const f = e.target.files[0];
+    if (f && f.size > MAX_SIZE) {
+      alert('이미지는 최대 50MB까지 업로드 가능합니다.');
+      e.target.value = null;
+      return;
+    }
+    setImage(f);
+  };
+
+  const handleFileChange = (e) => {
+    const f = e.target.files[0];
+    if (f && f.size > MAX_SIZE) {
+      alert('파일은 최대 50MB까지 업로드 가능합니다.');
+      e.target.value = null;
+      return;
+    }
+    setFile(f);
+  };
+
+
   const handleChange = (e) => {
     setPost({ ...post, [e.target.name]: e.target.value });
   };
@@ -122,7 +146,7 @@ const handleSubmit = async (e) => {
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => setImage(e.target.files[0])}
+          onChange={handleImageChange}
           className="mb-4"
         />
 
@@ -137,7 +161,7 @@ const handleSubmit = async (e) => {
         )}
         <input
           type="file"
-          onChange={(e) => setFile(e.target.files[0])}
+          onChange={handleFileChange}
           className="mb-4"
         />
 
