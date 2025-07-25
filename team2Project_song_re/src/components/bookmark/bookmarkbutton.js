@@ -65,7 +65,7 @@ export default function BookmarkButton({ user_no, trip_no, post_no }) {
 
   return (
     <button onClick={toggleBookmark} className={className}>
-      {bookmarked ? '⭐ 즐겨찾기 완료' : '☆ 즐겨찾기'}
+      {bookmarked ? '⭐ 즐겨찾기 해제' : '☆ 즐겨찾기'}
     </button>
   );
 }

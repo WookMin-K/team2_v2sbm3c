@@ -1,17 +1,28 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef  } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { getPostDetail } from '../api/postApi';
 import { useLoginContext } from '../contexts/LoginContext';
 import ReplyLikeButton from './ReplyLikeButton';
+import BookmarkPostButton from '../components/bookmark/bookmarkbutton_post';
 
-import BookmarkPostButton from './bookmark/bookmarkbutton_post';
+
+import { FiFileText, FiDownload } from 'react-icons/fi';
+
+import prev1Icon from '../pages/icon/left.png'
+import next1Icon from '../pages/icon/right.png'
+import reportIcon from '../pages/icon/rreport.png'
+import starIcon from '../pages/icon/star.png'
+import rdeleteIcon from '../pages/icon/rdelete.png'
+import updateIcon from '../pages/icon/update.png'
+import axios from 'axios';
 import './PostDetail.css';
 
 const PostDetail = () => {
   const { postNo } = useParams();
   const navigate = useNavigate();
   const { isLoggedIn, setIsLoginOpen } = useLoginContext();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef();
 
   // 게시글, 댓글, 페이징 상태
   const [post, setPost] = useState(null);
@@ -45,6 +56,8 @@ const PostDetail = () => {
   const isAdmin   = userGrade === 0;
   const location = useLocation(); // 목록클릭 시 페이지 유지
   const fromSearch = location.state?.fromSearch || location.search;
+
+  
 
 
   // ✅ LocalStorage에서 번역 데이터 꺼내기
@@ -93,6 +106,16 @@ const resetReplyTranslation = () => {
   useEffect(() => {
     fetchData();
   }, [postNo]);
+
+  useEffect(() => {
+    const onClickOutside = e => {
+      if (menuOpen && menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, [menuOpen]);
 
   // 파일 다운로드
   const handleDownload = async (fileName) => {
@@ -193,6 +216,17 @@ const resetReplyTranslation = () => {
     };
 
   // 신고 제출
+
+  const onClickReport = () => {
+    if (!isLoggedIn) {
+      alert('로그인 후 이용 가능합니다 😊');
+      sessionStorage.setItem('redirectAfterLogin', `/post/read/${postNo}${fromSearch}`);
+      setIsLoginOpen(true);
+      return;
+    }
+    setShowReportModal(true);
+  };
+
   const handleReportSubmit = async () => {
     if (!reportReason.trim()) {
       alert('신고 사유를 입력해주세요.');
@@ -223,6 +257,17 @@ const resetReplyTranslation = () => {
     }
   };
   //  댓글 신고 제출
+
+  const onClickReplyReport = (reply_no) => {
+    if (!isLoggedIn) {
+      alert('로그인 후 이용 가능합니다 😊');
+      sessionStorage.setItem('redirectAfterLogin', `/post/read/${postNo}${fromSearch}`);
+      setIsLoginOpen(true);
+      return;
+    }
+    setReportReplyNo(reply_no);
+    setShowReplyReportModal(true);
+  };
   const handleReplyReportSubmit = async () => {
     if (!replyReportReason.trim()) {
       alert('신고 사유를 입력해주세요.');
@@ -288,67 +333,156 @@ const resetReplyTranslation = () => {
         ) : (
           <>
             <div className="post-title">{translatedTitle}</div>
-            <div className="post-meta">
-              작성자: {post.name} | 작성일: {post.created_day} | 조회수: {post.view_cnt}
+            <div className="post-meta flex items-center justify-between text-sm text-gray-500">
+              <div className="flex items-center">
+              <span>{post.created_day}</span>
+              <span className="mx-2">·</span>
+              <span>조회 : {post.view_cnt}</span>
+              <span className="mx-2">·</span>
+              <span>작성자 : {post.name}</span>
             </div>
-            <div className="post-content">{translatedContent}</div>
+              <div ref={menuRef} className="relative inline-block">
+                <button
+                  onClick={() => setMenuOpen(o => !o)}
+                  className="p-2 hover:bg-gray-100 rounded-full"
+                  aria-label="더보기"
+                >
+                  <span className="text-lg select-none">⋮</span>
+                </button>
 
-            {post.image && (
-              <img
-                src={`http://localhost:9093/images/${post.image}`}
-                alt="게시글 이미지"
-                style={{ maxWidth: '100%', marginTop: 20, borderRadius: 8 }}
-              />
-            )}
+                {menuOpen && (
+                  <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded shadow-lg z-10">
+                    <button
+                      onClick={() => { onClickReport(); setMenuOpen(false); }}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <img src={reportIcon} alt="" className="w-4 h-4 mr-2" />
+                      신고
+                    </button>
+                {/* 수정된 BookmarkPostButton */}
+                <BookmarkPostButton
+                  post_no={post.post_no}
+                  onClickCallback={() => setMenuOpen(false)}
+                  defaultIcon={starIcon}
+                  activeIcon={starIcon /*(활성화 아이콘 따로 있으면 그걸)*/}
+                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                />
+
+                     {isAuthor && (
+                      <button
+                         onClick={() => { navigate(`/post/update/${post.post_no}`); setMenuOpen(false); }}
+                         className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                       >
+                        <img src={updateIcon} alt="" className="w-4 h-4 mr-2" />
+                         수정
+                       </button>
+                     )}
+
+                     {/* 삭제 */}
+                     {(isAuthor || isAdmin) && (
+                       <button
+                         onClick={() => { navigate(`/post/delete/${post.post_no}`); setMenuOpen(false); }}
+                         className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                       >
+                        <img src={rdeleteIcon} alt="" className="w-4 h-4 mr-2" />
+                         삭제
+                       </button>
+                     )}
+                    </div>
+                )}
+              </div>
+           </div>
+
+             <hr className="border-t border-gray-200 my-6" />
+             
+            <div className="flex flex-col space-y-6">
+              <div className="post-content">{translatedContent}</div>
+              {post.image && (
+                <img
+                  src={`http://localhost:9093/images/${post.image}`}
+                  alt="게시글 이미지"
+                  style={{ maxWidth: '100%', marginTop: 20, borderRadius: 8 }}
+                />
+              )}
+            </div>
+
+
 
             {post.file_org && (
-              <div style={{ margin: '10px 0' }}>
-                <button onClick={() => handleDownload(post.files)}>
-                  📎 {post.file_org} 다운로드
-                </button>
+              <div className="mt-6">
+                <div className="flex items-center p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-sm">
+                  {/* 문서 아이콘 */}
+                  <FiFileText className="w-6 h-6 text-gray-500 mr-3" />
+
+                  {/* 파일명 */}
+                  <span className="flex-1 text-gray-700 font-medium">
+                    {post.file_org}
+                  </span>
+
+                  {/* 다운로드 버튼 */}
+                  <button
+                    onClick={() => handleDownload(post.files)}
+                    className="
+                      inline-flex items-center
+                      px-3 py-1
+                      bg-blue-600 hover:bg-blue-700
+                      text-white text-sm font-medium
+                      rounded-md
+                      transition
+                    "
+                  >
+                    <FiDownload className="w-4 h-4 mr-1" />
+                    다운로드
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* 신고하기 버튼 (관리자 제외) */}
-            {!isAdmin && (
-              <button
-                onClick={() => setShowReportModal(true)}
-                className="link-btn report-btn"
-                style={{ marginBottom: 16 }}
-              >
-                🚩 신고하기
-              </button>
-            )}
-
-            {/* 수정/삭제/북마크 등 버튼 */}
-            <div className="buttons">
-              {isAuthor && (
-                <button onClick={() => navigate(`/post/update/${post.post_no}`)}>
-                  수정
-                </button>
-              )}
-              {(isAuthor || isAdmin) && (
-                <button onClick={() => navigate(`/post/delete/${post.post_no}`)}>
-                  삭제
-                </button>
-              )}
-              <BookmarkPostButton post_no={post.post_no} />
-              <br /><br />
-              {prevPost ? (
-                <button onClick={() => navigate(`/post/read/${prevPost.post_no}${fromSearch}`)}>
-                  이전글
-                </button>
-              ) : <div />}
-              <button onClick={() => navigate(`/post/list${fromSearch}`)}>목록</button>
-              {nextPost ? (
-                <button onClick={() => navigate(`/post/read/${nextPost.post_no}${fromSearch}`)}>
-                  다음글
-                </button>
-              ) : <div />}
-            </div>
-
             <hr style={{ margin: '40px 0' }} />
 
+            <div className="flex items-center justify-between mt-8 mb-12">
+              {prevPost ? (
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => navigate(`/post/read/${prevPost.post_no}${fromSearch}`)}
+                    className="p-2 bg-gray-100 rounded-full hover:bg-gray-200"
+                  >
+                    <img src={prev1Icon} alt="이전" className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => navigate(`/post/read/${prevPost.post_no}${fromSearch}`)}
+                    className="text-gray-500 hover:text-gray-800 text-sm"
+                  >
+                    이전 글
+                  </button>
+                </div>
+              ) : <div className="w-20" />}
+
+              
+              <button
+                onClick={() => navigate(`/post/list${fromSearch}`)}
+                className="px-6 py-2 border border-gray-300 rounded-full hover:bg-gray-50"
+              >
+                목록
+              </button>
+                  
+              {nextPost ? (
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => navigate(`/post/read/${nextPost.post_no}${fromSearch}`)}
+                    className="text-gray-500 hover:text-gray-800 text-sm"
+                  >
+                    다음 글
+                  </button>
+                  <button
+                    onClick={() => navigate(`/post/read/${nextPost.post_no}${fromSearch}`)}
+                    className="p-2 bg-gray-100 rounded-full hover:bg-gray-200"
+                  >
+                    <img src={next1Icon} alt="다음" className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : <div className="w-20" />}
+            </div>
             {/* 댓글 폼 */}
             <form className="reply-form" onSubmit={e => handleReplySubmit(e, null)}>
               <textarea
@@ -369,7 +503,7 @@ const resetReplyTranslation = () => {
                 disabled={isTranslatingReplies}
                 className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition"
               >
-                {isTranslatingReplies ? '번역 중…' : '댓글 영어로'}
+                {isTranslatingReplies ? 'Translating…' : '댓글 영어'}
               </button>
               <button
                 onClick={() => translateReplies('ja')}
@@ -382,7 +516,7 @@ const resetReplyTranslation = () => {
                 onClick={resetReplyTranslation}
                 className="px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
               >
-                원래대로
+                댓글 한국어
               </button>
             </div>
 
@@ -401,15 +535,12 @@ const resetReplyTranslation = () => {
                   return (
                     <div key={parent.reply_no} className="reply-item">
                       <div>
-                        <strong>{parent.userName || parent.user_id}</strong> | {parent.created_day}
+                        <strong>{parent.userName || parent.user_id}</strong>  <span className="reply-date">{parent.created_day}</span>
                         <ReplyLikeButton replyNo={parent.reply_no} userNo={userNo} />
                         {!isAdmin && (
                           <button
-                            onClick={() => {
-                              setReportReplyNo(parent.reply_no);
-                              setShowReplyReportModal(true);
-                            }}
-                            className="text-red-500 ml-2 text-sm"
+                            onClick={() => { onClickReplyReport(parent.reply_no); }}
+                            className="action-btn report-btn"
                           >
                             신고
                           </button>
@@ -434,29 +565,32 @@ const resetReplyTranslation = () => {
                           
                           <div style={{ marginTop: 5 }}>
                             {isLoggedIn && (
-                              <button
+                              <span
+                                 className="reply-text"
                                 onClick={() => {
                                   setReplyParent(parent.reply_no);
                                   setReplyContent('');
                                 }}
                               >
                                 답글
-                              </button>
+                              </span>
                             )}
+                            
                             {isReplyAuthor && (
-                              <button
+                              <span
+                                className="reply-text"
                                 onClick={() => {
                                   setEditingReplyNo(parent.reply_no);
                                   setEditContent(parent.content);
                                 }}
                               >
                                 수정
-                              </button>
+                              </span>
                             )}
                             {(isReplyAuthor || isAdmin) && (
-                              <button onClick={() => handleReplyDelete(parent.reply_no)}>
+                              <span className="reply-text" onClick={() => handleReplyDelete(parent.reply_no)}>
                                 삭제
-                              </button>
+                              </span>
                             )}
                           </div>
                         </>
@@ -513,18 +647,17 @@ const resetReplyTranslation = () => {
                                 style={{ borderLeft: '2px solid #eee', paddingLeft: 10, marginBottom: 10 }}
                               >
                                 <div>
-                                  <strong>{child.userName || child.user_id}</strong> | {child.created_day}
+                                  <strong>{child.userName || child.user_id}</strong>  
+                                  <span className="reply-date">{child.created_day}</span>
                                   <ReplyLikeButton replyNo={child.reply_no} userNo={userNo} />
                                   {!isAdmin && (
                                     <button
-                                      onClick={() => {
-                                        setReportReplyNo(child.reply_no);
-                                        setShowReplyReportModal(true);
-                                      }}
-                                      className="text-red-500 ml-2 text-sm"
+                                      onClick={() => { onClickReplyReport(child.reply_no); }}
+                                      className="action-btn report-btn"
                                     >
                                       신고
                                     </button>
+
                                   )}                                  
                                 </div>
                                 <div>{displayChild}</div>
@@ -543,19 +676,20 @@ const resetReplyTranslation = () => {
                                     {/* <div>{child.content}</div> */}
                                     <div style={{ marginTop: 5 }}>
                                       {isChildAuthor && (
-                                        <button
+                                         <span
+                                          className="reply-text"
                                           onClick={() => {
                                             setEditingReplyNo(child.reply_no);
                                             setEditContent(child.content);
                                           }}
                                         >
                                           수정
-                                        </button>
+                                         </span>
                                       )}
                                       {(isChildAuthor || isAdmin) && (
-                                        <button onClick={() => handleReplyDelete(child.reply_no)}>
+                                        <span className="reply-text" onClick={() => handleReplyDelete(child.reply_no)}>
                                           삭제
-                                        </button>
+                                        </span>
                                       )}
                                     </div>
                                   </>

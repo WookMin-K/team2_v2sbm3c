@@ -44,4 +44,9 @@ public class RequestProc implements RequestProcInter {
     public int updateAnswer(RequestVO requestVO) {
         return requestDAO.updateAnswer(requestVO);
     }
+    
+    @Override
+    public List<RequestVO> listUnanswered() {
+        return requestDAO.listUnanswered();
+    }
 }

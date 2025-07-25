@@ -275,7 +275,7 @@ const SignUp = () => {
         </div>
 
         {/* 소셜 로그인 버튼 */}
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <div className="social-login">
             <button
               type="button"
@@ -284,28 +284,28 @@ const SignUp = () => {
             >
               <img src="/images/Naver_btn.png" alt="네이버 회원가입" />
               네이버 계정으로 가입하기
-            </button>
+            </button> */}
 
-            <button
+            {/* <button
               type="button"
               className="signup-social-btn kakao"
               onClick={() => handleSocialLogin('kakao')}
             >
               <img src="/images/Kakao_btn.png" alt="카카오 회원가입" />
               카카오 계정으로 가입하기
-            </button>
+            </button> */}
 
             {/* 구글 */}
-            <button
+            {/* <button
               type="button"
               className="signup-social-btn google"
               onClick={() => handleSocialLogin('google')}
             >
               <img src="/images/Google_btn.png" alt="구글 회원가입" />
               Google 계정으로 가입하기
-            </button>
-          </div>
-        </div>
+            </button> */}
+          {/* </div>
+        </div> */}
       </div>
     </div>
   );

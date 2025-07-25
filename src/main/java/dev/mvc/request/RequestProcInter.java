@@ -15,4 +15,5 @@ public interface RequestProcInter {
 
     int delete(int request_no);
     int updateAnswer(RequestVO requestVO);
+    List<RequestVO> listUnanswered();
 }

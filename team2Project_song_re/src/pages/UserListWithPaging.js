@@ -67,7 +67,7 @@ const UserListWithPaging = () => {
   return (
     <div className="flex w-screen h-[800px] bg-[#f4f5f7]">
       {/* ── 왼쪽 사이드바 ── */}
-      <aside className="w-64 bg-white p-6 shadow-md">
+      {/* <aside className="w-64 bg-white p-6 shadow-md">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-6 text-[#3B3B58]">마이페이지</h2>
           <img
@@ -91,7 +91,7 @@ const UserListWithPaging = () => {
             <button onClick={() => navigate('/mypage/users')} className="btn-user flex items-center gap-2 text-lg ml-4">
               <span className="icon w-6 h-6" />
               회원 목록
-            </button>
+            </button>          
           )}
 
           {isAdmin && (
@@ -100,7 +100,6 @@ const UserListWithPaging = () => {
               신고 목록
             </button>
           )}
-          
 
           <h3 className="text-xl font-semibold">글 관리</h3>
           <button onClick={() => navigate('/mypage/bookmark')} className="btn-star flex items-center gap-2 text-lg ml-4">
@@ -108,12 +107,23 @@ const UserListWithPaging = () => {
             즐겨찾기
           </button>
 
-          <button onClick={() => navigate('/mypage/posts')} className="btn-post flex items-center gap-2 text-lg ml-4">
+          <button onClick={() => navigate('/mypage/postlist')} className="btn-post flex items-center gap-2 text-lg ml-4">
             <span className="icon w-6 h-6" />
             내 게시글
           </button>
+
+          <button onClick={() => navigate('/mypage/mytravel')} className="btn_plane flex items-center gap-2 text-lg ml-4">
+            <span className="icon w-6 h-6" />
+            내 여행 일정
+          </button>
+          
+          <button onClick={() => navigate('/request/list')} className="btn_inquiry flex items-center gap-2 text-lg ml-4">
+            <span className="icon w-6 h-6" />
+            내 문의
+          </button>
+
         </nav>
-      </aside>
+      </aside> */}
       
       <section className="flex-1 flex justify-center items-start mt-12">
           <div className="w-full max-w-[1180px] bg-white p-6 rounded shadow flex flex-col relative" style={{ minHeight: '700px' }}>

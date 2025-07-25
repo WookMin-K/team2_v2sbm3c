@@ -216,7 +216,7 @@ const PostList = () => {
                   disabled={isTranslating}
                   className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 transition"
                 >
-                  {isTranslating ? '번역 중…' : 'English'}
+                  {isTranslating ? 'Translating…' : '영어'}
                 </button>
 
                 <button
@@ -224,14 +224,14 @@ const PostList = () => {
                   disabled={isTranslating}
                   className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg shadow hover:bg-green-700 disabled:opacity-50 transition"
                 >
-                  {isTranslating ? '翻訳中…' : '日本語'}
+                  {isTranslating ? '翻訳中…' : '일본어'}
                 </button>
 
                 <button
                   onClick={handleResetTranslation}
                   className="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg shadow hover:bg-gray-300 transition"
                 >
-                  원래대로
+                  한국어
                 </button>
               </div>
 

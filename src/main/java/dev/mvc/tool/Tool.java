@@ -1,3 +1,4 @@
+// version 1.0
 package dev.mvc.tool;
 
 import java.awt.Image;
@@ -18,11 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.google.gson.Gson;
 
-import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 
 public class Tool {
   
@@ -506,69 +503,95 @@ public class Tool {
   
 
 
-    public static final String SMS_OAUTH_TOKEN_URL = "https://sms.gabia.com/oauth/token"; // ACCESS
-    //TOKEN 발급 API URL 입니다.
+  public static final String SMS_OAUTH_TOKEN_URL = "https://sms.gabia.com/oauth/token"; // ACCESS
+  //TOKEN 발급 API URL 입니다.
 
-    public static String getSMS_Token() throws IOException {
-      String smsId = "hihisun950sms"; // SMS ID 를 입력해 주세요.
-      String apiKey = "bdd48b4a2a176fc8e509ae50943edacc"; // SMS 관리툴에서 발급받은 API KEY 를 입력해 주세요.
-      String authValue =
-      Base64.getEncoder().encodeToString(String.format("%s:%s", smsId,
-      apiKey).getBytes(StandardCharsets.UTF_8)); // Authorization Header 에 입력할 값입니다.
-
-      // 사용자 인증 API 를 호출합니다.
-      OkHttpClient client = new OkHttpClient();
-
-      RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
-      .addFormDataPart("grant_type", "client_credentials")
-      .build();
-
-      Request request = new Request.Builder()
-      .url(SMS_OAUTH_TOKEN_URL)
-      .post(requestBody)
-      //.addHeader("Content-Type", "application/x-www-form-urlencoded")
-      .addHeader("Authorization", "Basic " + authValue)
-      .addHeader("cache-control", "no-cache")
-      .build();
-
-      // Response 를 key, value 로 확인하실 수 있습니다.
-      Response response = client.newCall(request).execute();
-      HashMap<String, String> result = new
-      Gson().fromJson(Objects.requireNonNull(response.body()).string(), HashMap.class);
-//      for(String key : result.keySet()) {
-//        System.out.printf("%s: %s%n", key, result.get(key));
-//      }
-//      System.out.println("-> access_token: " + result.get("access_token"));
-       return result.get("access_token");
-    }
-  public static void sendMMS(String phoneNumber, String message, File imageFile) throws IOException {
-    String token = getSMS_Token();
-    String cleanedPhone = phoneNumber.replaceAll("[^0-9]", "");  // 숫자만
+  public static String getSMS_Token() throws IOException {
+    String smsId = "ism128sms";
+    String apiKey = "83fb7e0179b5d8976a67c15405e344dd";
+    String authValue = Base64.getEncoder()
+            .encodeToString(String.format("%s:%s", smsId, apiKey)
+                    .getBytes(StandardCharsets.UTF_8));
 
     OkHttpClient client = new OkHttpClient();
 
-    RequestBody formBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
-            .addFormDataPart("phone", cleanedPhone)
-            .addFormDataPart("callback", "01037054914") // 관리자 발신 번호
-            .addFormDataPart("message", message)
-            .addFormDataPart("refkey", "mms_test") // MMS 구분용 키
-            .addFormDataPart("image", imageFile.getName(),
-                    RequestBody.create(imageFile, okhttp3.MediaType.parse("image/jpeg")))
+    // ✅ FormBody 사용 (x-www-form-urlencoded)
+    RequestBody requestBody = new FormBody.Builder()
+            .add("grant_type", "client_credentials")
             .build();
 
     Request request = new Request.Builder()
-            .url("https://sms.gabia.com/api/send/mms")
-            .post(formBody)
-            .addHeader("Authorization", "Bearer " + token)
-            .addHeader("Content-Type", "multipart/form-data")
+            .url(SMS_OAUTH_TOKEN_URL)
+            .post(requestBody)
+            .addHeader("Content-Type", "application/x-www-form-urlencoded")
+            .addHeader("Authorization", "Basic " + authValue)
+            .addHeader("cache-control", "no-cache")
             .build();
 
     Response response = client.newCall(request).execute();
 
-    if (!response.isSuccessful()) {
-      System.out.println("❌ MMS 전송 실패: " + response);
-    } else {
-      System.out.println("✅ MMS 전송 성공!");
+    // ✅ 응답 확인 로그 추가 (선택)
+    String responseBody = Objects.requireNonNull(response.body()).string();
+    System.out.println("🔐 토큰 응답: " + response.code());
+    System.out.println("🔐 응답 body: " + responseBody);
+
+    HashMap<String, String> result = new Gson().fromJson(responseBody, HashMap.class);
+    return result.get("access_token");
+  }
+
+
+  public static void sendMMS(String phoneNumber, String message, File imageFile) throws IOException {
+    String token = getSMS_Token();  // access_token 얻기
+    String cleanedPhone = phoneNumber.replaceAll("[^0-9]", "");  // 숫자만 추출
+    System.out.println("✅ 전송 대상 이미지 경로: " + imageFile.getAbsolutePath());
+    System.out.println("✅ 이미지 크기: " + imageFile.length() + " bytes");
+    System.out.println("✅ 이미지 존재 여부: " + imageFile.exists());
+    OkHttpClient client = new OkHttpClient();
+
+//    RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+//            .addFormDataPart("phone", cleanedPhone)
+//            .addFormDataPart("callback", "01087732436") // 발신번호 (Gabia에 등록된 번호)
+//            .addFormDataPart("message", message)
+//            .addFormDataPart("refkey", "mms_test")
+//            .addFormDataPart("image", imageFile.getName(),
+//                    RequestBody.create(imageFile, okhttp3.MediaType.parse("image/jpeg")))
+//            .build();
+    RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart("phone", cleanedPhone)
+            .addFormDataPart("callback", "01087732436") // 발신번호
+            .addFormDataPart("message", message)
+            .addFormDataPart("refkey", "mms_test")
+            .addFormDataPart("subject", "테스트 제목") // 제목 필수는 아니지만 추가 권장
+            .addFormDataPart("image_cnt", "1")
+            .addFormDataPart("images0", imageFile.getName(),
+                    RequestBody.create(imageFile, okhttp3.MediaType.parse("image/jpeg")))
+            .build();
+
+    // ✅ [중요] MMS도 SMS와 동일하게 "Basic {Base64(smsId:accessToken)}" 방식
+    String smsId = "ism128sms";
+    String authValue = Base64.getEncoder()
+            .encodeToString(String.format("%s:%s", smsId, token).getBytes(StandardCharsets.UTF_8));
+
+    Request request = new Request.Builder()
+            .url("https://sms.gabia.com/api/send/mms")
+            .post(requestBody)
+            .addHeader("Authorization", "Basic " + authValue) //
+            .addHeader("Content-Type", "multipart/form-data")
+            .addHeader("cache-control", "no-cache")
+            .build();
+
+    try (Response response = client.newCall(request).execute()) {
+      String responseBody = Objects.requireNonNull(response.body()).string();
+      System.out.println("📨 서버 응답 코드: " + response.code());
+      System.out.println("📨 응답 내용: " + responseBody);
+
+      if (response.isSuccessful()) {
+        System.out.println("✅ MMS 전송 성공!");
+      } else {
+        System.out.println("❌ MMS 전송 실패!");
+      }
+    } catch (IOException e) {
+      System.out.println("❌ 예외 발생: " + e.getMessage());
     }
   }
 }
