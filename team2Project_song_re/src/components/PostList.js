@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { getPostListPaged } from '../api/postApi';
 import { useNavigate, useLocation, Link  } from 'react-router-dom';
@@ -8,6 +8,8 @@ import prev1Icon from '../pages/icon/left.png';
 import next1Icon from '../pages/icon/right.png';
 import next5Icon from '../pages/icon/right2.png';
 import './PostList.css';
+import upIcon from '../pages/icon/up.png';
+import MegaMenu from '../components/MegaMenu';
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);
@@ -18,6 +20,14 @@ const PostList = () => {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [originalPosts, setOriginalPosts] = useState([]);     // ← 원본 보관
   const [isTranslating, setIsTranslating] = useState(false);  // ← 번역 중 플래그
+
+  // 햄버거 메뉴 열림/닫힘 상태
+  const [menuOpen, setMenuOpen] = useState(false);
+  const handleMenuToggle = () => setMenuOpen(open => !open);
+
+  // 본문 스크롤 감지용 ref
+  const scrollRef = useRef(null);
+  const [showTop, setShowTop] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -82,9 +92,6 @@ const PostList = () => {
     setTotalPostCount(data.total);
     setRecordPerPage(data.record_per_page);
   };
-
-
-
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -153,148 +160,187 @@ const PostList = () => {
     navigate(`/post/list?page=${page}&type=${searchType}&keyword=${searchKeyword}`);
   };
 
+  // 본문 스크롤 감지
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      setShowTop(el.scrollTop > 0);
+    };
+    el.addEventListener('scroll', onScroll);
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <div className="flex w-screen h-[800px] bg-[#f4f5f7]">
+    <div className="flex w-screen h-[807px] bg-[#ffffff]">
       {/* 왼쪽 사이드바 */}
-      <aside className="w-64 bg-white p-6 shadow-md">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4 text-[#3B3B58]">게시판</h2>
+      <aside className="w-24 bg-[#2e3a4e] flex flex-col justify-between items-center pt-4 pb-0 shadow-md">
 
-              {/* 글쓰기 */}
-              <button
-                className="btn mb-2"
-                onClick={handleWriteClick}
-              >
-                글쓰기
-              </button>
+        <button
+          className="ham_btn mb-4 focus:outline-none"
+          onClick={handleMenuToggle}>
+          <div className="line" />
+          <div className="line" />
+          <div className="line" />  
+        </button>
+        <MegaMenu open={menuOpen} onClose={handleMenuToggle} />
+        
+        <hr className="w-24 border-gray-600 mb-4" />
 
-              <div className="flex gap-4">
-                
-              <div className="flex justify-center gap-6 mt-4 ml-10">
-              {/* 즐겨찾기 */}
-              <button
-                className="btn-star flex flex-col items-center gap-1 text-sm"
-                onClick={handleBookmarkClick}
-              >
-                <span className="icon w-6 h-6" />
-                <span>즐겨찾기</span>
-              </button>
+        <nav className="flex-1 flex flex-col items-center justify-end space-y-6">
+          {/* 즐겨찾기 */}
+          <div className="relative group w-full">
+            <button
+              onClick={handleBookmarkClick} 
+              className="btn-star btn-underline w-full flex flex-col items-center py-2" >
+              <span className="icon w-7 h-7" />
+              <span className="text-white text-sm mt-2">즐겨찾기</span>
+            </button>
+          </div>
+          {/* 내 게시글 */}
+          <button 
+            onClick={handleMyPostsClick}
+            className="btn-post btn-underline w-full flex flex-col items-center py-2" >
+            <span className="icon w-8 h-8" />
+            <span className="text-white text-sm mt-2">내 게시글</span>
+          </button>
+        
+          <button 
+            onClick={() => navigate('/post/list')} 
+            className="btn-underline w-full flex flex-col items-center py-2">
+            <img src="/icon/note_white.png" alt="자유 게시판" className="w-7 h-7" />
+            <span className="text-white text-sm mt-2">자유 게시판</span>
+          </button>
 
-              {/* 내 게시글 */}
-              <button
-                className="btn-post flex flex-col items-center gap-1 text-sm"
-                onClick={handleMyPostsClick}
-              >
-                <span className="icon w-6 h-6" />
-                <span>내 게시글</span>
-              </button>
-              </div>
-            </div>          
-          <div className="-mx-6 border-t border-gray-300 my-6" />
-          <button onClick={() => navigate('/post/list')} 
-          className="flex items-center gap-2 mb-2 text-lg text-left">
-            <img src="/icon/note.png" alt="자유 게시판" className="w-6 h-6" />자유 게시판</button>
           <button onClick={() => alert('준비 중입니다.')}
-          className="flex items-center gap-2 text-lg text-left">
-            <img src="/icon/note.png" alt="일정 공유 게시판" className="w-6 h-6" />일정 공유 게시판</button>
-        </div>
+            className="btn-underline w-full flex flex-col items-center py-2">
+            <img src="/icon/note_white.png" alt="일정 공유 게시판" className="w-7 h-7" />
+            <span className="text-white text-sm mt-2">일정 공유</span>
+            <span className="text-white text-sm">게시판</span>
+          </button>
+          <span className="mb-2"></span>
+        </nav>
+        <button
+          onClick={() => scrollRef.current.scrollTo({ top: 0, behavior: 'smooth'})}
+          className="w-full p-6 flex justify-center bg-blue-300 transition-colors group">
+          <img src={upIcon} alt="위로가기" 
+          className="w-5 h-5 transform transition-transform duration-200 ease-in-out
+                     group-hover:-translate-y-1" />
+        </button>
       </aside>
 
       {/* ── 본문 ── */}
-      <section className="flex-1 flex justify-center items-start mt-10">
-        {/* info card */}
-        <div className="w-full max-w-[1180px] bg-white p-6 rounded shadow
-               flex flex-col justify-between h-[720px]" >
-          {/* 제목 + 비번 버튼 */}
-          <h2 className="text-3xl font-bold ml-1">자유 게시판</h2>
+      <section ref={scrollRef} className="overflow-y-auto scrollable flex-1 mt-16 px-0 pb-40">
+        {/* 제목 */}
+        <h2 className="text-3xl text-center font-bold mb-4">자유 게시판</h2>
+                  {/* 글쓰기 버튼 */}
+          <div className="flex justify-end mr-8">
+            <button
+              className="btn border py-2 px-4 rounded"
+              onClick={handleWriteClick}
+            >
+              글쓰기
+            </button>
+          </div>
+        <div className="border-t border-gray-300 my-6 "/>
 
-              {/* ===== 번역 버튼 (스타일 업그레이드) ===== */}
-              <div className="flex justify-end gap-3 mb-4">
-                <button
-                  onClick={() => handleTranslate('en')}
-                  disabled={isTranslating}
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 transition"
-                >
-                  {isTranslating ? 'Translating…' : '영어'}
-                </button>
+        {/* 상단 컨트롤 */}
+        <div className="flex flex-col w-full mb-6 space-y-4">
 
-                <button
-                  onClick={() => handleTranslate('ja')}
-                  disabled={isTranslating}
-                  className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg shadow hover:bg-green-700 disabled:opacity-50 transition"
-                >
-                  {isTranslating ? '翻訳中…' : '일본어'}
-                </button>
+            {/* ===== 번역 버튼 (스타일 업그레이드) ===== */}
+            <div className="flex justify-end mr-8 space-x-2">
+              <button
+                onClick={() => handleTranslate('en')}
+                disabled={isTranslating}
+                className="px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-lg shadow hover:bg-blue-700 disabled:opacity-50 transition"
+              >
+                {isTranslating ? 'Translating…' : 'ENG'}
+              </button>
 
+              <button
+                onClick={() => handleTranslate('ja')}
+                disabled={isTranslating}
+                className="px-3 py-1 bg-green-600 text-white text-sm font-medium rounded-lg shadow hover:bg-green-700 disabled:opacity-50 transition"
+              >
+                {isTranslating ? '翻訳中…' : '日本語'}
+              </button>
+
+              <button
+                onClick={handleResetTranslation}
+                className="px-3 py-1 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg shadow hover:bg-gray-300 transition"
+              >
+                한국어
+              </button>
+            </div>
+
+          <div className="flex justify-center mt-4">
+            {/* 검색 조건 선택창 */}                 
+            <select value={searchType} onChange={(e) => setSearchType(e.target.value)}
+              className="border border-[#DFD3D3] text-sm rounded h-[42px] w-[120px]">
+              <option value="all">제목 + 내용</option>
+              <option value="title">제목</option>
+              <option value="content">내용</option>
+            </select>
+            <form onSubmit={handleSearch}>
+              <div className="bg-white rounded border border-[#DFD3D3] p-2 pr-10 relative">
+                <input
+                  type="text"
+                  value={searchKeyword}
+                  onChange={(e) => setSearchKeyword(e.target.value)}
+                  placeholder="검색어를 입력하세요."
+                />
                 <button
-                  onClick={handleResetTranslation}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-lg shadow hover:bg-gray-300 transition"
+                  type="submit"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
                 >
-                  한국어
+                  <img src="/search_icon.png" alt="검색" className="w-5 h-5" />
                 </button>
               </div>
-
-              <div className="flex items-center justify-center gap-2 my-4">
-                {/* 검색 조건 선택창 */}                 
-                  <select value={searchType} onChange={(e) => setSearchType(e.target.value)}
-                    className="border border-[#DFD3D3] text-sm rounded h-[36px] w-[120px]">
-                    <option value="all">제목 + 내용</option>
-                    <option value="title">제목</option>
-                    <option value="content">내용</option>
-                  </select>
-                <form onSubmit={handleSearch}>
-                  <div className="bg-white rounded border border-[#DFD3D3] p-2 pr-10 relative">
-                    <input
-                      type="text"
-                      value={searchKeyword}
-                      onChange={(e) => setSearchKeyword(e.target.value)}
-                      placeholder="검색어를 입력하세요."
-                    />
-                    <button
-                      type="submit"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
-                    >
-                      <img src="/search_icon.png" alt="검색" className="w-5 h-5" />
-                    </button>
-                  </div>
-                </form>
-              </div>
-        <div className="flex-1 overflow-y-auto mb-0">  
-          <table className="w-full table-fixed">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>제목</th>
-                <th>글쓴이</th>
-                <th>작성시간</th>
-                <th>조회수</th>
-              </tr>
-            </thead>
-            <tbody>
-              {posts.map((post) => (
-                <tr key={post.post_no} className={post.notice_yn === 'Y' ? 'top-post' : ''}>
-                  <td>{post.notice_yn === 'Y' ? '📌' : post.post_no}</td>
-                  <td>
-                    <Link to={`/post/read/${post.post_no}`} 
-                    state={{ fromSearch: location.search }}
-                    className="link-btn">
-                      {post.title}
-                    </Link>
-                  </td>
-                  <td>{post.name}</td>
-                  <td>{new Date(post.created_day).toLocaleDateString()}</td>
-                  <td>{post.view_cnt}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            </form>
+          </div>
         </div>
-        
+
+        <div className="w-full max-w-5xl mx-auto min-w-[1200px]">
+          <div className="flex flex-col border-t border-gray-200 divide-y divide-gray-200">
+            {posts.map((post) => (
+              <Link
+                key={post.post_no}
+                to={`/post/read/${post.post_no}`}
+                state={{ fromSearch: location.search }}
+                className="flex items-center justify-between py-4 hover:bg-gray-50 transition"
+              >
+                {/* 왼쪽: 번호 + 공지 뱃지 */}
+                <div className="w-1/12 text-center text-sm text-gray-500">
+                    {post.post_no}
+                </div>
+
+                {/* 가운데: 제목 + 작성자 */}
+                <div className="w-6/12 flex items-center gap-2">
+                  {post.notice_yn === 'Y' && (
+                    <span className="inline-block px-3 py-[4px] text-sm bg-blue-900 text-white rounded-3xl mr-1">
+                      공지
+                    </span>
+                  )}
+                  <span className="text-xl font-medium text-gray-900 truncate">
+                    {post.title}
+                  </span>
+                </div>
+
+                {/* 오른쪽: 작성일 + 조회수 */}
+                <div className="w-2/12 flex flex-col items-end text-sm text-gray-400 mr-10">
+                  <span>{new Date(post.created_day).toLocaleDateString()}</span>
+                  <span>조회수 {post.view_cnt}</span>
+                  <span className="text-sm text-gray-500">{post.name}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+        <div className="relative mt-6 mb-8">
+
           {/* 페이징 영역 */}
-          <div className="pagination flex items-center gap-4 absolute bottom-4 right-4">
-            <span>{nowPage}</span>
-            <span>전체 {totalPostCount}건</span>
+          <div className="flex justify-center items-center space-x-2 my-6">
 
             <button
               className="page-btn"
@@ -312,6 +358,26 @@ const PostList = () => {
               <img src={prev1Icon} alt="◀" className="w-6 h-6" />
             </button>
 
+            {/* 페이지 번호들 (1~totalPage 중 슬라이싱해서 표시) */}
+            {Array.from({ length: totalPage }, (_, i) => i + 1)
+              // 화면에 최대 15페이지만 보여주고 싶으면 슬라이스를 이용하세요:
+              .slice(0, 15)
+              .map((page) => (
+                <button
+                  key={page}
+                  onClick={() => navigate(`/post/list?page=${page}&type=${searchType}&keyword=${searchKeyword}`)}
+                  className={`
+                    w-8 h-8 flex items-center justify-center
+                    ${page === nowPage
+                      ? 'bg-blue-600 text-white rounded-full'
+                      : 'text-gray-700 hover:text-white hover:bg-blue-500 rounded-full'}
+                  `}
+                >
+                  {page}
+                </button>
+              ))
+            }
+            
             <button
               className="page-btn"
               onClick={() => jumpToPage(1)}
@@ -327,10 +393,10 @@ const PostList = () => {
             >
               <img src={next5Icon} alt="▶▶" className="w-6 h-6" />
             </button>
-            </div>  
           </div>
+        </div>
       </section>
-    </div>
+    </div>  
   );
 };
 

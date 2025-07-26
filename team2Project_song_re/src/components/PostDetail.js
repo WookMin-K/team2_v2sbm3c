@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef  } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation,  } from 'react-router-dom';
 import { getPostDetail } from '../api/postApi';
 import { useLoginContext } from '../contexts/LoginContext';
 import ReplyLikeButton from './ReplyLikeButton';
@@ -16,12 +16,13 @@ import rdeleteIcon from '../pages/icon/rdelete.png'
 import updateIcon from '../pages/icon/update.png'
 import axios from 'axios';
 import './PostDetail.css';
+import upIcon from '../pages/icon/up.png';
+import MegaMenu from '../components/MegaMenu';
 
 const PostDetail = () => {
   const { postNo } = useParams();
   const navigate = useNavigate();
   const { isLoggedIn, setIsLoginOpen } = useLoginContext();
-  const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef();
 
   // 게시글, 댓글, 페이징 상태
@@ -58,12 +59,44 @@ const PostDetail = () => {
   const fromSearch = location.state?.fromSearch || location.search;
 
   
+  // 햄버거 메뉴 열림/닫힘 상태
+  const [menuOpen, setMenuOpen] = useState(false);
+  const handleMenuToggle = () => setMenuOpen(open => !open);
+
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  // 본문 스크롤 감지용 ref
+  const scrollRef = useRef(null);
+  const [showTop, setShowTop] = useState(false);
+
+  
 
 
   // ✅ LocalStorage에서 번역 데이터 꺼내기
   const translationMap = JSON.parse(
     localStorage.getItem('translatedPosts') || '{}'
   );
+
+    // 즐겨찾기
+  const handleBookmarkClick = () => {
+    if (isLoggedIn) {
+      navigate('/mypage/bookmark');
+    } else {
+      alert('로그인 후 이용 가능합니다 😊');
+      sessionStorage.setItem('redirectAfterLogin', '/mypage/bookmark');
+      setIsLoginOpen(true);
+    }
+  };
+
+  // 내 게시글
+  const handleMyPostsClick = () => {
+    if (isLoggedIn) {
+      navigate('/mypage/postlist');
+    } else {
+      alert('로그인 후 이용 가능합니다 😊');
+      sessionStorage.setItem('redirectAfterLogin', '/mypage/postlist');
+      setIsLoginOpen(true);
+    }
+  };
 
   // 데이터 로드
   const fetchData = async () => {
@@ -97,6 +130,18 @@ const translateReplies = async (lang) => {
     setIsTranslatingReplies(false);
   }
 };
+
+    // 본문 스크롤 감지
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      setShowTop(el.scrollTop > 0);
+    };
+    el.addEventListener('scroll', onScroll);
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
 
 // 댓글 원래대로
 const resetReplyTranslation = () => {
@@ -306,26 +351,66 @@ const resetReplyTranslation = () => {
   const translatedContent = translationMap[post.post_no]?.content || post.content;
 
   return (
-    <div className="post-detail-container">
-      {/* 사이드바 */}
-      <div className="sidebar">
-        <h3>마이페이지</h3>
-        <ul>
-          <li>
-            <button className="link-btn" onClick={() => navigate('/mypage/bookmark')}>
-              즐겨찾기
+    <div className="post-detail-container flex h-screen">
+      {/* 왼쪽 사이드바 */}
+      <aside className="w-24 bg-[#2e3a4e] flex flex-col justify-between items-center pt-4 pb-0 shadow-md">
+
+        <button
+          className="ham_btn mb-4 focus:outline-none"
+          onClick={handleMenuToggle}>
+          <div className="line" />
+          <div className="line" />
+          <div className="line" />  
+        </button>
+        
+        <MegaMenu open={menuOpen} onClose={handleMenuToggle} />
+        
+        <hr className="w-24 border-gray-600 mb-4" />
+
+        <nav className="flex flex-col items-center justify-start space-y-6 mt-4">
+          {/* 즐겨찾기 */}
+          <div className="relative group w-full">
+            <button
+              onClick={handleBookmarkClick} 
+              className="btn-star btn-underline w-full flex flex-col items-center py-2" >
+              <span className="icon w-7 h-7" />
+              <span className="text-white text-sm mt-2">즐겨찾기</span>
             </button>
-          </li>
-          <li>
-            <button className="link-btn" onClick={() => navigate('/mypage/postlist')}>
-              내 게시물
-            </button>
-          </li>
-        </ul>
-      </div>
+          </div>
+          {/* 내 게시글 */}
+          <button 
+            onClick={handleMyPostsClick}
+            className="btn-post btn-underline w-full flex flex-col items-center py-2" >
+            <span className="icon w-8 h-8" />
+            <span className="text-white text-sm mt-2">내 게시글</span>
+          </button>
+        
+          <button 
+            onClick={() => navigate('/post/list')} 
+            className="btn-underline w-full flex flex-col items-center py-2">
+            <img src="/icon/note_white.png" alt="자유 게시판" className="w-7 h-7" />
+            <span className="text-white text-sm mt-2">자유 게시판</span>
+          </button>
+
+          <button onClick={() => alert('준비 중입니다.')}
+            className="btn-underline w-full flex flex-col items-center py-2">
+            <img src="/icon/note_white.png" alt="일정 공유 게시판" className="w-7 h-7" />
+            <span className="text-white text-sm mt-2">일정 공유</span>
+            <span className="text-white text-sm">게시판</span>
+          </button>
+          <span className="mb-2"></span>
+        </nav>
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="w-full p-6 flex justify-center bg-blue-300 transition-colors group">
+          <img src={upIcon} alt="위로가기" 
+          className="w-5 h-5 transform transition-transform duration-200 ease-in-out
+                     group-hover:-translate-y-1" />
+        </button>
+      </aside>
 
       {/* 본문 */}
-      <div className="content">
+      <section ref={scrollRef} className="content flex-1 overflow-y-auto">
         {post.hidden_yn === 'Y' && !isAdmin ? (
           <div className="text-center mt-20 text-xl">
             신고 처리된 글입니다.
@@ -343,17 +428,17 @@ const resetReplyTranslation = () => {
             </div>
               <div ref={menuRef} className="relative inline-block">
                 <button
-                  onClick={() => setMenuOpen(o => !o)}
+                  onClick={() => setMoreMenuOpen(o => !o)}
                   className="p-2 hover:bg-gray-100 rounded-full"
                   aria-label="더보기"
                 >
                   <span className="text-lg select-none">⋮</span>
                 </button>
 
-                {menuOpen && (
+                {moreMenuOpen && (
                   <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded shadow-lg z-10">
                     <button
-                      onClick={() => { onClickReport(); setMenuOpen(false); }}
+                      onClick={() => { onClickReport(); setMoreMenuOpen(false); }}
                       className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       <img src={reportIcon} alt="" className="w-4 h-4 mr-2" />
@@ -362,7 +447,7 @@ const resetReplyTranslation = () => {
                 {/* 수정된 BookmarkPostButton */}
                 <BookmarkPostButton
                   post_no={post.post_no}
-                  onClickCallback={() => setMenuOpen(false)}
+                  onClickCallback={() => setMoreMenuOpen(false)}
                   defaultIcon={starIcon}
                   activeIcon={starIcon /*(활성화 아이콘 따로 있으면 그걸)*/}
                   className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -370,7 +455,7 @@ const resetReplyTranslation = () => {
 
                      {isAuthor && (
                       <button
-                         onClick={() => { navigate(`/post/update/${post.post_no}`); setMenuOpen(false); }}
+                         onClick={() => { navigate(`/post/update/${post.post_no}`); setMoreMenuOpen(false); }}
                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                        >
                         <img src={updateIcon} alt="" className="w-4 h-4 mr-2" />
@@ -381,7 +466,7 @@ const resetReplyTranslation = () => {
                      {/* 삭제 */}
                      {(isAuthor || isAdmin) && (
                        <button
-                         onClick={() => { navigate(`/post/delete/${post.post_no}`); setMenuOpen(false); }}
+                         onClick={() => { navigate(`/post/delete/${post.post_no}`); setMoreMenuOpen(false); }}
                          className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                        >
                         <img src={rdeleteIcon} alt="" className="w-4 h-4 mr-2" />
@@ -503,20 +588,20 @@ const resetReplyTranslation = () => {
                 disabled={isTranslatingReplies}
                 className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition"
               >
-                {isTranslatingReplies ? 'Translating…' : '댓글 영어'}
+                {isTranslatingReplies ? 'Translating…' : 'ENG'}
               </button>
               <button
                 onClick={() => translateReplies('ja')}
                 disabled={isTranslatingReplies}
                 className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition"
               >
-                {isTranslatingReplies ? '翻訳中…' : '댓글 일본어'}
+                {isTranslatingReplies ? '翻訳中…' : '日本語'}
               </button>
               <button
                 onClick={resetReplyTranslation}
                 className="px-3 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
               >
-                댓글 한국어
+                한국어
               </button>
             </div>
 
@@ -704,7 +789,7 @@ const resetReplyTranslation = () => {
             </div>
           </>
         )}
-      </div>
+      </section>
 
       {/* 신고 모달 */}
       {showReportModal && (

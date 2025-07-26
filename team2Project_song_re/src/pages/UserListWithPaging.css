@@ -62,35 +62,120 @@
   width: 20px;
   height: 28px;
   border: none;
-  background: #eee;
+  background: transparent !important;
   cursor: pointer;
   font-size: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  /* 기본 투명도 적용 */
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+}
+
+/* 호버 시 원래 색상(투명도 해제) */
+.page-btn:hover:not(:disabled) {
+  opacity: 1;
 }
 
 /* 버튼 비활성화 스타일 */
 .page-btn:disabled {
-  opacity: 0.3;
   cursor: default;
-}
-
-/* 페이지 정보 텍스트 */
-.page-info {
-  width: 20px;
-  height: 28px;
-  border: 2px solid #E6E6E6;
-  background: #ffffff;
-  font-weight: 600;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* 클릭 불가 표시만 남기고 투명도는 hover 효과로만 제어 */
 }
 
 /* 전체 건수 텍스트 */
 .total-count {
   color: #666;
   font-size: 0.9rem;
+}
+
+/* 버튼에 붙일 공용 클래스 */
+.btn-underline {
+  position: relative;
+  /* 텍스트 아래 공간 확보 */
+  padding-bottom: 4px;
+}
+
+/* ::after를 이용한 가짜 밑줄 */
+.btn-underline::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;              /* 선 두께 */
+  background-color: white;  /* 선 색 */
+  transform: scaleX(0);      /* 처음엔 0% 너비 */
+  transform-origin: center;  /* 가운데 기준으로 확장 */
+  transition: transform 0.3s ease;
+}
+
+/* 호버 시 scaleX(1) → 100% 너비로 확장 */
+.btn-underline:hover::after {
+  transform: scaleX(1);
+}
+
+.ham_btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 24px;    /* 전체 버튼 너비 */
+  height: 24px;   /* 버튼 높이 */
+  cursor: pointer;
+  padding: 4px;   /* 여백: 필요에 따라 조정 */
+}
+
+.ham_btn .line {
+  height: 2px;
+  background-color: white;
+  transition: width 0.3s ease;
+}
+
+/* 기본 상태: 1,3번은 길게, 2번은 짧게 */
+.ham_btn .line:nth-child(1),
+.ham_btn .line:nth-child(3) {
+  width: 100%;
+}
+.ham_btn .line:nth-child(2) {
+  width: 60%;
+  margin-right: 40%;  /* 가운데로 살짝 당기기 */
+}
+
+/* 호버 상태: 1,3번은 짧게, 2번은 길게 */
+.ham_btn:hover .line:nth-child(1),
+.ham_btn:hover .line:nth-child(3) {
+  width: 60%;
+  margin-right: 40%;
+}
+.ham_btn:hover .line:nth-child(2) {
+  width: 100%;
+  margin-right: 0;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 8px;               /* 스크롤바 너비 */
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: transparent;  /* 트랙 배경 */
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.3);  /* 엄지색 */
+  border-radius: 4px;
+  border: 2px solid transparent;           /* 여백 */
+  background-clip: content-box;             /* 안쪽만 색 칠하기 */
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255,255,255,0.5);
+}
+
+
+/* — Firefox */
+.scrollable {
+  scrollbar-width: thin;                  /* 얇게 */
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
 }

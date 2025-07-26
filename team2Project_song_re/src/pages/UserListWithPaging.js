@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLoginContext } from '../contexts/LoginContext';
+import MegaMenu from '../components/MegaMenu';
 import axios from 'axios';
 import './UserListWithPaging.css';
 import './MyPage.css';
@@ -8,20 +9,23 @@ import prev5Icon from './icon/left2.png';  // src/assets에 두었다면 import
 import prev1Icon from './icon/left.png';
 import next1Icon from './icon/right.png';
 import next5Icon from './icon/right2.png';
+import upIcon from '../pages/icon/up.png';
 
 axios.defaults.withCredentials = true;
-const DEFAULT_PROFILE = '/icon/user2.png';
 
 const UserListWithPaging = () => {
   const navigate = useNavigate();
   const { loginUser } = useLoginContext()
   const [userList, setUserList] = useState([]);
   const [totalCnt, setTotalCnt] = useState(0);
+  const [searchType, setSearchType] = useState("all");
   const [nowPage, setNowPage] = useState(1);
   const [keyword, setKeyword] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
   const perPage = 10;
   const totalPage = Math.ceil(totalCnt / perPage);
   const isAdmin = loginUser && String(loginUser.grade) === '0';
+  const scrollRef = useRef(null);
 
   const fetchUserList = useCallback(async () => {
     try {
@@ -49,11 +53,14 @@ const UserListWithPaging = () => {
     fetchUserList();
   };
 
-  const goPage = pageNum => {
-    if (pageNum >= 1 && pageNum <= totalPage) setNowPage(pageNum);
+  const jumpToPage = (delta) => {
+    let page = nowPage + delta;
+    if (page < 1) page = 1;
+    if (page > totalPage) page = totalPage;
+    navigate(`/mypage/users?page=${page}&type=${searchType}&keyword=${keyword}`);
   };
 
-    // ⭐️ 관리자가 아니면 접근 자체 차단!
+    // 관리자가 아니면 접근 자체 차단!
   useEffect(() => {
     // 아직 loadedUser 정보가 안 들어온 상태면 아무것도 안함
     if (!loginUser) return;
@@ -64,165 +71,192 @@ const UserListWithPaging = () => {
     }
   }, [loginUser, navigate]);
 
+  const handleMenuToggle = () => setMenuOpen(o => !o);
+
   return (
-    <div className="flex w-screen h-[800px] bg-[#f4f5f7]">
-      {/* ── 왼쪽 사이드바 ── */}
-      {/* <aside className="w-64 bg-white p-6 shadow-md">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-6 text-[#3B3B58]">마이페이지</h2>
-          <img
-            src={loginUser?.profileUrl || DEFAULT_PROFILE}
-            alt="profile"
-            className="w-20 h-20 mx-auto"
-          />
-          <p className="mt-4 font-semibold text-lg">{loginUser?.name || '---'}</p>
-        </div>
+    <div className="flex w-screen h-[807px] bg-[#ffffff]">
+      {/* 왼쪽 사이드바 */}
+      <aside className="w-24 bg-[#2e3a4e] flex flex-col justify-between items-center pt-4 pb-0 shadow-md">
 
-        <nav className="mt-6 space-y-4">
-          <div className="-mx-6 border-t border-gray-300 my-6" />
-          <h3 className="text-xl font-semibold">계정</h3>
+        <button
+          className="ham_btn mb-4 focus:outline-none"
+          onClick={handleMenuToggle}>
+          <div className="line" />
+          <div className="line" />
+          <div className="line" />  
+        </button>
+        <MegaMenu open={menuOpen} onClose={handleMenuToggle} />
+        
+        <hr className="w-24 border-gray-600 mb-4" />
 
-          <button onClick={() => navigate('/mypage')} className="flex items-center gap-2 text-lg ml-4">
-            <img src="/icon/info.png" alt="내 정보" className="w-6 h-6" />
-            내 정보
-          </button>
+        <nav className="flex-1 flex flex-col items-center justify-end space-y-6">
 
-          {isAdmin && (
-            <button onClick={() => navigate('/mypage/users')} className="btn-user flex items-center gap-2 text-lg ml-4">
-              <span className="icon w-6 h-6" />
-              회원 목록
+          <div className="relative group w-full">
+           <button onClick={() => navigate('/mypage')} className="btn-underline w-full flex flex-col items-center py-2">
+             <img src="/icon/info_white.png" alt="내 정보" className="w-7 h-7" />
+             <span className="text-white text-sm mt-2">내 정보</span>
+           </button>
+          </div>
+           {isAdmin && (
+            <button onClick={() => navigate('/mypage/users')} className="btn_user btn-underline w-full flex flex-col items-center py-2">
+              <span className="icon w-7 h-7" />
+              <span className="text-white text-sm mt-2">회원 목록</span>
             </button>          
           )}
 
           {isAdmin && (
-            <button onClick={() => navigate('/admin/reports')} className="btn_report flex items-center gap-2 text-lg ml-4">
-              <span className="icon w-6 h-6" />
-              신고 목록
+            <button onClick={() => navigate('/admin/reports')} className="btn_report btn-underline w-full flex flex-col items-center py-2">
+              <span className="icon w-7 h-7" />
+              <span className="text-white text-sm mt-2">신고 목록</span>
             </button>
           )}
 
-          <h3 className="text-xl font-semibold">글 관리</h3>
-          <button onClick={() => navigate('/mypage/bookmark')} className="btn-star flex items-center gap-2 text-lg ml-4">
-            <span className="icon w-6 h-6" />
-            즐겨찾기
+          <button onClick={() => navigate('/mypage/bookmark')} className="btn-star btn-underline w-full flex flex-col items-center py-2">
+            <span className="icon w-7 h-7" />
+            <span className="text-white text-sm mt-2">즐겨찾기</span>
           </button>
 
-          <button onClick={() => navigate('/mypage/postlist')} className="btn-post flex items-center gap-2 text-lg ml-4">
-            <span className="icon w-6 h-6" />
-            내 게시글
+          <button onClick={() => navigate('/mypage/postlist')} className="btn-post btn-underline w-full flex flex-col items-center py-2">
+            <span className="icon w-7 h-7" />
+            <span className="text-white text-sm mt-2">내 게시글</span>
           </button>
 
-          <button onClick={() => navigate('/mypage/mytravel')} className="btn_plane flex items-center gap-2 text-lg ml-4">
-            <span className="icon w-6 h-6" />
-            내 여행 일정
+          <button onClick={() => navigate('/mypage/mytravel')} className="btn_plane btn-underline w-full flex flex-col items-center py-2">
+            <span className="icon w-7 h-7" />
+            <span className="text-white text-sm mt-2">내 여행 일정</span>
           </button>
           
-          <button onClick={() => navigate('/request/list')} className="btn_inquiry flex items-center gap-2 text-lg ml-4">
-            <span className="icon w-6 h-6" />
-            내 문의
+          <button onClick={() => navigate('/request/list')} className="btn_inquiry btn-underline w-full flex flex-col items-center py-2">
+            <span className="icon w-7 h-7" />
+            <span className="text-white text-sm mt-2">내 문의</span>
           </button>
-
+          <span className="mb-2"></span>
         </nav>
-      </aside> */}
-      
-      <section className="flex-1 flex justify-center items-start mt-12">
-          <div className="w-full max-w-[1180px] bg-white p-6 rounded shadow flex flex-col relative" style={{ minHeight: '700px' }}>
-          <h2 className="text-3xl font-bold mb-4 ml-1">회원 목록</h2>
+        <button
+          onClick={() => scrollRef.current.scrollTo({ top: 0, behavior: 'smooth'})}
+          className="w-full p-6 flex justify-center bg-blue-300 transition-colors group">
+          <img src={upIcon} alt="위로가기" 
+          className="w-5 h-5 transform transition-transform duration-200 ease-in-out
+                     group-hover:-translate-y-1" />
+        </button>
+      </aside>
 
-          <div className="relative w-full max-w-sm mx-auto mb-4">
-            <div className="bg-white rounded-md shadow border border-[#e5e0e0] p-2 pr-12">
+      {/* ── 본문 ── */}
+      <section ref={scrollRef} className="overflow-y-auto scrollable flex-1 mt-16 px-0 pb-40">
+        {/* 제목 */}
+        <h2 className="text-3xl text-center font-bold mb-4">회원 목록</h2>
+
+        <div className="border-t border-gray-300 my-14" />
+
+        <div className="w-full max-w-5xl mx-auto min-w-[1000px] mt-14">
+        {/* 검색창 */}
+        <div className="flex justify-center mt-4">
+          <select
+            value={searchType}
+            onChange={e => setSearchType(e.target.value)}
+            className="border border-[#DFD3D3] text-sm rounded h-[42px] w-[120px]"
+          >
+            <option value="all">전체</option>
+            <option value="id">아이디</option>
+            <option value="name">이름</option>
+            <option value="email">이메일</option>
+          </select>
+          <form onSubmit={handleSearch}>
+            <div className="bg-white rounded border border-[#DFD3D3] p-2 pr-10 relative ml-2">
               <input
                 type="text"
-                placeholder="아이디, 이름, 이메일 검색"
                 value={keyword}
                 onChange={e => setKeyword(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();      // form 제출 막기
-                    handleSearch(e);
-                  }
-                }}
-                className="w-full px-4 py-2 text-sm border border-[#e5e0e0] rounded focus:outline-none"
+                placeholder="검색어를 입력하세요."
+                className="text-sm focus:outline-none"
               />
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
+              >
+                <img src="/search_icon.png" alt="검색" className="w-5 h-5" />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={handleSearch}
-              className="absolute right-2 top-[14px] p-1"
-            >
-              <img src="/search_icon.png" alt="검색" className="w-5 h-5" />
-            </button>
-          </div>
-
-        <div className="table-wrapper flex-1 overflow-y-auto">
-          <table className="user-table">
-            <thead>
-                <tr>
-                    <th>번호</th>
-                    <th>아이디</th>
-                    <th>이름</th>
-                    <th>이메일</th>
-                    <th>등급</th>
-                    <th>가입일</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {userList.map((user, index) => (
-                    <tr key={user.user_no}>
-                      <td>{totalCnt - (nowPage - 1) * perPage - index}</td>
-                      <td>{user.user_id}</td>
-                      <td>{user.name}</td>
-                      <td>{user.email}</td>
-                      <td>{user.grade}</td>
-                      <td>{user.created_at?.split('T')[0]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          </form>
         </div>
+      </div>
 
-          <div className="pagination flex items-center gap-4 absolute bottom-4 right-4">
-            {/* 현재 페이지 / 전체 페이지 */}
-            <span className="page-info">
-              {nowPage}
-            </span>
+      {/* 목록 */}
+      <div className="w-full max-w-5xl mx-auto min-w-[1200px]">
+        <div className="flex flex-col border-t border-gray-200 divide-y divide-gray-200">
+          {userList.map(user => (
+            <div
+              key={user.user_no}
+              className="flex items-center justify-between py-4 hover:bg-gray-50 transition"
+            >
+              {/* 왼쪽: 번호 */}
+              <div className="w-1/12 text-center text-sm text-gray-500">
+                {user.user_no}
+              </div>
+              {/* 중간: 아이디 */}
+              <div className="w-6/12 flex items-center gap-2">
+                <span className="text-xl font-medium text-gray-900 truncate">
+                  {user.user_id}
+                </span>
+              </div>
+              {/* 오른쪽: 이름, 이메일, 등급, 가입일 등 */}
+              <div className="w-2/12 flex flex-col items-end text-sm text-gray-400 mr-10 space-y-1">
+                <span>{user.name}</span>
+                <span>{user.email}</span>
+                <span>등급 {user.grade}</span>
+                <span>가입 {user.created_at?.split('T')[0]}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
-            {/* 전체 건수 */}
-            <span className="total-count">
-              전체 {totalCnt}건
-            </span>
-            
-            {/* 5페이지 앞으로 */}
+        <div className="relative mt-6 mb-8">
+
+          {/* 페이징 */}
+          <div className="flex justify-center items-center space-x-2 my-6">
             <button
               className="page-btn"
-              onClick={() => goPage(nowPage - 5, 1)}
-              disabled={nowPage <= 1}
+              onClick={() => jumpToPage(-5)}
+              disabled={nowPage === 1}
             >
               <img src={prev5Icon} alt="◀◀" className="w-6 h-6" />
             </button>
-
-            {/* 1페이지 앞으로 */}
             <button
               className="page-btn"
-              onClick={() => goPage(nowPage - 1)}
+              onClick={() => jumpToPage(-1)}
               disabled={nowPage === 1}
             >
               <img src={prev1Icon} alt="◀" className="w-6 h-6" />
             </button>
 
-            {/* 1페이지 뒤로 */}  
+            {Array.from({ length: totalPage }, (_, i) => i + 1)
+              .slice(0, 15)
+              .map(page => (
+                <button
+                  key={page}
+                  onClick={() => navigate(`/mypage/users?page=${page}&type=${searchType}&keyword=${keyword}`)}
+                  className={`w-8 h-8 flex items-center justify-center ${
+                    page === nowPage
+                      ? 'bg-blue-600 text-white rounded-full'
+                      : 'text-gray-700 hover:text-white hover:bg-blue-500 rounded-full'
+                  }`}
+                >
+                  {page}
+                </button>
+              ))
+            }
+
             <button
               className="page-btn"
-              onClick={() => goPage(nowPage + 1)}
+              onClick={() => jumpToPage(1)}
               disabled={nowPage === totalPage}
             >
               <img src={next1Icon} alt="▶" className="w-6 h-6" />
             </button>
-
-            {/* 5페이지 뒤로 */}
             <button
               className="page-btn"
-              onClick={() => goPage(nowPage + 5, totalPage)}
+              onClick={() => jumpToPage(5)}
               disabled={nowPage >= totalPage}
             >
               <img src={next5Icon} alt="▶▶" className="w-6 h-6" />
