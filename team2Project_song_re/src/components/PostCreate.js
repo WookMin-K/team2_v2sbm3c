@@ -51,7 +51,7 @@ export default function PostCreate() {
 
     try {
       const res = await axios.post(
-        'http://localhost:9093/post/create',
+        'http://192.168.12.142:9093/post/create',
         payload
       );
       if (res.status < 300) {

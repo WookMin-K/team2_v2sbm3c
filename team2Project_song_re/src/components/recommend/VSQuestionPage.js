@@ -18,9 +18,18 @@ const VSQuestionPage = () => {
 // useEffect
 useEffect(() => {
   if (!loginUser && !localStorage.getItem("guest_session_id")) {
-    const newSessionId = `guest_${crypto.randomUUID()}`;
+    // window.crypto가 있으면 native UUID, 없으면 간단한 폴백
+    const uuid = window.crypto?.randomUUID
+      ? window.crypto.randomUUID()
+      : `fallback_${Math.random().toString(36).slice(2)}`;
+    const newSessionId = `guest_${uuid}`;
     localStorage.setItem("guest_session_id", newSessionId);
   }
+// useEffect(() => {
+//   if (!loginUser && !localStorage.getItem("guest_session_id")) {
+//     const newSessionId = `guest_${crypto.randomUUID()}`;
+//     localStorage.setItem("guest_session_id", newSessionId);
+//   }
 
   const shuffled = [...vsQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
   setShuffledQuestions(shuffled);

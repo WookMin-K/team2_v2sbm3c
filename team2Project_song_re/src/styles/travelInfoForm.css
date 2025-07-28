@@ -1,7 +1,7 @@
 /* ───────── 컨테이너 ───────── */
 .form-container {
-  width: 97vw;
-  height: 83vh;
+  width: 100vw;
+  height: 88.6vh;
   box-sizing: border-box;
   padding: 80px 40px;
   margin: 0 auto;
@@ -16,7 +16,7 @@
   justify-content: center;
   align-items: center;
   gap: 48px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* ───── 상단 2칸 ───── */
@@ -26,7 +26,7 @@
   justify-content: center;
   align-items: center;
   column-gap: 96px;
-  margin-top: 80px;
+  margin-top: 40px;
   width: 100%;
 }
 
@@ -131,4 +131,33 @@ select:hover,
 .nav-btns .prev:hover,
 .nav-btns .next:hover {
   background-color: #accbee;
+}
+
+.address-modal {
+  position: fixed;
+  top: 55%;
+  left: 50%;
+  z-index: 100;
+  transform: translate(-50%, -50%);
+  border: 1px solid #ccc;
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.address-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  border: none;
+  background: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.address-close-btn:hover {
+  color: #111;
 }

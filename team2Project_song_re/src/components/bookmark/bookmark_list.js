@@ -11,7 +11,7 @@ import next1Icon from '../../pages/icon/right.png';
 import next5Icon from '../../pages/icon/right2.png';
 import upIcon from '../../pages/icon/up.png';
 
-const API_BASE = 'http://localhost:9093';
+const API_BASE = 'http://192.168.12.142:9093';
 const PAGE_SIZE = 5;
 
 export default function BookmarkListPage() {

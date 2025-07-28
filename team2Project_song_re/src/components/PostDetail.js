@@ -62,6 +62,7 @@ const PostDetail = () => {
   // 햄버거 메뉴 열림/닫힘 상태
   const [menuOpen, setMenuOpen] = useState(false);
   const handleMenuToggle = () => setMenuOpen(open => !open);
+  const megaMenuRef = useRef();
 
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   // 본문 스크롤 감지용 ref
@@ -154,7 +155,7 @@ const resetReplyTranslation = () => {
 
   useEffect(() => {
     const onClickOutside = e => {
-      if (menuOpen && menuRef.current && !menuRef.current.contains(e.target)) {
+      if (menuOpen && megaMenuRef.current && !megaMenuRef.current.contains(e.target)) {
         setMenuOpen(false);
       }
     };
@@ -165,7 +166,7 @@ const resetReplyTranslation = () => {
   // 파일 다운로드
   const handleDownload = async (fileName) => {
     try {
-      const res = await fetch(`http://localhost:9093/post/download/${fileName}`);
+      const res = await fetch(`http://192.168.12.142:9093/post/download/${fileName}`);
       if (!res.ok) throw new Error();
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
@@ -351,7 +352,7 @@ const resetReplyTranslation = () => {
   const translatedContent = translationMap[post.post_no]?.content || post.content;
 
   return (
-    <div className="post-detail-container flex h-screen">
+    <div className="flex w-screen h-[807px] bg-[#ffffff]">
       {/* 왼쪽 사이드바 */}
       <aside className="w-24 bg-[#2e3a4e] flex flex-col justify-between items-center pt-4 pb-0 shadow-md">
 
@@ -363,11 +364,13 @@ const resetReplyTranslation = () => {
           <div className="line" />  
         </button>
         
-        <MegaMenu open={menuOpen} onClose={handleMenuToggle} />
-        
+
+          <MegaMenu open={menuOpen} onClose={handleMenuToggle} />
+
+
         <hr className="w-24 border-gray-600 mb-4" />
 
-        <nav className="flex flex-col items-center justify-start space-y-6 mt-4">
+        <nav className="flex-1 flex flex-col items-center justify-end space-y-6">
           {/* 즐겨찾기 */}
           <div className="relative group w-full">
             <button
@@ -401,7 +404,7 @@ const resetReplyTranslation = () => {
           <span className="mb-2"></span>
         </nav>
         <button
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onClick={() => scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
           className="w-full p-6 flex justify-center bg-blue-300 transition-colors group">
           <img src={upIcon} alt="위로가기" 
           className="w-5 h-5 transform transition-transform duration-200 ease-in-out
@@ -484,7 +487,7 @@ const resetReplyTranslation = () => {
               <div className="post-content">{translatedContent}</div>
               {post.image && (
                 <img
-                  src={`http://localhost:9093/images/${post.image}`}
+                  src={`http://192.168.12.142:9093/images/${post.image}`}
                   alt="게시글 이미지"
                   style={{ maxWidth: '100%', marginTop: 20, borderRadius: 8 }}
                 />

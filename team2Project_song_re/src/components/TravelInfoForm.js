@@ -5,13 +5,14 @@ import CalendarModal from './CalendarModal';
 import IconSelect from './IconSelect';
 import { useNavigate } from 'react-router-dom';
 import { TRANSPORT_OPTIONS, PERSON_COUNT_OPTIONS } from '../constants/formOptions';
+import DaumPostcode from 'react-daum-postcode';
 
 import '../styles/travelInfoForm.css';
 
 const TravelInfoForm = () => {
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState(null);
-  const [departure, setDeparture] = useState({ city: '', district: '' });
+  const [departure, setDeparture] = useState('');      // ✅ 문자열로 수정
   const [transport, setTransport] = useState('');
   const [persons, setPersons] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
@@ -21,6 +22,9 @@ const TravelInfoForm = () => {
   const location = useLocation();
   const { selectedSpots } = location.state || { selectedSpots: [] };
   const [spots, setSpots] = useState(selectedSpots);
+
+  const [isAddressOpen, setIsAddressOpen] = useState(false);  // 모달 on/off
+
 
   // 제목 입력을 위한 state
   const [planTitle, setPlanTitle] = useState('');
@@ -87,35 +91,57 @@ const handleSubmit = async () => {
       <section className="form-container">
 
         {/* --- 여행 제목 입력 필드 --- */}
-        <div className="field mb-4">
+        <div className="field mb-2">
           <label className="field-label">여행 제목</label>
           <input
             type="text"
-            placeholder="여행 제목을 입력하세요"
+            placeholder="여행 제목을 입력하세요."
             value={planTitle}
             onChange={e => setPlanTitle(e.target.value)}
-            className="w-full px-3 py-2 border rounded"
+            className="w-full px-3 py-2 border rounded text-center"
           />
         </div>
         {/* 상단 3개 필드 */}
         <div className="grid-1">
+          {/* 일정 선택 */}
           <div className="field">
             <label className="field-label">일정</label>
             <button type="button" className="date-range-box" onClick={() => setShowCalendar(true)}>
               <div className="date-text">
-                {dateRange
-                  ? `${dateRange.start} ~ ${dateRange.end}`
-                  : '--.--.-- ~ --.--.--'}
+                {dateRange ? `${dateRange.start} ~ ${dateRange.end}` : '--.--.-- ~ --.--.--'}
               </div>
               <img src="/calendar.png" alt="calendar" />
             </button>
           </div>
 
+          {/* 출발지 입력 */}
           <div className="field">
             <label className="field-label">출발지</label>
-            <LocationSelect value={departure} onChange={setDeparture} />
+            <button type="button" className="date-range-box" onClick={() => setIsAddressOpen(true)}>
+              <div className="date-text">{departure || '--'}</div>
+              <img src="/map.png" alt="map" className="w-7 h-7" />
+            </button>
+            {isAddressOpen && (
+              <div className="address-modal">
+              {/* 닫기 버튼 추가 */}
+              <button className="address-close-btn" onClick={() => setIsAddressOpen(false)}>✕</button>
+                <DaumPostcode
+                  onComplete={(data) => {
+                    const fullAddress = data.roadAddress || data.jibunAddress;
+                    setDeparture(fullAddress);
+                    setIsAddressOpen(false);
+                  }}
+                  autoClose
+                  style={{
+                    width: '500px',
+                    height: '450px'
+                  }}
+                />
+              </div>
+            )}
           </div>
         </div>
+
 
         <div className="grid-2">
           <div className="field">
