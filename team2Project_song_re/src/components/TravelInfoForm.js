@@ -25,6 +25,9 @@ const TravelInfoForm = () => {
 
   const [isAddressOpen, setIsAddressOpen] = useState(false);  // 모달 on/off
 
+  // ✅ 제출 중 로딩 상태
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   // 제목 입력을 위한 state
   const [planTitle, setPlanTitle] = useState('');
@@ -36,6 +39,9 @@ const handleSubmit = async () => {
     alert('모든 정보를 입력해 주세요!');
     return;
   }
+
+  // 로딩 시작
+  setIsSubmitting(true);
 
   const payload = {
     title: planTitle,
@@ -82,12 +88,22 @@ const handleSubmit = async () => {
   } catch (err) {
     console.error(err);
     alert('일정 생성 실패');
-  }
+  } finally {
+    setIsSubmitting(false);
+    }
 };
 
 
   return (
     <>
+      {/* ================= 로딩 오버레이 ================= */}
+      {isSubmitting && (
+        <div className="spinner-overlay">
+          {/* 원형 스피너 표시 */}
+          <div className="spinner" />
+        </div>
+      )}
+
       <section className="form-container">
 
         {/* --- 여행 제목 입력 필드 --- */}
@@ -165,8 +181,13 @@ const handleSubmit = async () => {
         </div>
 
         <div className="nav-btns">
-          <button className="nav-btn prev" onClick={() => navigate(-1)}>이전</button>
-          <button className="nav-btn next" onClick={handleSubmit}>일정 생성하기</button>
+          {/* <button className="nav-btn prev" onClick={() => navigate(-1)}>이전</button>
+          <button className="nav-btn next" onClick={handleSubmit}>일정 생성하기</button> */}
+          <button className="nav-btn prev" onClick={() => navigate(-1)} disabled={isSubmitting}>이전</button>
+          <button className={`nav-btn next ${isSubmitting ? 'loading' : ''}`} onClick={handleSubmit} disabled={isSubmitting}>
+          {/* 버튼 텍스트를 로딩 여부에 따라 변경 */}
+          {isSubmitting ? '일정 생성중…' : '일정 생성하기'}
+        </button>
         </div>
       </section>
 

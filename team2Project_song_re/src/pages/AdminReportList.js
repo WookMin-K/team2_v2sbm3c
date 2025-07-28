@@ -122,10 +122,17 @@ const AdminReportList = () => {
             <span className="text-white text-sm mt-2">내 여행 일정</span>
           </button>
           
-          <button onClick={() => navigate('/request/list')} className="btn_inquiry btn-underline w-full flex flex-col items-center py-2">
+          {/* 관리자는 '문의 목록', 일반 회원은 '내 문의' */}
+          <button
+            onClick={() => navigate('/request/list')}
+            className="btn_inquiry btn-underline w-full flex flex-col items-center py-2"
+          >
             <span className="icon w-7 h-7" />
-            <span className="text-white text-sm mt-2">내 문의</span>
+            <span className="text-white text-sm mt-2">
+              {isAdmin ? '문의 목록' : '내 문의'}
+            </span>
           </button>
+
           <span className="mb-2"></span>
         </nav>
         <button

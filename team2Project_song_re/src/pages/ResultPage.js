@@ -113,7 +113,7 @@ const handleSave = async () => {
 
       <div className="result-buttons">
         <button className="save-button" onClick={handleSave}>저장</button>
-        <button className="back-button" onClick={() => navigate('/travel-info')}>
+        <button className="back-button" onClick={() => navigate(-1)}>
           다시 만들기
         </button>
       </div>
