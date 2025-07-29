@@ -1,0 +1,310 @@
+/* ====== 전체 컨테이너 ====== */
+.vs-container {
+  max-width: 720px;
+  margin: auto;
+  padding: 2.5rem;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f0f8ff, #ffffff);
+  box-shadow: 0 6px 24px rgba(92, 107, 192, 0.1);
+  animation: fadeIn 0.6s ease;
+  font-family: 'SUIT', 'Pretendard', sans-serif;
+  position: relative;
+  background-color: #f5faff;
+  background-image: radial-gradient(circle at top left, rgba(255, 255, 255, 0.4), transparent 60%);
+}
+
+/* ====== 질문 인덱스 배지 ====== */
+.vs-question-index {
+  display: inline-block;
+  background: #dbe9ff;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  color: #497bff;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  box-shadow: inset 0 0 4px rgba(120, 150, 255, 0.2);
+}
+
+/* ====== 질문 텍스트 ====== */
+.vs-question {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin-bottom: 2.5rem;
+  text-align: center;
+  line-height: 1.6;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+/* ====== 옵션 영역 ====== */
+.vs-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+/* ====== 선택지 버튼 (카드형) ====== */
+.vs-option-btn {
+  position: relative;
+  flex: 1 1 45%;
+  padding: 1.5rem;
+  background: #ffffffcc;
+  border: 1px solid #e0eaff;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.vs-option-btn:hover {
+  background: linear-gradient(135deg, #f0faff, #dceeff);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(80, 140, 255, 0.2);
+}
+
+.vs-option-btn.selected {
+  background: linear-gradient(135deg, #79aaff, #5c7aff);
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 10px 24px rgba(92, 107, 192, 0.4);
+}
+
+.vs-option-btn.selected::after {
+  content: '✔';
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 1.3rem;
+  color: white;
+}
+
+.vs-option-emoji {
+  font-size: 2.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.vs-option-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* ====== 제출 버튼 ====== */
+.vs-submit-btn {
+  display: block;
+  width: 100%;
+  padding: 20px;
+  font-size: 1.15rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #5c6bc0, #3f51b5);
+  color: white;
+  border: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  margin-top: 2.8rem;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.vs-submit-btn:hover {
+  background: linear-gradient(135deg, #3f51b5, #2c387e);
+  transform: translateY(-2px);
+}
+
+.vs-result-ready {
+  text-align: center;
+  padding: 2rem;
+  animation: fadeIn 0.6s ease;
+}
+
+.vs-result-ready h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 1rem;
+}
+
+/* ====== 페이드 전환 (질문 → 결과) ====== */
+.fade-transition {
+  animation: fadeIn 0.6s ease;
+}
+
+/* ====== 로딩 dots ====== */
+.vs-typing-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 1rem 0;
+}
+
+.vs-typing-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #6d88ff, #9db5ff);
+  animation: bounce 1.4s infinite ease-in-out;
+}
+
+.vs-typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.vs-typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.vs-waiting-msg {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+@media (max-width: 600px) {
+  .vs-modal-content {
+    padding: 24px;
+    width: 95%;
+  }
+
+  .vs-option-btn {
+    flex: 1 1 100%;
+    font-size: 1rem;
+  }
+
+  .vs-question {
+    font-size: 1.5rem;
+  }
+
+  .vs-submit-btn {
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 14px 28px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #4e60ff, #6f84ff);
+    color: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  .vs-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .vs-modal-close {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+}
+
+/* ====== 모달 ====== */
+.vs-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.vs-modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  width: 90%;
+  max-width: 760px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: slideUp 0.4s ease-out;
+  overflow: hidden;
+}
+
+.vs-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: none;
+  color: #888;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.vs-modal-close:hover {
+  color: #333;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+.scrollable {
+  /* 스크롤바 공간을 항상 예약해서 레이아웃 시프트 방지 */
+  scrollbar-gutter: stable;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 8px;               /* 스크롤바 너비 */
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: transparent;  /* 트랙 배경 */
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.3);  /* 엄지색 */
+  border-radius: 4px;
+  border: 2px solid transparent;           /* 여백 */
+  background-clip: content-box;             /* 안쪽만 색 칠하기 */
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255,255,255,0.5);
+}
+
+
+/* — Firefox */
+.scrollable {
+  scrollbar-width: thin;                  /* 얇게 */
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
+}

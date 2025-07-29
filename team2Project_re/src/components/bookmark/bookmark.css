@@ -1,0 +1,240 @@
+/* ───── Bookmark Style 리팩토링 ───── */
+.bookmark-container {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #f5f7fb;
+  border-radius: 12px;
+}
+
+.bookmark-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bookmark-section-title {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  color: #4a5568;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bookmark-empty {
+  font-size: 0.95rem;
+  color: #999;
+  padding: 12px;
+}
+
+.bookmark-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 0;
+  list-style: none;
+  margin-bottom: 40px;
+}
+
+.bookmark-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 35px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.bookmark-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.bookmark-title-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #2d3748;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bookmark-meta {
+  font-size: 0.9rem;
+  color: #555;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  line-height: 1.4;
+}
+
+.bookmark-button {
+  border: none;
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  margin-top: 10px;
+}
+
+.bookmark-default {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.bookmark-active {
+  background-color: #ffd700;
+  color: #000;
+}
+
+.bookmark-button.clicked {
+  animation: pop 0.3s ease-in-out;
+}
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 6px solid #ddd;
+  border-top-color: #4a6cf7;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 기본 아이콘 */
+.btn_star  .icon { content:url('./icon/star_white_line.png'); }
+.btn_post  .icon { content:url('./icon/post_white_line.png'); }
+.btn_user  .icon { content:url('./icon/user_white_line.png'); }
+.btn_plane  .icon { content:url('./icon/plane_white_line.png'); }
+.btn_inquiry  .icon { content:url('./icon/inquiry_white_line.png'); }
+.btn_report .icon { content:url('./icon/report_white_line.png'); }
+
+/* 호버 & 활성 상태 아이콘 */
+
+.btn_star:hover  .icon,
+.btn_star.active .icon { content:url('./icon/star.png'); }
+
+.btn_post:hover  .icon,
+.btn_post.active .icon { content:url('./icon/post.png'); }
+
+.btn_user:hover  .icon,
+.btn_user.active .icon { content:url('./icon/user_white.png'); }
+
+.btn_plane:hover  .icon,
+.btn_plane.active .icon { content:url('./icon/plane_white.png'); }
+
+.btn_inquiry:hover  .icon,
+.btn_inquiry.active .icon { content:url('./icon/inquiry_white.png'); }
+
+
+.btn_report:hover  .icon,
+.btn_report.active  .icon { content:url('./icon/report_white.png'); }
+
+.custom-file-input {
+  display: none; /* 실제 파일 입력은 숨기고 */
+}
+
+.custom-file-label {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #AFC8E0;
+  color: #000;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.custom-file-label:hover {
+  background: #96B6D7;
+}
+
+.modal-box {
+  width: 400px;    /* 원하는 고정 너비 */
+  max-width: 90%;  /* 반응형 여유 */
+  padding: 1.5rem; /* 기존 p-6 */
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.btn {
+  padding: 6px 0px;
+  background-color: #F4F5F7;
+  color: #3B3B58;
+  width: 80px !important;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn:hover {
+   background-color: #bfd6eb;
+}
+
+.scrollable {
+  /* 스크롤바 공간을 항상 예약해서 레이아웃 시프트 방지 */
+  scrollbar-gutter: stable;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 8px;               /* 스크롤바 너비 */
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: transparent;  /* 트랙 배경 */
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.3);  /* 엄지색 */
+  border-radius: 4px;
+  border: 2px solid transparent;           /* 여백 */
+  background-clip: content-box;             /* 안쪽만 색 칠하기 */
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255,255,255,0.5);
+}
+
+
+/* — Firefox */
+.scrollable {
+  scrollbar-width: thin;                  /* 얇게 */
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
+}
+

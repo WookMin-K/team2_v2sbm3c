@@ -1,0 +1,228 @@
+.post-detail-container {
+  display: flex;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f9f9f9;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 200px;
+  background: #f7f7f7;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar h3, .sidebar h4 {
+  margin-bottom: 10px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.sidebar li {
+  margin-bottom: 8px;
+}
+
+.sidebar a {
+  text-decoration: none;
+  color: #333;
+}
+
+.content {
+  flex: 1;
+  padding: 40px;
+  background: white;
+}
+
+.post-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.post-meta {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 20px;
+}
+
+.post-content {
+  font-size: 16px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.buttons {
+  margin-top: 30px;
+}
+
+.buttons button {
+  margin-right: 10px;
+  padding: 6px 12px;
+  background-color: #5c6bc0;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.reply-form {
+  margin-top: 40px;
+  margin-bottom: 30px;
+}
+
+.reply-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.reply-form textarea::-webkit-resizer {
+  display: none;
+}
+.reply-form .right {
+  text-align: right;
+  margin-top: 8px;
+}
+
+.reply-form button {
+  padding: 6px 14px;
+  background: #5c6bc0;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.reply-text {
+  cursor: pointer;
+  color: #555;
+  font-size: 13px;
+  font-weight: 600; /* 또는 bold */
+  margin-right: 12px;
+}
+.reply-text:hover {
+  color: #06c;
+  text-decoration: underline;
+}
+.link-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font: inherit;
+}
+
+.link-btn:hover {
+  text-decoration: none;
+}
+.reply-list {
+  margin-top: 20px;
+}
+
+.reply-item {
+  border-top: none;
+  padding-top: 15px;
+  margin-bottom: 15px;
+}
+
+.reply-item strong {
+  font-size: 14px;
+  color: #333;
+}
+
+.reply-item div {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.replies {
+  margin-top: 10px;
+  padding-left: 20px;
+  /* border-left: 2px solid #ddd; */
+}
+
+.reply-item button {
+  margin-top: 6px;
+  padding: 4px 8px;
+  font-size: 13px;
+  background-color: #ddd;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+  
+.reply-item button:hover {
+  background-color: #ccc;
+}
+.action-btn.report-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  font-size: 13px;
+  color: #e00;
+  cursor: pointer;
+}
+.action-btn.report-btn:hover {
+  color: #c00;
+}
+
+.reply-form .right button + button {
+  margin-left: 8px;
+}
+
+.reply-item > div > button:not(:last-child) {
+  margin-right: 8px;
+}
+
+.reply-item .reply-date {
+  color: #aaa;       /* 원하는 연한 회색으로 조정 */
+  font-size: 12px;   /* 필요하면 크기도 같이 조절 */
+  margin-left: 8px;  /* 사용자 이름과 간격 */
+}
+
+.menu-text {
+  cursor: pointer;
+  color: #555;         /* 평상시 색 */
+  font-size: 14px;
+  font-weight: 600;
+  margin-right: 16px;  /* 버튼 사이 간격 */
+}
+.menu-text:hover {
+  color: #06c;
+  text-decoration: underline;
+}
+
+.scrollable {
+  /* 스크롤바 공간을 항상 예약해서 레이아웃 시프트 방지 */
+  scrollbar-gutter: stable;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 8px;               /* 스크롤바 너비 */
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: transparent;  /* 트랙 배경 */
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.3);  /* 엄지색 */
+  border-radius: 4px;
+  border: 2px solid transparent;           /* 여백 */
+  background-clip: content-box;             /* 안쪽만 색 칠하기 */
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255,255,255,0.5);
+}
+
+
+/* — Firefox */
+.scrollable {
+  scrollbar-width: thin;                  /* 얇게 */
+  scrollbar-color: rgba(255,255,255,0.3) transparent;
+}
