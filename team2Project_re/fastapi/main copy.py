@@ -10,21 +10,14 @@ from openai import OpenAI
 from typing import List
 
 from sqlalchemy.orm import Session
-from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from db import SessionLocal
 from models import User, ChatHistory, Base
 
 # LangChain imports
-
-from langchain.prompts.chat import (
-    ChatPromptTemplate,
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder
-)
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationChain
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
+from langchain.chains import RetrievalQA
+from rag_utils import get_vectorstore
+from langchain.prompts import PromptTemplate
 
 # 1) DB 종속성
 def get_db():
@@ -43,58 +36,33 @@ print("✅ API KEY (repr):", repr(OPENAI_API_KEY))
 openai.api_key = OPENAI_API_KEY
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-SITE_SYSTEM_PROMPT = """
-너는 'trAveI' 여행 자동 일정 생성 사이트의 챗봇이야.
-아래 FAQ를 기반으로 짧고 정확하게 답하고,
-추가 설명 요청이 오면 친절하게 풀어서 설명해 줘.
 
-▶중요◀: 절대로 사용자의 질문을 반복하거나 질문 일부를 답변 앞에 넣지 마세요.
-▶중요◀: “AI:”, “System:” 같은 접두사도 전혀 사용하지 말고, 오직 자연스러운 문장 형태로만 응답하세요.
+# 1) vectorstore 초기화
+vectorstore = get_vectorstore()
+# 2) RetrievalQA 체인 생성
+# “Context에 있는 내용만 참고” 하라는 프롬프트 템플릿
+template = """
+아래 'Context'에 있는 내용만 참고해서 질문에 **정확하게** 답해주세요.
+ Context:
+ {context}
 
-Q: 여행 일정은 어떻게 생성하나요?
-A: 메인에서 'trAveI 시작하기' 또는 '일정 생성' 클릭 → 여행지·날짜 등 정보입력 → 자동 생성됩니다.
+ 질문:
+ {question}
 
-Q: 일정을 저장하려면?
-A: 회원가입 후 로그인 상태에서 생성하고 저장버튼을 누르면 저장돼요.
+ ※ Context에 답이 없다면, '죄송합니다. 해당 정보를 찾을 수 없습니다.'라고만 답해주세요.
+ """
 
-Q: 저장된 일정은 어디서 보나요?
-A: 상단 메뉴 '마이페이지 → 내 일정'에서 확인 가능합니다.
-
-Q: PDF로 저장할 수 있나요?
-A: '내 일정' 화면의 'PDF 저장' 버튼을 누르면 돼요.
-
-Q: 친구와 공유는?
-A: 일정 상세보기에서 '공유하기' 버튼 클릭 → 링크 복사됩니다.
-
-"""
-
-
-# 2) 프롬프트 구성: system → human
-chat_prompt = ChatPromptTemplate.from_messages([
-    # (a) FAQ 가이드
-    SystemMessagePromptTemplate.from_template(SITE_SYSTEM_PROMPT),
-    # (b) 대화 히스토리 자리
-    MessagesPlaceholder(variable_name="history"),
-    # (c) 최신 질문
-    HumanMessagePromptTemplate.from_template("{query}"),
-])
-
-# 3) 메모리
-memory = ConversationBufferMemory(
-    memory_key="history",
-    return_messages=True,      
+prompt = PromptTemplate(
+    template=template,
+    input_variables=["context", "question"]
 )
 
-# 4) 체인 생성 (ConversationChain)
-chat_chain = ConversationChain(
-    llm=ChatOpenAI(model_name="gpt-4o", temperature=0.7), # LangChain LLM 래퍼
-    prompt=chat_prompt,             # 위에서 정의한 ChatPromptTemplate
-    memory=memory,                  # ConversationBufferMemory
-    input_key="query",
-    verbose=False,
+qa_chain = RetrievalQA.from_chain_type(
+    llm=ChatOpenAI(model_name="gpt-4o", temperature=0),
+    chain_type="stuff",
+    retriever=vectorstore.as_retriever(),
+    chain_type_kwargs={"prompt": prompt},
 )
-
-
 # ✅ FastAPI 앱 생성
 app = FastAPI()
 
@@ -267,37 +235,18 @@ async def chat(request: ChatRequest, db: Session = Depends(get_db)):
         name = "손님"
         past = []
 
-    # 1) 메모리 완전 초기화
-    memory.clear()
 
-    if request.user_no:
-        # 2) 로그인한 회원 → DB에서 이력 불러와서 memory에 채워 넣기
-        past = (
-            db.query(ChatHistory)
-              .filter(ChatHistory.user_no == request.user_no)
-              .order_by(ChatHistory.created_at)
-              .all()
-        )
-        for msg in past:
-            if msg.role == "human":
-                memory.save_context(
-                    {"query": msg.content},  # 과거 사용자 질문
-                    {"response": ""}         # placeholder
-                )
-            else:
-                memory.save_context(
-                    {"query": ""},           # placeholder
-                    {"response": msg.content}# 과거 봇 답변
-                )
-    else:
-        # 3) 비로그인(guest) → 초기화된 상태(원하면 환영 메시지 한 줄만)
-        memory.save_context(
-            {"query": ""}, 
-            {"response": "손님님, 환영합니다! 무엇을 도와드릴까요?"}
-        )
-
-    # 4) 대화 실행 (history + 지금 질문)
-    answer = chat_chain.predict(query=request.query)
+    # # 4) 대화 실행 (history + 지금 질문)
+    # answer = chat_chain.predict(query=request.query)
+    
+    # 4) RAG 기반 응답 생성
+    answer = qa_chain.run(request.query)
+    
+    # -- 파일에도 기록 --
+    with open("chat_history.txt", "a", encoding="utf-8") as f:
+        f.write(f"USER: {request.query}\n")
+        f.write(f"AI  : {answer}\n")
+        f.write("-" * 40 + "\n")
 
     # — DB에 새 이력 저장 (회원만) —
     if request.user_no:
@@ -306,6 +255,8 @@ async def chat(request: ChatRequest, db: Session = Depends(get_db)):
         db.commit()
 
     return {"answer": answer}
+
+
 
     
 
@@ -332,4 +283,5 @@ for route in app.routes:
 # ✅ 새로 추가
 from translate import router as translate_router
 app.include_router(translate_router)
+
 

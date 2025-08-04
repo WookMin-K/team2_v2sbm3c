@@ -176,8 +176,21 @@ const Layout = () => {
       <ChatbotWidget />
       
       {/* 하단 문구 */}
-      <footer className="fixed bottom-4 left-1/2 -translate-x-1/2 text-lg text-gray-500 z-40">
-        모두를 위한 여행
+      <footer className="bg-[#F4F5F7] text-black py-6 mt-6 mb-3">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-lg leading-relaxed text-gray-400">
+            INFO
+          </p>          
+          <p className="text-md leading-relaxed text-gray-400">
+            trAveI 대표: 이송민, 김민욱, 이건우, 김나영, 박서연 | 사업자등록번호: 000-00-00000
+          </p>
+          <p className="text-md leading-relaxed text-gray-400">
+            주소: 서울특별시 종로구 솔데스크 512호
+          </p>
+          <p className="text-md leading-relaxed text-gray-400">
+            광고/제휴 문의: <a href="mailto:trAveI@gmail.com" className="underline">trAveI@gmail.com</a>
+          </p>
+        </div>
       </footer>
     </div>
   );
