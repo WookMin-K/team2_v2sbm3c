@@ -47,14 +47,14 @@ function TripDetailPage() {
     setKeywords(state.keywords || []);
     setLoading(false);
   
-    fetch(`http://192.168.12.142:9093/trip/read?trip_no=${state.trip.trip_no}`)
+    fetch(`http://121.78.128.95:9093/trip/read?trip_no=${state.trip.trip_no}`)
       .then(res => res.json())
       .then(springData => {
         setTripDetail(prev => ({ ...prev, ...springData }));
       })
       .catch(err => console.warn("Spring trip read 실패:", err.message));
 
-    fetch(`http://192.168.12.142:8000/trip/agent-analysis?trip_no=${state.trip.trip_no}`)
+    fetch(`http://121.78.128.95:8000/trip/agent-analysis?trip_no=${state.trip.trip_no}`)
       .then(res => res.json())
       .then(insightData => {
         setTripDetail(prev => ({
@@ -77,7 +77,7 @@ function TripDetailPage() {
         localStorage.setItem("session_id", session_id);
       }
 
-      const res = await fetch("http://192.168.12.142:9093/recommend-log/create", {
+      const res = await fetch("http://121.78.128.95:9093/recommend-log/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

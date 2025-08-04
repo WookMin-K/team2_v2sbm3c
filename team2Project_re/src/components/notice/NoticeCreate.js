@@ -60,8 +60,8 @@ const NoticeCreate = () => {
       // });
 
       const res = await axios.post(
-        'http://192.168.12.142:9093/notice/create', // ⛳ API 주소 주의!
-        //'http://192.168.12.142:9093';
+        'http://121.78.128.95:9093/notice/create', // ⛳ API 주소 주의!
+        //'http://121.78.128.95:9093';
         payload
       );
 

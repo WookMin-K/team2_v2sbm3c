@@ -101,7 +101,7 @@ app = FastAPI()
 # ✅ CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://192.168.12.142:3000"],         # or ["http://localhost:3000"] for local dev only
+    allow_origins=["http://localhost:3000", "http://121.78.128.95:3000"],         # or ["http://localhost:3000"] for local dev only
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

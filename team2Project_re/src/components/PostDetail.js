@@ -117,7 +117,7 @@ const translateReplies = async (lang) => {
     const translated = await Promise.all(
       replies.map(async r => {
         const { data } = await axios.post(
-          'http://192.168.12.142:8000/api/translate',
+          'http://121.78.128.95:8000/api/translate',
           { text: r.content, target_language: lang }
         );
         return { ...r, content: data.translated_text };
@@ -166,7 +166,7 @@ const resetReplyTranslation = () => {
   // 파일 다운로드
   const handleDownload = async (fileName) => {
     try {
-      const res = await fetch(`http://192.168.12.142:9093/post/download/${fileName}`);
+      const res = await fetch(`http://121.78.128.95:9093/post/download/${fileName}`);
       if (!res.ok) throw new Error();
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
@@ -470,7 +470,7 @@ const resetReplyTranslation = () => {
               <div className="post-content">{translatedContent}</div>
               {post.image && (
                 <img
-                  src={`http://192.168.12.142:9093/images/${post.image}`}
+                  src={`http://121.78.128.95:9093/images/${post.image}`}
                   alt="게시글 이미지"
                   style={{ maxWidth: '30%', marginTop: 20, borderRadius: 8 }}
                 />

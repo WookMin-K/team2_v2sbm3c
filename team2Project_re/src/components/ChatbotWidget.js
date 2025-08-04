@@ -22,7 +22,7 @@ function ChatbotWidget() {
   //     return;
   //   }
   //   // 로그인한 회원 → DB에서 history 호출
-  //   fetch(`http://192.168.12.142:8000/api/chat/history?user_no=${userNo}`)
+  //   fetch(`http://121.78.128.95:8000/api/chat/history?user_no=${userNo}`)
   //     .then(res => {
   //       if (!res.ok) throw new Error('이력 조회 실패');
   //       return res.json();  // [{ role, content, created_at}, …]
@@ -61,7 +61,7 @@ function ChatbotWidget() {
     setLoading(true);
 
     try {
-      const res = await fetch('http://192.168.12.142:8000/api/chat', {
+      const res = await fetch('http://121.78.128.95:8000/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -93,8 +93,8 @@ function ChatbotWidget() {
 
     try {
       // 2) 로컬 FastAPI 챗봇 호출
-      console.log('🔍 요청 보냄 → http://192.168.12.142:8000/api/chat', userInput);
-      const res = await fetch('http://192.168.12.142:8000/api/chat', {
+      console.log('🔍 요청 보냄 → http://121.78.128.95:8000/api/chat', userInput);
+      const res = await fetch('http://121.78.128.95:8000/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

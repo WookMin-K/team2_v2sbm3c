@@ -43,7 +43,7 @@ const NoticeList = () => {
     const safePage = Number(page) || 1;
 
     try {
-      const res = await fetch(`http://192.168.12.142:9093/notice/list?type=${type}&now_page=${safePage}`);
+      const res = await fetch(`http://121.78.128.95:9093/notice/list?type=${type}&now_page=${safePage}`);
       const data = await res.json();
       setNotices(data.list || []);
       setNowPage(data.now_page);

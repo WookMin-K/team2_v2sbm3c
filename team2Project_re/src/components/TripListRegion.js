@@ -6,8 +6,8 @@ import { useLoginContext } from '../contexts/LoginContext';
 
 
 
-//const API_HOST = 'http://192.168.12.142:9093';
-const API_HOST = 'http://192.168.12.142:9093';
+//const API_HOST = 'http://121.78.128.95:9093';
+const API_HOST = 'http://121.78.128.95:9093';
 const { PUBLIC_URL } = process.env;
 const defaultRegionImage = `${PUBLIC_URL}/images/default.png`;
 const defaultDistrictImage = `${PUBLIC_URL}/images/default_district.png`;
@@ -74,7 +74,7 @@ export function TripListRegion() {
 
       const regionCode = `${trip.trip_no}${trip.tname.toUpperCase()}`;
       const analysisRes = await fetch(
-        `http://192.168.12.142:8000/trip/analysis?region_code=${regionCode}&region_name=${trip.tname}&trip_no=${trip.trip_no}`
+        `http://121.78.128.95:8000/trip/analysis?region_code=${regionCode}&region_name=${trip.tname}&trip_no=${trip.trip_no}`
       );
       const analysisData = await analysisRes.json();
 

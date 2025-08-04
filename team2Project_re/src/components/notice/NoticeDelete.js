@@ -18,7 +18,7 @@ function NoticeDelete() {
 
     const fetchNotice = async () => {
       try {
-        const res = await fetch(`http://192.168.12.142:9093/notice/read/${notice_no}`);
+        const res = await fetch(`http://121.78.128.95:9093/notice/read/${notice_no}`);
         const data = await res.json();
         if (data.notice) setNotice(data.notice);
       } catch (error) {
@@ -33,7 +33,7 @@ function NoticeDelete() {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
     try {
-      const res = await axios.delete(`http://192.168.12.142:9093/notice/delete/${notice_no}`);
+      const res = await axios.delete(`http://121.78.128.95:9093/notice/delete/${notice_no}`);
 
       if (res.status === 200 && res.data === "success") {
         alert("✅ 삭제되었습니다.");

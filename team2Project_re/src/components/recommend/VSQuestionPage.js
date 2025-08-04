@@ -74,7 +74,7 @@ const handleSubmit = async () => {
       selected_questions: originalQuestions
     };
 
-    const res = await fetch("http://192.168.12.142:8000/trip/agent-recommend", {
+    const res = await fetch("http://121.78.128.95:8000/trip/agent-recommend", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

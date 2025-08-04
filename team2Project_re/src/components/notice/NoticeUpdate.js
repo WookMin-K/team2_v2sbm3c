@@ -23,7 +23,7 @@ function NoticeUpdate() {
 
     const fetchNotice = async () => {
       try {
-        const res = await fetch(`http://192.168.12.142:9093/notice/read/${notice_no}`);
+        const res = await fetch(`http://121.78.128.95:9093/notice/read/${notice_no}`);
         if (!res.ok) throw new Error('불러오기 실패');
         const data = await res.json();
         if (data && data.notice) setNotice(data.notice);
@@ -64,7 +64,7 @@ function NoticeUpdate() {
       });
 
       const res = await axios.post(
-        'http://192.168.12.142:9093/notice/update',
+        'http://121.78.128.95:9093/notice/update',
         formData
       );
 

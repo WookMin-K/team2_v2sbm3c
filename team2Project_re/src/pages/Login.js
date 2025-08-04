@@ -102,7 +102,7 @@ const Login = ({ isOpen, onClose, onSignUpClick, onLoginSuccess }) => {
 
   // 소셜로그인 버튼
   const handleSocialLogin = (provider) => {
-    let url = `http://192.168.12.142:9093/oauth2/authorization/${provider}`;
+    let url = `http://121.78.128.95:9093/oauth2/authorization/${provider}`;
     if (provider === 'google') url += '?prompt=select_account';
     if (provider === 'naver') url += '?auth_type=reprompt';
     if (provider === 'kakao') url += '?prompt=login';

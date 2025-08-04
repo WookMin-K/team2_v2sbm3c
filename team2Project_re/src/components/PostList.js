@@ -117,10 +117,10 @@ const PostList = () => {
     try {
       const translated = await Promise.all(posts.map(async post => {
         const [{ data: tRes }, { data: cRes }] = await Promise.all([
-          axios.post('http://192.168.12.142:8000/api/translate', {
+          axios.post('http://121.78.128.95:8000/api/translate', {
             text: post.title, target_language: targetLanguage
           }),
-          axios.post('http://192.168.12.142:8000/api/translate', {
+          axios.post('http://121.78.128.95:8000/api/translate', {
             text: post.content, target_language: targetLanguage
           }),
         ]);

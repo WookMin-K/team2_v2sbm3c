@@ -2,7 +2,7 @@
 // s
 
 // 백엔드 API 서버 주소
-// const BASE_URL = 'http://192.168.12.142:9093/post';
+// const BASE_URL = 'http://121.78.128.95:9093/post';
 
 /** 게시글 전체 목록 조회 (map 에러 방지 포함) */
 

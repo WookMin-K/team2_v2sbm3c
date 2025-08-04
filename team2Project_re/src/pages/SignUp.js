@@ -144,7 +144,7 @@ const SignUp = () => {
   };
 
   const handleSocialLogin = (provider) => {
-    let url = `http://192.168.12.142:9093/oauth2/authorization/${provider}`;
+    let url = `http://121.78.128.95:9093/oauth2/authorization/${provider}`;
 
     if (provider === 'google') {
       url += '?prompt=select_account';

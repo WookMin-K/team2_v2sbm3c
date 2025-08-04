@@ -31,7 +31,7 @@ export const ChatbotProvider = ({ children }) => {
       );
     } else {
       // 🙋‍♂️ 회원(로그인)일 때: DB에서 이력 fetch
-      fetch(`http://192.168.12.142:8000/api/chat/history?user_no=${userNo}`)
+      fetch(`http://121.78.128.95:8000/api/chat/history?user_no=${userNo}`)
         .then(res => {
           if (!res.ok) throw new Error('이력 조회 실패');
           return res.json();

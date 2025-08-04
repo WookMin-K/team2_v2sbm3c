@@ -11,7 +11,7 @@ import next1Icon from '../../pages/icon/right.png';
 import next5Icon from '../../pages/icon/right2.png';
 import upIcon from '../../pages/icon/up.png';
 
-const API_BASE = 'http://192.168.12.142:9093';
+const API_BASE = 'http://121.78.128.95:9093';
 const PAGE_SIZE = 5;
 
 export default function BookmarkListPage() {
@@ -75,7 +75,7 @@ export default function BookmarkListPage() {
       try {
         setLoading(true); // ✅ 로딩 시작
         const regionCode = `${item.trip_no}${item.trip_title?.toUpperCase?.() || ''}`;
-        const res = await fetch(`http://192.168.12.142:8000/trip/analysis?region_code=${regionCode}&region_name=${item.trip_title}&trip_no=${item.trip_no}`);
+        const res = await fetch(`http://121.78.128.95:8000/trip/analysis?region_code=${regionCode}&region_name=${item.trip_title}&trip_no=${item.trip_no}`);
         const data = await res.json();
 
         const trip = {

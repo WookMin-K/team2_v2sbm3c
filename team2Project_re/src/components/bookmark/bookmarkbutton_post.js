@@ -6,7 +6,7 @@ import { useLoginContext } from '../../contexts/LoginContext';
 import filledStar from '../../pages/icon/star.png';       // ⭐ 채워진 별
 import outlineStar from '../../pages/icon/star_line.png'; // ☆ 테두리 별
 
-const API_BASE = 'http://192.168.12.142:9093';
+const API_BASE = 'http://121.78.128.95:9093';
 
 export default function BookmarkPostButton({
   post_no,
